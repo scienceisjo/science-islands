@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#2b705b">
+<meta name="description" content="주민의 부탁을 해결하려고 실험하고, 그 실험으로 세계의 규칙을 알아가는 스토리형 3D 과학 탐험 게임 시리즈.">
+<title>놀러오세요 과학의 섬</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%232b705b'/%3E%3Ccircle cx='32' cy='38' r='16' fill='%23fff1b7'/%3E%3Cpath d='M32 10v12M22 16l6 8M42 16l-6 8' stroke='%23fff1b7' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>
+:root{--ink:#1d2b26;--muted:#6b7a74;--line:#e6e9e3;--paper:#fff;--wash:#f4f7f2;--green:#2b705b;--gold:#e4bd64;--lemon:#f2c94c;--sky:#8fc7e8;font-family:'Malgun Gothic','Apple SD Gothic Neo',system-ui,sans-serif;color:var(--ink)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);line-height:1.6;-webkit-font-smoothing:antialiased}
+main{max-width:920px;margin:0 auto;padding:56px 20px 24px}
+header h1{font-size:clamp(28px,5vw,40px);letter-spacing:-.02em;margin:0 0 10px;font-weight:800}
+header p{margin:0;color:var(--muted);font-size:17px;max-width:620px}
+.islands{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;margin-top:40px}
+.card{display:block;text-decoration:none;color:inherit;border:1px solid var(--line);border-radius:22px;padding:24px 24px 22px;background:var(--wash);transition:transform .15s,box-shadow .15s;position:relative;overflow:hidden}
+.card:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(0,0,0,.06)}
+.card .tag{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.02em;padding:3px 10px;border-radius:999px;background:#fff;border:1px solid var(--line);color:var(--muted);margin-bottom:14px}
+.card h2{margin:0 0 6px;font-size:22px;letter-spacing:-.01em}
+.card p{margin:0;color:var(--muted);font-size:15px}
+.card .unit{margin-top:14px;font-size:13px;color:var(--muted)}
+.card .mark{position:absolute;right:-18px;bottom:-22px;width:120px;height:120px;border-radius:50%;opacity:.35}
+.forest .mark{background:radial-gradient(circle at 40% 40%,#9fd8c1,var(--green))}
+.lemon .mark{background:radial-gradient(circle at 40% 40%,#fff2a8,var(--lemon))}
+.soon{opacity:.75}
+.soon .tag{background:#fff7dc;border-color:#f2e2a6;color:#8a6d1e}
+section.how{margin-top:56px;border-top:1px solid var(--line);padding-top:28px}
+section.how h3{margin:0 0 8px;font-size:17px}
+section.how p{margin:0;color:var(--muted);font-size:15px}
+#app-credit{width:100%;box-sizing:border-box;margin:3rem 0 0;padding:14px 12px;text-align:center;font-size:12.5px;line-height:1.6;color:#9aa39e;border-top:1px solid var(--line)}
+@media (min-width:1600px){html{zoom:1.2}}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>놀러오세요 과학의 섬</h1>
+    <p>주민의 부탁을 해결하려고 실험하고, 그 실험으로 세계의 규칙을 알아가는 스토리형 3D 탐험 게임. 섬 하나가 단원 하나예요.</p>
+  </header>
+
+  <div class="islands">
+    <a class="card forest" href="https://scienceisjo.github.io/electricity/sparkle-island/">
+      <span class="tag">배포됨 · 중2</span>
+      <h2>놀러오세요 전기의 숲</h2>
+      <p>빛 축제를 부탁해 — 두리·모아·토리·소담·해온의 부탁을 풀며 전류·전압·저항과 회로를 탐구하는 나만의 탐험일지.</p>
+      <div class="unit">전기와 자기 · 스위치 → 옴의 법칙 → 직렬 → 병렬 → 축제</div>
+      <span class="mark"></span>
+    </a>
+    <a class="card lemon soon" href="lemon-island/">
+      <span class="tag">제작 중 · 고1 통합과학</span>
+      <h2>레몬 백작의 부탁</h2>
+      <p>레몬 왕국 아이들에게 번진 중화병. 두 연구자의 조수가 되어 산과 염기의 정체를 밝히고, 사건을 해결한다.</p>
+      <div class="unit">산과 염기 · 지시약 → H⁺/OH⁻ → 이온화 → 중화 반응 → 미지 시료 판별</div>
+      <span class="mark"></span>
+    </a>
+  </div>
+
+  <section class="how">
+    <h3>어떻게 노나요</h3>
+    <p>섬을 돌아다니며 주민의 부탁을 받고, 연구실(공방)에서 실험을 하고, 일지에 기록한 증거로 보고합니다. 전자칠판·크롬북·휴대전화 모두 브라우저만 있으면 됩니다.</p>
+  </section>
+
+  <footer id="app-credit">© 2026 조승재(과학이조선생) · 해누리중학교 · All rights reserved<br><span style="font-size:11px;opacity:.85;">최종 업데이트: 2026-09-21</span></footer>
+</main>
+</body>
+</html>

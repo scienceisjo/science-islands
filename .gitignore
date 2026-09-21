@@ -1,0 +1,17 @@
+# 원본 자료·추출본(저작권 있는 참고 그림 포함) — 로컬 전용
+*/source/
+**/renders/
+*.pptx
+*.hwp
+*.hwpx
+
+# 작업 임시
+_scratch/
+_backup/
+*.bak
+*.tmp
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
