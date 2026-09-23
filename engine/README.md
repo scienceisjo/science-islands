@@ -1,8 +1,42 @@
-# engine — 공용 엔진 (분리 예정)
+# engine — 공용 엔진
 
-「놀러오세요 전기의 숲」(`scienceisjo/electricity/sparkle-island/index.html`, 단일 파일 약 240KB, 축약 코드)에서 내용과 무관한 블록을 떼어 여기에 둔다.
+「놀러오세요 전기의 숲」(`scienceisjo/electricity/sparkle-island/index.html`)에서 떼어 온 공용 부분.
+**1단계(분리)와 2-a(읽기 좋게 펴기)는 끝났다.** 지금 이 폴더의 코드는 전기의 숲과 뜻이 같다는 것이 증명돼 있다.
 
-## 가져올 블록 (전기의 숲 script 순서 기준)
+| 확인 | 방법 | 결과 |
+|---|---|---|
+| 조각을 되합치면 원본 그대로인가 | `python build.py _reference/sparkle --check <원본>` | 216,320 바이트 · SHA-256 `0ff978fb…5652` 일치 |
+| 보기 좋게 편 뒤에도 뜻이 같은가 | `node engine/tools/ast-compare.mjs _backup_engine_min engine` | 12개 파일 구문 트리 전부 일치 |
+| 계산·그림·문구가 같은가 | `engine/tools/snapshot.js` 를 두 판본에서 실행 | 561,888자 스냅숏 해시 `cb4a6840…b071` 일치 |
+
+## 파일
+
+| 파일 | 내용 |
+|---|---|
+| `world.js` | three.js 섬 · 지형/소품 만들기 · 캐릭터 이동 · 길찾기 · 구역 진입 · 프레임 루프 |
+| `main.js` | 화면 전체 진행 — HUD · 대화 · 공방(실험) 모달 · 일지 · 지도 · 설정 · 저장/복원 · 드래그 · 조이스틱 |
+| `ime.js` | 깨진 한글 입력 되살리기 |
+| `audio.js` | 배경음 · 효과음 |
+| `comfort.js` | 편의 설정 · 키보드 도움말 |
+| `fx.js` | 축하 연출 |
+| `visit-count.js` | 방문 집계(Supabase) |
+| `tools/` | `split-sparkle.py`(한 번 쓴 분리 도구) · `ast-compare.mjs` · `snapshot.js` |
+
+`_reference/sparkle/` 는 **배포하지 않는 검증용 기준 섬**이다(전기의 숲 콘텐츠: model·circuit·missions·play·concept + shell.html).
+
+## 남은 일 — 2-b 섬 인터페이스
+
+아직 엔진 안에 전기 섬 전용 코드가 남아 있다. 새 섬을 만들려면 이걸 섬 쪽으로 옮겨야 한다.
+
+| 어디 | 무엇이 남아 있나 |
+|---|---|
+| `world.js` | `build()`(섬 지형·건물 배치 약 200줄) · `regionAt()`(구역 판정) · 축제 연출 6개 메서드 |
+| `main.js` | 회로 전용 · `hintText()` 5개 · `simData()` · `probeToolbar()` · `measureHint()` · `measurementLabel()` · `meterExplanation()` · `readingHtml()` · `placePart()` · `renderExperiment()` 속 회로 문구 · `drawMap()` |
+| `main.js` | 섬 이름 문구 11군데(일지 표지 · 지도 제목 · 축제 대사 · 초대장 · 내려받는 파일 이름) |
+
+옮기는 방향은 `인계_엔진분리.md` 2단계 참고. 실험 모듈 인터페이스가 그 핵심이다.
+
+## 옛 메모 — 가져올 블록 (전기의 숲 script 순서 기준)
 - IslandWorld — three.js 섬·캐릭터 이동·시점·구역 진입
 - IME·Audio — 한글 입력 보정, 배경음·효과음
 - IslandComfort — 편의 설정(글자 크기·움직임 줄이기 등)

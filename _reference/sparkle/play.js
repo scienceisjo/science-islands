@@ -1,17 +1,56 @@
-(function(root){
-'use strict';
-const gifts=['camp-lamp','flower-pot','forest-flag','sea-light','explorer-stamp'];
-const names=id=>[['우체국 등','예비 등'],['축제 장치','예비 장치'],['앞쪽 안내등','뒤쪽 안내등'],['실내등','테라스등'],['공연장 안내등','체험 부스']][id]||['장치 1','장치 2'];
-const titles=['우체국의 꺼진 등','모아의 저항선 작업대','앞뒤로 이어진 숲길','책 읽는 실내와 야외 테라스','안내등을 지키는 축제 광장'];
-function controls(s){
- const resistorSlider=(key,label,value)=>`<label class="res-slider">${label} <output id="${key}Output">${value} Ω</output><input type="range" min="10" max="30" step="10" value="${value}" data-lab-range="${key}" aria-label="${label} 바꾸기"><span class="ticks"><i>10 Ω</i><i>20 Ω</i><i>30 Ω</i></span></label>`;const electronToggle=s=>`<button class="toggle-button electrons-toggle" data-action="electrons" aria-pressed="${!!s.electrons}">${s.electrons?'⚡ 전자 이동 모형 숨기기':'⚡ 전자 이동 모형 보기'}</button>`;
- if(s.id===1)return `<div class="workshop-tools"><p class="compact-rule">Step ${s.phase+1} · ${s.phase===0?'저항 10 Ω을 유지하며 전압 비교':s.phase===1?'전압 6 V를 유지하며 저항 비교':'6 V에서 목표 0.3 A 만들기'}</p><label>전압 <output id="voltageOutput">${s.v} V</output><input type="range" min="3" max="12" step="3" value="${s.v}" data-lab-range="v" aria-label="전압 바꾸기"></label><label>저항선 길이 <output id="lengthOutput">${s.length}배</output><input type="range" min="1" max="4" step="1" value="${s.length}" data-lab-range="length" aria-label="저항선 길이 바꾸기"></label><label>저항선 단면적 <output id="areaOutput">${s.area}배</output><input type="range" min="1" max="2" step="1" value="${s.area}" data-lab-range="area" aria-label="저항선 단면적 바꾸기"></label><div class="wire-sample"><span id="wireSample" style="width:${s.length*22}%;height:${s.area*5}px"></span></div><p id="wireResistance" class="compact-rule">같은 재질 · 저항 ${s.r1} Ω</p><small>기준 길이·단면적에서 10 Ω인 저항선 모형이에요. 길수록, 가늘수록 저항이 커져요. 한 번에 한 조건을 바꿔요.</small>${electronToggle(s)}</div>`;
- if(s.id===2)return `<div class="parts-tray"><b>연결할 장치</b>${s.count===1?'<button class="part-card" data-action="pick-part" data-part="device">💡 뒤쪽 안내등 · 10 Ω<br><small>그림의 노란 자리로 끌어다 놓기<br>(카드를 누른 뒤 노란 자리를 눌러도 돼요)</small></button>':'<button class="secondary" data-action="count">↩ 뒤쪽 안내등을 보관함으로</button>'+resistorSlider('r2','뒤쪽 안내등 저항',s.r2)}</div><p class="compact-rule">${s.count===1?'그림의 노란 자리를 바로 눌러도 연결돼요.':'그림의 스위치를 직접 눌러 열고 닫아요.'}</p>${electronToggle(s)}`;
- if(s.id>=3)return `<div class="parts-tray"><button class="part-card" data-action="pick-part" data-part="branch">🔌 ${names(s.id)[1]} 연결선<br><small>끌거나 누른 뒤 연결 자리 선택</small></button></div><p class="compact-rule">${s.type==='series'?'현재: 한 경로로 직렬 연결':'현재: 두 경로로 병렬 연결'} · 그림의 스위치를 눌러요.</p>${s.id===3?resistorSlider('r2','테라스등 저항',s.r2):''}${electronToggle(s)}`;
- return '<p class="compact-rule">노란 테두리의 스위치를 직접 눌러 보세요.</p>'+electronToggle(s);
-}
-function zones(s){if(s.record)return '';if(s.id===2&&s.count===1)return '';if(s.id>=3&&s.selectedPart==='branch')return '<div class="connection-zones"><button class="placement-zone" data-action="place-part" data-place="series">한 길에 잇기 · 직렬</button><button class="placement-zone" data-action="place-part" data-place="parallel">별도 가지에 잇기 · 병렬</button></div>';return '';}
-function svg(s,p){let picture=root.IslandCircuit.svg(p,{probe:s.probe,electrons:s.electrons,final:s.id===4,names:names(s.id),interactive:!s.record,switchKey:s.id>=3?'on2':'on1',picture:s.view==='picture',sceneTitle:titles[s.id],sceneId:s.id});if(s.id===2&&s.count===1&&!s.record)picture=picture.replace('</svg>','<g role="button" tabindex="0" aria-label="뒤쪽 안내등 놓는 자리" class="placement-zone svg-slot" data-action="place-part" data-place="device"><rect x="495" y="85" width="210" height="110" rx="16" fill="#fff3ac" stroke="#deb03e" stroke-width="4" stroke-dasharray="10 6"/><text x="600" y="128" text-anchor="middle" font-size="25" fill="#624c29">＋ 뒤쪽 안내등</text><text x="600" y="162" text-anchor="middle" font-size="20" fill="#624c29">여기에 끌어다 놓거나 눌러요</text></g></svg>');return picture;}
-function inventory(state){return `<header class="modal-head"><h2 id="inventoryTitle">나의 선물 보관함</h2><button class="close" data-close aria-label="보관함 닫기">×</button></header><p>주민의 부탁을 해결할 때마다 선물을 받아요. 받은 선물은 캠프에도 놓여요.</p><div class="gift-grid">${root.IslandModel.quests.map((q,i)=>{const got=state.completed.includes(i);return `<article class="gift-card ${got?'earned':'locked'}">${got?`<img src="art/gift-${gifts[i]}.png" alt="${q.reward}">`:'<div class="gift-lock">🎁</div>'}<h3>${got?q.reward:'아직 열지 않은 선물'}</h3><p>${q.npc} · ${got?'부탁 해결 선물':'「'+q.name+'」을 해결해요'}</p></article>`;}).join('')}</div><button data-action="camp">내 캠프 보러 가기 →</button>`;}
-root.IslandPlay={names,titles,controls,zones,svg,inventory};
+(function(root) {
+    'use strict';
+    const gifts = ['camp-lamp', 'flower-pot', 'forest-flag', 'sea-light', 'explorer-stamp'];
+    const names = id => [
+        ['우체국 등', '예비 등'],
+        ['축제 장치', '예비 장치'],
+        ['앞쪽 안내등', '뒤쪽 안내등'],
+        ['실내등', '테라스등'],
+        ['공연장 안내등', '체험 부스']
+    ][id] || ['장치 1', '장치 2'];
+    const titles = ['우체국의 꺼진 등', '모아의 저항선 작업대', '앞뒤로 이어진 숲길', '책 읽는 실내와 야외 테라스', '안내등을 지키는 축제 광장'];
+
+    function controls(s) {
+        const resistorSlider = (key, label, value) => `<label class="res-slider">${label} <output id="${key}Output">${value} Ω</output><input type="range" min="10" max="30" step="10" value="${value}" data-lab-range="${key}" aria-label="${label} 바꾸기"><span class="ticks"><i>10 Ω</i><i>20 Ω</i><i>30 Ω</i></span></label>`;
+        const electronToggle = s => `<button class="toggle-button electrons-toggle" data-action="electrons" aria-pressed="${!!s.electrons}">${s.electrons?'⚡ 전자 이동 모형 숨기기':'⚡ 전자 이동 모형 보기'}</button>`;
+        if (s.id === 1) return `<div class="workshop-tools"><p class="compact-rule">Step ${s.phase+1} · ${s.phase===0?'저항 10 Ω을 유지하며 전압 비교':s.phase===1?'전압 6 V를 유지하며 저항 비교':'6 V에서 목표 0.3 A 만들기'}</p><label>전압 <output id="voltageOutput">${s.v} V</output><input type="range" min="3" max="12" step="3" value="${s.v}" data-lab-range="v" aria-label="전압 바꾸기"></label><label>저항선 길이 <output id="lengthOutput">${s.length}배</output><input type="range" min="1" max="4" step="1" value="${s.length}" data-lab-range="length" aria-label="저항선 길이 바꾸기"></label><label>저항선 단면적 <output id="areaOutput">${s.area}배</output><input type="range" min="1" max="2" step="1" value="${s.area}" data-lab-range="area" aria-label="저항선 단면적 바꾸기"></label><div class="wire-sample"><span id="wireSample" style="width:${s.length*22}%;height:${s.area*5}px"></span></div><p id="wireResistance" class="compact-rule">같은 재질 · 저항 ${s.r1} Ω</p><small>기준 길이·단면적에서 10 Ω인 저항선 모형이에요. 길수록, 가늘수록 저항이 커져요. 한 번에 한 조건을 바꿔요.</small>${electronToggle(s)}</div>`;
+        if (s.id === 2) return `<div class="parts-tray"><b>연결할 장치</b>${s.count===1?'<button class="part-card" data-action="pick-part" data-part="device">💡 뒤쪽 안내등 · 10 Ω<br><small>그림의 노란 자리로 끌어다 놓기<br>(카드를 누른 뒤 노란 자리를 눌러도 돼요)</small></button>':'<button class="secondary" data-action="count">↩ 뒤쪽 안내등을 보관함으로</button>'+resistorSlider('r2','뒤쪽 안내등 저항',s.r2)}</div><p class="compact-rule">${s.count===1?'그림의 노란 자리를 바로 눌러도 연결돼요.':'그림의 스위치를 직접 눌러 열고 닫아요.'}</p>${electronToggle(s)}`;
+        if (s.id >= 3) return `<div class="parts-tray"><button class="part-card" data-action="pick-part" data-part="branch">🔌 ${names(s.id)[1]} 연결선<br><small>끌거나 누른 뒤 연결 자리 선택</small></button></div><p class="compact-rule">${s.type==='series'?'현재: 한 경로로 직렬 연결':'현재: 두 경로로 병렬 연결'} · 그림의 스위치를 눌러요.</p>${s.id===3?resistorSlider('r2','테라스등 저항',s.r2):''}${electronToggle(s)}`;
+        return '<p class="compact-rule">노란 테두리의 스위치를 직접 눌러 보세요.</p>' + electronToggle(s);
+    }
+
+    function zones(s) {
+        if (s.record) return '';
+        if (s.id === 2 && s.count === 1) return '';
+        if (s.id >= 3 && s.selectedPart === 'branch') return '<div class="connection-zones"><button class="placement-zone" data-action="place-part" data-place="series">한 길에 잇기 · 직렬</button><button class="placement-zone" data-action="place-part" data-place="parallel">별도 가지에 잇기 · 병렬</button></div>';
+        return '';
+    }
+
+    function svg(s, p) {
+        let picture = root.IslandCircuit.svg(p, {
+            probe: s.probe,
+            electrons: s.electrons,
+            final: s.id === 4,
+            names: names(s.id),
+            interactive: !s.record,
+            switchKey: s.id >= 3 ? 'on2' : 'on1',
+            picture: s.view === 'picture',
+            sceneTitle: titles[s.id],
+            sceneId: s.id
+        });
+        if (s.id === 2 && s.count === 1 && !s.record) picture = picture.replace('</svg>', '<g role="button" tabindex="0" aria-label="뒤쪽 안내등 놓는 자리" class="placement-zone svg-slot" data-action="place-part" data-place="device"><rect x="495" y="85" width="210" height="110" rx="16" fill="#fff3ac" stroke="#deb03e" stroke-width="4" stroke-dasharray="10 6"/><text x="600" y="128" text-anchor="middle" font-size="25" fill="#624c29">＋ 뒤쪽 안내등</text><text x="600" y="162" text-anchor="middle" font-size="20" fill="#624c29">여기에 끌어다 놓거나 눌러요</text></g></svg>');
+        return picture;
+    }
+
+    function inventory(state) {
+        return `<header class="modal-head"><h2 id="inventoryTitle">나의 선물 보관함</h2><button class="close" data-close aria-label="보관함 닫기">×</button></header><p>주민의 부탁을 해결할 때마다 선물을 받아요. 받은 선물은 캠프에도 놓여요.</p><div class="gift-grid">${root.IslandModel.quests.map((q,i)=>{const got=state.completed.includes(i);return `<article class="gift-card ${got?'earned':'locked'}">${got?`<img src="art/gift-${gifts[i]}.png" alt="${q.reward}">`:'<div class="gift-lock">🎁</div>'}<h3>${got?q.reward:'아직 열지 않은 선물'}</h3><p>${q.npc} · ${got?'부탁 해결 선물':'「'+q.name+'」을 해결해요'}</p></article>`;}).join('')}</div><button data-action="camp">내 캠프 보러 가기 →</button>`;
+    }
+    root.IslandPlay = {
+        names,
+        titles,
+        controls,
+        zones,
+        svg,
+        inventory
+    };
 })(window);

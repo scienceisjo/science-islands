@@ -15,3 +15,6 @@ _backup/
 .DS_Store
 Thumbs.db
 desktop.ini
+_verify/
+_backup_engine_min/
+_backup_reference_min/

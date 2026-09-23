@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "verify-sparkle",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "5890", "--directory", "_verify"],
+      "port": 5890
+    }
+  ]
+}
