@@ -1,0 +1,85 @@
+
+/* ── 레몬 백작의 부탁 · 섬 테마 (engine/style.css 위에 덮어쓰기) ── */
+:root{--ink:#3d4630;--muted:#7c806a;--paper:#fffbea;--green:#4f8f3a;--deep:#3b722c;--line:#ebe3c7;--gold:#f0c23a}
+body{background:#2a2350}
+button.primary{background:var(--green);box-shadow:0 4px 0 #3a6e2a}
+button.primary:hover{background:#447f32}
+.paper{background:rgba(255,251,234,.95);box-shadow:0 5px 0 rgba(120,96,30,.12),0 9px 22px rgba(70,50,20,.08)}
+.brand-icon{color:#d9a400}
+.vignette{box-shadow:inset 0 0 160px #2a235055}
+.dialogue-name{background:#f3cf5a;color:#5e4a14}
+.dialogue-role{font-weight:600;font-size:12px;opacity:.75;margin-left:4px}
+.eyebrow{color:#8a6a12}
+
+/* 표지 — 코드로 그린 그림 */
+#coverPanel>.cover-art{position:absolute;inset:0;overflow:hidden;background:#2a2350}
+#coverPanel>.cover-art svg{display:block;width:100%;height:100%}
+.cover-copy{background:linear-gradient(90deg,#fffbeaf0 20%,#fffbeadb 66%,#fffbea00)}
+.cover-copy h1{color:#5c4a10}
+.cover-copy p{color:#5a5a3f}
+.cover-copy .eyebrow{color:#8a6a12}
+.welcome-dialog h1{color:#6a5516}
+.welcome-dialog:not(.prepare){background:#fbf6df}
+@media(max-width:600px){#coverPanel>.cover-art{height:255px;bottom:auto}}
+
+.story-svg{background:#2a2350;overflow:hidden}
+.story-svg svg{display:block;width:100%;height:100%}
+.journal-art-svg{height:92px;border-radius:15px;margin-bottom:14px;display:flex;align-items:center;justify-content:center;font-size:56px;background:linear-gradient(120deg,#fff3b8,#ffe07a 55%,#cfeefc)}
+.gift-emoji{width:100%;aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:64px;border-radius:12px;background:linear-gradient(140deg,#fff6cc,#ffe9a0)}
+.gift-card.locked .gift-emoji{background:#eee9d8;filter:grayscale(1);opacity:.6}
+
+/* 실험대 그림 */
+.lab-scene svg,.journal-figure svg{aspect-ratio:1000/560!important;height:auto}
+.journal-figure svg,.evidence svg{aspect-ratio:auto!important}
+.lab-svg text{font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif}
+.lab-svg .t-title{font-size:30px;font-weight:800;fill:#3d4630;letter-spacing:-.5px}
+.lab-svg .t-sub{font-size:20px;fill:#6f7560}
+.lab-svg .t-label{font-size:22px;font-weight:700;fill:#44503f}
+.lab-svg .t-small{font-size:19px;fill:#56604f}
+.lab-svg .t-mini{font-size:15.5px;fill:#5d665a}
+.lab-svg .t-big{font-size:32px;font-weight:800;fill:#44503f}
+.lab-svg .t-tag{font-size:20px;font-weight:800}
+.lab-svg .t-slot{font-size:19px;font-weight:700;fill:#8a6a12}
+.lab-svg .t-particle{font-weight:800;fill:#22301d}
+.lab-svg .t-pole{font-size:30px;font-weight:900;fill:#ffffff}
+.lab-svg .t-white{font-size:17px;font-weight:700;fill:#ffffff}
+.lab-svg .t-pop{font-size:26px;font-weight:900;fill:#c9531f}
+.lab-hit{cursor:pointer;outline:none}
+.lab-hit:hover .hit-ring,.lab-hit:focus-visible .hit-ring{fill:#ffe98a;stroke:#c9920f}
+.lab-hit:focus-visible{filter:drop-shadow(0 0 6px #e4b65d)}
+.lab-hit.is-done{cursor:default}
+.lab-hit.hint-target,.hint-target .hit-ring{animation:hintPulse 1s ease-in-out 5}
+@keyframes hintPulse{50%{filter:drop-shadow(0 0 10px #f0c23a)}}
+.rise{animation:rise 1.6s linear infinite}
+@keyframes rise{from{transform:translateY(0);opacity:.95}to{transform:translateY(-150px);opacity:0}}
+.migrate-band{animation:grow 2.4s ease-out both}
+@keyframes grow{from{transform:scaleX(.13)}to{transform:scaleX(1)}}
+.pop{animation:pop .5s ease-out both;transform-box:fill-box;transform-origin:center}
+@keyframes pop{from{transform:scale(.3);opacity:0}to{transform:scale(1);opacity:1}}
+@media(prefers-reduced-motion:reduce){.rise,.migrate-band,.pop,.lab-hit.hint-target{animation:none}}
+body.calm .rise,body.calm .migrate-band,body.calm .pop{animation:none}
+
+/* 도구·모형 조작 */
+.tool-tray{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 10px}
+.tool-tray button,.tool-btn{min-height:44px;padding:10px 14px;border-radius:14px;background:#f6efd4;font-weight:700;display:inline-flex;align-items:center;gap:6px}
+.tool-btn[aria-pressed="true"]{background:#ffe27a;box-shadow:inset 0 0 0 2px #d9a400}
+span.tool-btn{cursor:default}
+.model-picker{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.model-picker button{min-height:40px;padding:8px 12px;background:#f3f0e2}
+.model-picker button[aria-pressed="true"]{background:#dff0c8;box-shadow:inset 0 0 0 2px #6aa84f}
+.counter-list{display:grid;gap:8px;margin:6px 0 10px}
+.counter-row{display:grid;grid-template-columns:1fr 44px 42px 44px;align-items:center;gap:6px;background:#fffdf3;border:1px solid #ebe3c7;border-radius:14px;padding:6px 8px}
+.counter-name{font-weight:800;font-size:17px;line-height:1.2}
+.counter-name small{display:block;font-weight:500;font-size:12px;color:#7c806a}
+.counter-row button{min-height:40px;padding:0;font-size:20px;border-radius:12px}
+.counter-row output{text-align:center;font-size:20px;font-weight:800}
+.measurement-fields select{width:100%;min-height:44px;font-size:15px;padding:8px 10px;border-radius:12px;border:1px solid #d7ceb0;background:#fffef6;color:inherit}
+.measurement-fields select[aria-invalid="true"]{border-color:#c0503a;box-shadow:0 0 0 2px #f3c7bb}
+
+/* 증거 고르기 */
+.concept-picks{display:grid;gap:8px;margin:10px 0}
+.pick-row{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border:1px solid #e6dcc0;border-radius:14px;background:#fffdf4;cursor:pointer;line-height:1.55}
+.pick-row input{width:22px;height:22px;margin-top:2px;flex:none;accent-color:#4f8f3a}
+.pick-row .mine{display:inline-block;margin-left:8px;font-size:12px;color:#4f8f3a;font-weight:700}
+.pick-row.ok{background:#eef8e6;border-color:#9cc98a}
+.pick-row.no{opacity:.65}
