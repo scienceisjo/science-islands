@@ -6,7 +6,7 @@
     try {
         var U = "https://vbvtnmnodeoocbbjauap.supabase.co";
         var K = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZidnRubW5vZGVvb2NiYmphdWFwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk0OTQ0OTYsImV4cCI6MjA5NTA3MDQ5Nn0.dvuRrt3qw2Tya_QwGbcXrmGPdfDgI4xmgyH8UjU73Nc";
-        var APP = "sparkle-island",
+        var APP = window.ISLAND_APP || "sparkle-island",
             PAGE = "index";
         var H = {
             "Content-Type": "application/json",

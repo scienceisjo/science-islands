@@ -4,6 +4,7 @@
     python build.py <섬폴더> [-o 출력.html] [--check 원본.html]
 
 섬폴더의 `shell.html` 안에 있는 `<!--PART:이름-->` 표식을 파일 내용으로 바꾼다.
+확장자가 없으면 `이름.js`, 있으면 그 파일(`<!--PART:style.css-->`).
 찾는 순서는 **섬폴더 먼저, 없으면 engine/** — 섬이 엔진 부품을 덮어쓸 수 있다.
 
 읽고 쓰기는 모두 newline='' 이라 원본의 CRLF 가 그대로 살아난다.
@@ -17,7 +18,7 @@ import sys
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 ENGINE = os.path.join(ROOT, "engine")
-MARK = re.compile(r"<!--PART:([A-Za-z0-9_-]+)-->")
+MARK = re.compile(r"<!--PART:([A-Za-z0-9_.-]+)-->")
 
 
 def read(path):
@@ -38,12 +39,14 @@ def build(island_dir):
 
     def swap(m):
         name = m.group(1)
+        # 확장자가 없으면 .js — `<!--PART:style.css-->` 처럼 확장자를 쓰면 그 파일 그대로
+        filename = name if "." in name else name + ".js"
         for base in (island_dir, ENGINE):
-            path = os.path.join(base, name + ".js")
+            path = os.path.join(base, filename)
             if os.path.exists(path):
                 used.append((name, os.path.relpath(path, ROOT)))
                 return read(path)
-        sys.exit("부품을 못 찾음: %s.js (섬폴더·engine 둘 다 없음)" % name)
+        sys.exit("부품을 못 찾음: %s (섬폴더·engine 둘 다 없음)" % filename)
 
     return MARK.sub(swap, shell), used
 

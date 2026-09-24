@@ -1,8 +1,25 @@
 (function() {
     'use strict';
     const T = THREE;
+    /* 섬마다 바꿀 수 있는 색. 섬 파일이 IslandWorld.prototype.palette 로 일부만 덮어쓴다. 기본값 = 전기의 숲. */
+    const DEFAULT_PALETTE = {
+        sky: '#182c48',
+        skyFestival: '#263d5d',
+        fog: '#263e55',
+        water: '#24465b',
+        waterFestival: '#315c72',
+        darkSky: '#304867',
+        darkWater: '#345f78',
+        hemiSky: 0x8ca9dd,
+        hemiGround: 0x263747,
+        sun: 0x7f9fee,
+        playerShirt: '#5d9db0',
+        playerSkin: '#513b30'
+    };
     class IslandWorld {
         constructor(canvas, callbacks, state) {
+            this.pal = Object.assign({}, DEFAULT_PALETTE, this.palette || {});
+            this.regionCount = this.regionCount || 5;
             this.canvas = canvas;
             this.cb = callbacks;
             this.state = state;
@@ -25,8 +42,8 @@
             this.pendingNpc = null;
             this.camTarget = new T.Vector3();
             this.scene = new T.Scene();
-            this.scene.background = new T.Color('#182c48');
-            this.scene.fog = new T.Fog('#263e55', 42, 95);
+            this.scene.background = new T.Color(this.pal.sky);
+            this.scene.fog = new T.Fog(this.pal.fog, 42, 95);
             this.camera = new T.OrthographicCamera(-18, 18, 11, -11, 0.1, 130);
             this.renderer = new T.WebGLRenderer({
                 canvas,
@@ -40,9 +57,9 @@
             this.renderer.outputEncoding = T.sRGBEncoding;
             this.renderer.toneMapping = T.ACESFilmicToneMapping;
             this.renderer.toneMappingExposure = .78;
-            this.hemi = new T.HemisphereLight(0x8ca9dd, 0x263747, 0.24);
+            this.hemi = new T.HemisphereLight(this.pal.hemiSky, this.pal.hemiGround, 0.24);
             this.scene.add(this.hemi);
-            this.sun = new T.DirectionalLight(0x7f9fee, 0.14);
+            this.sun = new T.DirectionalLight(this.pal.sun, 0.14);
             this.sun.position.set(-13, 26, 14);
             this.sun.castShadow = true;
             this.sun.shadow.mapSize.set(1536, 1536);
@@ -67,7 +84,7 @@
             this.build();
             this.buildFestivalDecor();
             this.batchStatic();
-            this.player = this.character('#5d9db0', '#513b30', 'human');
+            this.player = this.character(this.pal.playerShirt, this.pal.playerSkin, 'human');
             this.player.position.set(state.pos.x, 0.43, state.pos.z);
             this.scene.add(this.player);
             this.camTarget.copy(this.player.position);
@@ -621,7 +638,7 @@
         buildFestivalDecor() {
             // Five point batches add tree garlands without dozens of lamps, shadows or draw calls.
             const positions = Array.from({
-                length: 5
+                length: this.regionCount
             }, () => []);
             this.scene.updateMatrixWorld(true);
             for (const tree of this.trees) {
@@ -634,7 +651,7 @@
                     positions[q].push(p.x, p.y, p.z);
                 }
             }
-            for (let q = 0; q < 5; q++) {
+            for (let q = 0; q < this.regionCount; q++) {
                 if (!positions[q].length) continue;
                 const geometry = new T.BufferGeometry();
                 geometry.setAttribute('position', new T.Float32BufferAttribute(positions[q], 3));
@@ -909,10 +926,10 @@
                 hemi: this.hemi.intensity,
                 sky: this.scene.background.clone(),
                 water: this.waterMat.color.clone(),
-                darkSky: new T.Color('#304867'),
-                darkWater: new T.Color('#345f78').convertSRGBToLinear(),
-                finalSky: new T.Color(this.state.festival ? '#263d5d' : '#182c48'),
-                finalWater: new T.Color(this.state.festival ? '#315c72' : '#24465b').convertSRGBToLinear()
+                darkSky: new T.Color(this.pal.darkSky),
+                darkWater: new T.Color(this.pal.darkWater).convertSRGBToLinear(),
+                finalSky: new T.Color(this.state.festival ? this.pal.skyFestival : this.pal.sky),
+                finalWater: new T.Color(this.state.festival ? this.pal.waterFestival : this.pal.water).convertSRGBToLinear()
             };
             this.festivalRun = run;
             this.keys.clear();
@@ -961,7 +978,7 @@
             this.dusk = this.state.festival ? 1 : 0;
             this.sun.intensity = .14 + this.dusk * .08;
             this.hemi.intensity = .24 + this.dusk * .06;
-            this.scene.background.set(this.state.festival ? '#263d5d' : '#182c48');
+            this.scene.background.set(this.state.festival ? this.pal.skyFestival : this.pal.sky);
             this.waterMat.color.copy(run.finalWater);
         }
         finishFestival(reason = 'complete') {
@@ -993,7 +1010,7 @@
                 step = run.calm ? .14 : .6,
                 ramp = run.calm ? .2 : .45,
                 finaleAt = run.calm ? 1.1 : 4.2,
-                region = Math.min(4, Math.floor((elapsed - dimEnd) / step)),
+                region = Math.min(this.regionCount - 1, Math.floor((elapsed - dimEnd) / step)),
                 stage = elapsed < dimEnd ? 'dim' : elapsed < finaleAt ? 'relight' : 'finale';
             if (stage !== run.lastStage || stage === 'relight' && region !== run.lastRegion) {
                 run.lastStage = stage;
@@ -1120,8 +1137,8 @@
                 this.dusk += (Number(this.state.festival) - this.dusk) * dt * .35;
                 this.sun.intensity = .14 + this.dusk * .08;
                 this.hemi.intensity = .24 + this.dusk * .06;
-                this.scene.background.lerp(new T.Color(this.state.festival ? '#263d5d' : '#182c48'), dt * .3);
-                this.waterMat.color.lerp(new T.Color(this.state.festival ? '#315c72' : '#24465b').convertSRGBToLinear(), dt * .3);
+                this.scene.background.lerp(new T.Color(this.state.festival ? this.pal.skyFestival : this.pal.sky), dt * .3);
+                this.waterMat.color.lerp(new T.Color(this.state.festival ? this.pal.waterFestival : this.pal.water).convertSRGBToLinear(), dt * .3);
             }
             this.renderer.render(this.scene, this.camera);
             if (Math.floor(this.time * 8) !== this.lastUi) {

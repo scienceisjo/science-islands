@@ -1,7 +1,7 @@
 (function() {
     'use strict';
     // The supplied piano compilation is served as a local, seekable audio asset.
-    const DEFAULT_BGM = 'audio/maple-piano-bgm.mp3';
+    const DEFAULT_BGM = window.ISLAND_BGM || 'audio/maple-piano-bgm.mp3';
     class IslandAudio {
         constructor(preferences, onChange) {
             this.preferences = preferences;
