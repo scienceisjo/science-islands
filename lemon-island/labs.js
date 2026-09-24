@@ -198,39 +198,44 @@
     }
 
     /* ── 이온화 모형 조립(산·염기 공용) ───────────────── */
-    function modelInit(list) {
+    /* 모형 하나는 연구자의 「예시」로 미리 채워 두고(원본 수업: 염산·수산화 나트륨을 예시로 보여 준 뒤 나머지는 직접), 나머지를 학생이 만든다 */
+    function modelInit(list, example = null) {
         const counts = {};
         for (const k of list)
-            for (const [sp] of M.models[k].parts) counts[k + ':' + sp] = 0;
+            for (const [sp, n] of M.models[k].parts) counts[k + ':' + sp] = k === example ? n : 0;
         return {
             list,
-            pick: list[0],
+            example,
+            pick: example || list[0],
             counts
         };
     }
 
-    function modelScene(sim) {
+    function modelScene(sim, who) {
         const md = sim.model,
-            m = M.models[md.pick];
+            m = M.models[md.pick],
+            isExample = md.pick === md.example;
         const parts = m.parts.map(([sp]) => [sp, md.counts[md.pick + ':' + sp] || 0]);
         const listed = parts.flatMap(([sp, n]) => Array(n).fill(sp));
         const total = listed.length,
             r = total > 14 ? 16 : total > 8 ? 19 : 23;
         const charge = parts.reduce((a, [sp, n]) => a + PT[sp].charge * n, 0);
-        return `${title(m.label + ' 수용액 모형 만들기', m.label + ' ' + m.dissolved + '개 입자를 물에 녹였어요 · 입자 수를 맞춰 보세요')}${beaker(120,150,420,300,'#d9eef6',.86)}${scatter(listed,{x:140,y:205,w:380,h:230},r)}<g transform="translate(600 150)"><rect width="340" height="300" rx="20" fill="#ffffff" stroke="#e2dccb" stroke-width="2"/><text x="24" y="44" class="t-label">녹인 것</text><text x="24" y="78" class="t-big">${esc(m.formula)} × ${m.dissolved}</text><text x="24" y="130" class="t-label">지금 모형</text>${parts.map(([sp,n],i)=>`<text x="24" y="${166+i*34}" class="t-small">${esc(PT[sp].text)} ${n}개 <tspan fill="#8a9a8c">· ${esc(PT[sp].name)}</tspan></text>`).join('')}<text x="24" y="276" class="t-small" fill="${charge===0?'#3f8f5a':'#c0503a'}">전하의 합: ${charge>0?'+':''}${charge} ${charge===0?'✓ 균형':'— 0이 되어야 해요'}</text></g><g transform="translate(120 490)">${['cation','anion','molecule'].map((t,i)=>`<g transform="translate(${i*190} 0)">${particle(16,0,{cation:'Na+',anion:'Cl-',molecule:'HCl'}[t],12).replace(/>[^<]*<\/text>/,'></text>')}<text x="40" y="6" class="t-small">${['양이온','음이온','녹기만 한 분자'][i]}</text></g>`).join('')}</g>`;
+        return `${title(isExample?`${m.label} 수용액 모형 · ${who}의 예시`:`${m.label} 수용액 모형 만들기`, isExample?'입자의 종류·개수·전하를 살펴본 뒤, 다음 물질을 골라 직접 만들어요':`${m.label} ${m.dissolved}개 입자를 물에 녹였어요 · 입자 수를 맞춰 보세요`)}${beaker(120,150,420,300,'#d9eef6',.86)}${scatter(listed,{x:140,y:205,w:380,h:230},r)}<g transform="translate(600 150)"><rect width="340" height="300" rx="20" fill="#ffffff" stroke="${isExample?'#e2bf4a':'#e2dccb'}" stroke-width="${isExample?3:2}"/><text x="24" y="44" class="t-label">녹인 것</text><text x="24" y="78" class="t-big">${esc(m.formula)} × ${m.dissolved}</text><text x="24" y="130" class="t-label">${isExample?'예시 모형':'지금 모형'}</text>${parts.map(([sp,n],i)=>`<text x="24" y="${166+i*34}" class="t-small">${esc(PT[sp].text)} ${n}개 <tspan fill="#8a9a8c">· ${esc(PT[sp].name)}</tspan></text>`).join('')}<text x="24" y="276" class="t-small" fill="${charge===0?'#3f8f5a':'#c0503a'}">전하의 합: ${charge>0?'+':''}${charge} ${charge===0?'✓ 균형':'— 0이 되어야 해요'}</text></g><g transform="translate(120 490)">${['cation','anion','molecule'].map((t,i)=>`<g transform="translate(${i*190} 0)">${particle(16,0,{cation:'Na+',anion:'Cl-',molecule:'HCl'}[t],12).replace(/>[^<]*<\/text>/,'></text>')}<text x="40" y="6" class="t-small">${['양이온','음이온','녹기만 한 분자'][i]}</text></g>`).join('')}</g>`;
     }
 
-    function modelControls(sim) {
+    function modelControls(sim, who) {
         const md = sim.model,
-            m = M.models[md.pick];
+            m = M.models[md.pick],
+            isExample = md.pick === md.example;
         const built = sim.built || {};
-        return `<div class="model-picker" role="group" aria-label="모형을 만들 물질">${md.list.map(k=>`<button type="button" data-lab="pick-model" data-model="${k}" aria-pressed="${md.pick===k}">${esc(M.models[k].label)}${built[k]?' ✓':''}</button>`).join('')}</div><div class="counter-list">${m.parts.map(([sp])=>{const key=md.pick+':'+sp,n=md.counts[key]||0;return `<div class="counter-row"><span class="counter-name">${esc(PT[sp].text)}<small>${esc(PT[sp].name)}</small></span><button type="button" data-lab="count" data-key="${esc(key)}" data-delta="-1" aria-label="${esc(PT[sp].text)} 하나 빼기" ${n?'':'disabled'}>−</button><output>${n}</output><button type="button" data-lab="count" data-key="${esc(key)}" data-delta="1" aria-label="${esc(PT[sp].text)} 하나 더하기" ${n>=8?'disabled':''}>+</button></div>`;}).join('')}</div><p class="compact-rule">${m.strength==='weak'?'힌트: 녹은 입자 중 대부분은 분자 그대로 남아요.':'모형이 맞으면 ‘증거 남기기’로 반응식을 골라 기록해요.'}</p>`;
+        return `<div class="model-picker" role="group" aria-label="모형을 만들 물질">${md.list.map(k=>`<button type="button" data-lab="pick-model" data-model="${k}" aria-pressed="${md.pick===k}">${esc(M.models[k].label)}${k===md.example?' · 예시':built[k]?' ✓':''}</button>`).join('')}</div><div class="counter-list">${m.parts.map(([sp])=>{const key=md.pick+':'+sp,n=md.counts[key]||0;return `<div class="counter-row"><span class="counter-name">${esc(PT[sp].text)}<small>${esc(PT[sp].name)}</small></span><button type="button" data-lab="count" data-key="${esc(key)}" data-delta="-1" aria-label="${esc(PT[sp].text)} 하나 빼기" ${n&&!isExample?'':'disabled'}>−</button><output>${n}</output><button type="button" data-lab="count" data-key="${esc(key)}" data-delta="1" aria-label="${esc(PT[sp].text)} 하나 더하기" ${n>=8||isExample?'disabled':''}>+</button></div>`;}).join('')}</div><p class="compact-rule">${isExample?`${who}가 먼저 보여 준 예시예요. ${esc(m.equation)} — 입자 수를 살펴본 뒤 위에서 다음 물질을 골라 직접 만들어 보세요.`:m.strength==='weak'?'힌트: 녹은 입자 중 대부분은 분자 그대로 남아요.':'모형이 맞으면 ‘증거 남기기’로 반응식을 골라 기록해요.'}</p>`;
     }
 
     function modelAct(sim, a, d) {
         const md = sim.model;
         if (a === 'pick-model' && M.models[d.model]) md.pick = d.model;
         if (a === 'count') {
+            if (md.pick === md.example) return;
             const k = d.key;
             if (k in md.counts) md.counts[k] = Math.max(0, Math.min(8, (md.counts[k] || 0) + Number(d.delta)));
             return {
@@ -242,6 +247,7 @@
     function modelCheck(sim) {
         const md = sim.model,
             m = M.models[md.pick];
+        if (md.pick === md.example) return '이건 예시예요. 위에서 다음 물질을 골라 직접 모형을 만들어 봐요.';
         const wrong = m.parts.filter(([sp, n]) => (md.counts[md.pick + ':' + sp] || 0) !== n);
         if (!wrong.length) return null;
         const charge = m.parts.reduce((a, [sp]) => a + PT[sp].charge * (md.counts[md.pick + ':' + sp] || 0), 0);
@@ -284,6 +290,54 @@
         if (!m) return '';
         const listed = m.parts.flatMap(([sp, n]) => Array(n).fill(sp));
         return `<svg class="lab-svg" viewBox="0 0 420 240" role="img" aria-label="${esc(m.label)} 모형"><rect width="420" height="240" rx="18" fill="#fbf7ea"/><rect x="20" y="30" width="380" height="180" rx="18" fill="#d9eef6" stroke="#7d93a0" stroke-width="3"/>${scatter(listed,{x:30,y:40,w:360,h:160},listed.length>6?20:24)}<text x="210" y="232" class="t-small" text-anchor="middle">${esc(m.equation)}</text></svg>`;
+    }
+
+    /* ── 간이 전기 전도 장치(산·염기 공용) ─────────────── */
+    const LED_WORD = {
+        bright: '밝게 켜짐',
+        dim: '희미하게 켜짐',
+        off: '켜지지 않음'
+    };
+
+    function conductScene(sim, list, heading) {
+        const s = sim.cell,
+            led = s ? S[s].conduct : null;
+        const glow = led === 'bright' ? '<circle cx="300" cy="150" r="70" fill="url(#glowG)"/>' : led === 'dim' ? '<circle cx="300" cy="150" r="34" fill="url(#glowG)" opacity=".7"/>' : '';
+        const short = k => S[k].short || S[k].name.replace(' 수용액', '');
+        const table = list.map((k, i) => `<text x="640" y="${214+i*40}" class="t-small">${esc(short(k))}</text><text x="930" y="${214+i*40}" class="t-small" text-anchor="end" fill="${sim.tested[k]?'#3d5d4a':'#a3ab9f'}">${sim.tested[k]?LED_WORD[S[k].conduct]:'—'}</text>`).join('');
+        return svg(`${title(heading,'아래 병을 누르면 그 용액을 전도 장치에 담아요 (농도 1 M)')}${glow}<rect x="248" y="170" width="104" height="54" rx="12" fill="#3b4b5a"/><circle cx="300" cy="150" r="22" fill="${led==='bright'?'#ffe066':led==='dim'?'#f3e3a0':'#d9dde0'}" stroke="#8a949c" stroke-width="3"/><line x1="280" y1="224" x2="280" y2="380" stroke="#8a949c" stroke-width="8"/><line x1="320" y1="224" x2="320" y2="380" stroke="#8a949c" stroke-width="8"/>${beaker(200,286,200,140,s?'#dcecf2':'#f3f6f7',s?.6:0,{label:s?S[s].name:'비어 있음'})}<rect x="610" y="150" width="340" height="250" rx="18" fill="#ffffff" stroke="#e2dccb" stroke-width="2"/><text x="640" y="182" class="t-label">내가 본 전구</text>${table}${list.map((k,i)=>hit(`<rect x="${40+i*186}" y="490" width="172" height="48" rx="12" fill="${sim.cell===k?'#fff0b8':'#ffffff'}" stroke="#d8c9a4" stroke-width="2"/><text x="${126+i*186}" y="520" class="t-small" text-anchor="middle">${esc(short(k))}</text>`,'pour',{sol:k},S[k].name+' 담기')).join('')}`, '간이 전기 전도 장치');
+    }
+
+    function conductReadings(sim) {
+        if (!sim.cell) return '';
+        return `<div class="reading-row"><div class="reading current"><small>담은 용액</small><b style="font-size:1.1rem">${esc(S[sim.cell].name)}</b></div><div class="reading voltage"><small>전구</small><b style="font-size:1.1rem">${esc(LED_WORD[S[sim.cell].conduct])}</b></div></div>`;
+    }
+
+    function conductAct(sim, a, d, list) {
+        if (a === 'pour' && list.includes(d.sol)) {
+            sim.cell = d.sol;
+            sim.tested[d.sol] = true;
+            return {
+                sound: S[d.sol].conduct === 'off' ? 'click' : 'switch-close'
+            };
+        }
+        if (a === 'empty') sim.cell = null;
+    }
+
+    function conductCapture(sim, list, need, tag, label) {
+        const miss = need.filter(k => !sim.tested[k]);
+        if (miss.length) return {
+            error: `${miss.map(k=>S[k].name).join(', ')}도 담아 본 뒤 기록해요.`
+        };
+        const tested = list.filter(k => sim.tested[k]);
+        return {
+            tag,
+            label,
+            fields: tested.map(k => choiceField(k, S[k].name + ' (1 M)', ['밝게 켜짐', '희미하게 켜짐', '켜지지 않음'], LED_WORD[S[k].conduct], '오른쪽 표에 적힌 내 관찰을 옮겨 적어요.')),
+            snap: {
+                list: tested
+            }
+        };
     }
 
     /* ── 지시약 검사대(조수 시험·염기·표 공용) ─────────── */
@@ -365,6 +419,11 @@
                 }
             };
         },
+        say(tag) {
+            if (tag === 'start') return [0, '건강한 레몬 즙은 푸른 리트머스를 붉게 바꾸지. 샘물은 비교할 기준이야. 새콤이의 즙은 어떨지 확인해 주게.'];
+            if (tag === 'juice') return [0, '새콤이의 즙은 샘물과 똑같이 푸른색 그대로군… 산성을 잃어 가고 있어! 산성을 회복할 궁극의 약이 필요하네.'];
+            return null;
+        },
         after() {},
         figure(e) {
             const xs = [60, 190, 320];
@@ -383,11 +442,12 @@
     Labs[1] = {
         title: '에시드 연구실 · 조수 시험대',
         steps: ['푸른 리트머스 종이로 용액 A~D를 검사하고 색을 기록해요.', 'BTB 용액으로 다시 확인하고 색을 기록해요.', '용액에 마그네슘 조각을 넣고, 나오는 기체에 성냥불을 대어 확인해요.'],
-        prediction: ['네 용액 중 산을 가려내는 가장 믿을 만한 방법은?', ['지시약의 색 변화로 알 수 있을 것 같아', '용액의 겉모습만 봐도 알 수 있을 것 같아', '실험으로 확인해 볼래']],
+        prediction: ['산 수용액에 초록색 BTB 용액을 떨어뜨리면 공통적으로 어떤 색이 될까?', ['노란색', '초록색', '파란색']],
         principle: '산 수용액은 푸른 리트머스를 붉게, 초록색 BTB 용액을 노랗게 바꿔요. 마그네슘 같은 금속과 반응해 수소 기체(H₂)를 내놓는데, 성냥불을 대면 ‘펑’ 소리를 내며 타요. 모든 금속이 산과 반응하는 것은 아니에요.',
         safety: '성냥불은 시험관 입구에 잠깐만 대요. 산 수용액이 손에 묻으면 흐르는 물에 씻어요.',
         init(tags) {
-            const phase = has(tags, 'btb') ? 2 : has(tags, 'litmus') ? 1 : 0;
+            const first = this.checks(tags).findIndex(ok => !ok),
+                phase = first < 0 ? 2 : first;
             return {
                 phase,
                 tool: ['blueLitmus', 'btb', 'mg'][phase],
@@ -414,7 +474,7 @@
             const noMg = L1.find(k => !sim.mg[k]);
             if (noMg) return {
                 selector: sim.tool === 'mg' ? `[data-lab="apply"][data-cup="${noMg}"]` : '[data-lab="tool"][data-tool="mg"]',
-                copy: sim.tool === 'mg' ? `시험관 ${noMg}을 눌러 마그네슘 조각을 넣어요.` : '먼저 ‘마그네슘 조각’을 골라요.'
+                copy: sim.tool === 'mg' ? `시험관 ${noMg}를 눌러 마그네슘 조각을 넣어요.` : '먼저 ‘마그네슘 조각’을 골라요.'
             };
             if (!L1.some(k => sim.match[k] && S[L1SOL[k]].mg !== 'none')) return {
                 selector: sim.tool === 'match' ? '[data-lab="apply"][data-cup="A"]' : '[data-lab="tool"][data-tool="match"]',
@@ -428,6 +488,13 @@
                 selector: '[data-action="complete"]',
                 copy: '세 가지 시험을 모두 통과했어요! ‘부탁 해결하기’를 눌러요.'
             };
+        },
+        say(tag) {
+            if (tag === 'start') return [1, '이 리트머스 종이로 앞에 있는 용액들 중 산성을 띠는 용액을 찾아보게나.'];
+            if (tag === 'litmus') return [1, '산성을 띠는 용액에 넣은 리트머스 종이는 공통적으로 붉게 변했군. 기본기는 있는 친구였구먼! 그러면 한 번 더 시험해 보도록 하지.'];
+            if (tag === 'btb') return [1, '좋아! 사실 A·B·C는 묽은 염산, 묽은 황산, 아세트산 수용액이었네. 세 산 모두 수소(H)를 가지고 있지. 산에 금속을 넣어 보면 정말 수소가 나오는지 확인할 수 있을 게야. 염산에 마그네슘을 넣었더니 꽤나 재미있는 반응을 보이더군.'];
+            if (tag === 'mg') return [1, '부글부글… 기체가 계속 나오고, 불을 대니 ‘펑’! 그래, 바로 이거야. 우린 수소를 찾은 거야!'];
+            return null;
         },
         name(k, sim) {
             return sim.reveal || sim.phase === 2 ? `${S[L1SOL[k]].name}` : '';
@@ -526,23 +593,19 @@
     };
 
     /* ═══ 2. 산의 정체 — 전도성 · 이온 이동 · 이온화 모형 ═══ */
-    const CONDUCT = ['HCl', 'H2SO4', 'CH3COOH', 'sugar', 'water'],
-        CONDUCT_NEED = ['HCl', 'H2SO4', 'CH3COOH', 'sugar'];
-    const LED_WORD = {
-        bright: '밝게 켜짐',
-        dim: '희미하게 켜짐',
-        off: '켜지지 않음'
-    };
+    const ACID_CONDUCT = ['HCl', 'H2SO4', 'CH3COOH', 'sugar', 'water'],
+        ACID_NEED = ['HCl', 'H2SO4', 'CH3COOH', 'sugar'],
+        ACID_MODELS = ['HNO3', 'H2SO4', 'CH3COOH'];
     Labs[2] = {
         title: '에시드의 전기 실험대',
-        steps: ['간이 전기 전도 장치로 산 수용액과 설탕물의 전구 밝기를 비교해 기록해요.', '리트머스 종이 위에서 전류를 흘려, 붉은색을 만든 이온을 찾아 기록해요.', '염산·황산·아세트산의 이온화 모형을 만들어 기록해요.'],
+        steps: ['간이 전기 전도 장치로 산 수용액과 설탕물의 전구 밝기를 비교해 기록해요.', '리트머스 종이 위에서 전류를 흘려, 붉은색을 만든 이온을 찾아 기록해요.', '에시드 박사의 염산 예시를 보고, 질산·황산·아세트산의 이온화 모형을 직접 만들어 기록해요.'],
         prediction: ['산 수용액에 전류를 흘리면 전구는?', ['켜질 것 같아', '켜지지 않을 것 같아', '산마다 다를 것 같아']],
-        principle: '물에 녹아 이온으로 나뉘는 물질(전해질)의 수용액에는 전류가 흘러요. 전류를 흘리면 양이온은 (−)극으로, 음이온은 (+)극으로 움직여요. 산은 물에 녹아 수소 이온(H⁺)을 내놓아요. 대부분 이온화하면 강산, 일부만 이온화하면 약산이에요.',
+        principle: '물에 녹아 이온으로 나뉘는 물질(전해질)의 수용액에는 전류가 흘러요. 전류를 흘리면 양이온은 (−)극으로, 음이온은 (+)극으로 움직여요. 산이 물에 녹아 수소 이온(H⁺)과 음이온으로 나뉘는 것을 ‘산의 이온화’라고 해요. 대부분 이온화하면 강산, 일부만 이온화하면 약산이에요.',
         safety: '전원은 낮은 전압을 써요. 전극을 바꿀 때는 전류를 끈 상태에서 바꿔요.',
         init(tags) {
-            const phase = has(tags, 'migrate-acid') ? 2 : has(tags, 'conduct') ? 1 : 0;
+            const phase = this.phaseOf(tags);
             const built = {};
-            for (const k of ['HCl', 'H2SO4', 'CH3COOH', 'HNO3']) built[k] = has(tags, 'model-' + k);
+            for (const k of ['HCl', ...ACID_MODELS]) built[k] = has(tags, 'model-' + k);
             return {
                 phase,
                 tested: {},
@@ -552,14 +615,15 @@
                     ran: false,
                     ranAt: 0
                 },
-                model: modelInit(['HCl', 'H2SO4', 'CH3COOH', 'HNO3']),
+                model: modelInit(['HCl', 'HNO3', 'H2SO4', 'CH3COOH'], 'HCl'),
                 built
             };
         },
-        checks: tags => [has(tags, 'conduct'), has(tags, 'migrate-acid'), ['HCl', 'H2SO4', 'CH3COOH'].every(k => has(tags, 'model-' + k))],
+        phaseOf: tags => !has(tags, 'conduct') ? 0 : !has(tags, 'migrate-acid') ? 1 : 2,
+        checks: tags => [has(tags, 'conduct'), has(tags, 'migrate-acid'), ACID_MODELS.every(k => has(tags, 'model-' + k))],
         hint(sim, tags) {
             if (sim.phase === 0) {
-                const next = CONDUCT_NEED.find(k => !sim.tested[k]);
+                const next = ACID_NEED.find(k => !sim.tested[k]);
                 if (next) return {
                     selector: `[data-lab="pour"][data-sol="${next}"]`,
                     copy: `‘${S[next].name}’ 병을 눌러 전도 장치에 담아 봐요.`
@@ -569,20 +633,17 @@
                     copy: '네 용액의 전구 밝기를 봤어요. ‘증거 남기기’로 기록해요.'
                 };
             }
-            if (sim.phase === 1) {
-                if (!sim.migration.ran) return {
-                    selector: '[data-lab="run"]',
-                    copy: '‘전류 흘리기’를 눌러 붉은색이 어느 쪽으로 넓어지는지 봐요.'
-                };
-                return {
-                    selector: '[data-action="capture"]',
-                    copy: '붉은 띠가 넓어진 쪽을 확인했어요. ‘증거 남기기’로 기록해요.'
-                };
-            }
-            const next = ['HCl', 'H2SO4', 'CH3COOH'].find(k => !has(tags, 'model-' + k));
+            if (sim.phase === 1) return !sim.migration.ran ? {
+                selector: '[data-lab="run"]',
+                copy: '‘전류 흘리기’를 눌러 붉은색이 어느 쪽으로 넓어지는지 봐요.'
+            } : {
+                selector: '[data-action="capture"]',
+                copy: '붉은 띠가 넓어진 쪽을 확인했어요. ‘증거 남기기’로 기록해요.'
+            };
+            const next = ACID_MODELS.find(k => !has(tags, 'model-' + k));
             if (next && sim.model.pick !== next) return {
                 selector: `[data-lab="pick-model"][data-model="${next}"]`,
-                copy: `${M.models[next].label} 모형을 골라 입자 수를 맞춰 봐요.`
+                copy: sim.model.pick === 'HCl' ? `염산 예시를 봤다면 이제 ${M.models[next].label}을(를) 골라 직접 만들어 봐요.` : `${M.models[next].label} 모형을 골라 입자 수를 맞춰 봐요.`
             };
             if (next) {
                 const err = modelCheck(sim);
@@ -599,61 +660,40 @@
                 copy: '산의 정체를 밝힐 증거가 모였어요. ‘부탁 해결하기’를 눌러요.'
             };
         },
-        scene(sim) {
-            if (sim.phase === 0) {
-                const s = sim.cell,
-                    led = s ? S[s].conduct : null;
-                const glow = led === 'bright' ? '<circle cx="300" cy="150" r="70" fill="url(#glowG)"/>' : led === 'dim' ? '<circle cx="300" cy="150" r="34" fill="url(#glowG)" opacity=".7"/>' : '';
-                const table = CONDUCT.map((k, i) => `<text x="640" y="${196+i*44}" class="t-small">${esc(S[k].name)}</text><text x="930" y="${196+i*44}" class="t-small" text-anchor="end" fill="${sim.tested[k]?'#3d5d4a':'#a3ab9f'}">${sim.tested[k]?LED_WORD[S[k].conduct]:'—'}</text>`).join('');
-                return svg(`${title('Step 1 · 간이 전기 전도 장치','아래 병을 누르면 그 용액을 전도 장치에 담아요 (농도 1 M)')}${glow}<rect x="248" y="170" width="104" height="54" rx="12" fill="#3b4b5a"/><circle cx="300" cy="150" r="22" fill="${led==='bright'?'#ffe066':led==='dim'?'#f3e3a0':'#d9dde0'}" stroke="#8a949c" stroke-width="3"/><line x1="280" y1="224" x2="280" y2="380" stroke="#8a949c" stroke-width="8"/><line x1="320" y1="224" x2="320" y2="380" stroke="#8a949c" stroke-width="8"/>${beaker(200,300,200,150,s?'#dcecf2':'#f3f6f7',s?.6:0,{label:s?S[s].name:'비어 있음'})}<rect x="610" y="150" width="340" height="250" rx="18" fill="#ffffff" stroke="#e2dccb" stroke-width="2"/><text x="640" y="176" class="t-label">내가 본 전구</text>${table}${CONDUCT.map((k,i)=>hit(`<rect x="${60+i*112}" y="486" width="100" height="44" rx="12" fill="${sim.cell===k?'#fff0b8':'#ffffff'}" stroke="#d8c9a4" stroke-width="2"/><text x="${110+i*112}" y="514" class="t-small" text-anchor="middle">${esc(S[k].short||S[k].name.replace(' 수용액',''))}</text>`,'pour',{sol:k},S[k].name+' 담기')).join('')}`, '간이 전기 전도 장치');
+        say(tag, tags) {
+            if (tag === 'start') return [1, '조수! 일단 산 수용액에 전기가 흐르는지 체크해 보자고! 간이 전기 전도 장치로 간단하게 테스트해 보도록 하지.'];
+            if (tag === 'conduct') return [1, '전기가 흐르는 걸 보니 전해질이군! 그럼 수소 이온을 찾을 수 있겠지. 이제 전류를 흘려서 어느 이온이 산을 이루는지 찾아볼 차례야.'];
+            if (tag === 'migrate-acid') return [1, '(−)극 쪽으로 붉은색이 넓어졌지? 양이온 때문에 산의 공통적인 성질이 나타난 것이었어! 오호, 이제 퍼즐 조각이 맞춰지고 있군! 다음은 산이 물에 녹은 모습을 모형으로 나타내 볼 차례야.'];
+            if (/^model-/.test(tag)) {
+                const all = ACID_MODELS.every(k => has(tags, 'model-' + k));
+                if (tag === 'model-CH3COOH') return [1, '앞의 산들과 다른 점을 발견했는가? 아세트산은 일부만 이온화하는구먼. 염산·황산·질산처럼 대부분 이온화하는 산은 강산, 아세트산처럼 일부만 이온화하는 산은 약산이라고 하자!' + (all ? ' 그래도 물에 녹아 수소 이온(H⁺)을 내놓는 건 모두 같지. 이걸 ‘산의 이온화’라고 부르는 건 어떻나?!' : '')];
+                return [1, all ? '훌륭해! 산은 모두 물에 녹아 수소 이온(H⁺)을 내놓는군. 이걸 ‘산의 이온화’라고 부르는 건 어떻나?! 대부분 이온화하는 산은 강산, 아세트산처럼 일부만 이온화하는 산은 약산이라고 하자!' : '염산을 참고해서 잘 만들었군! 생각보다 쉽지는 않지? 곧 쉬워질 거야. 막히면 언제든 힌트를 부르게!'];
             }
+            return null;
+        },
+        scene(sim) {
+            if (sim.phase === 0) return conductScene(sim, ACID_CONDUCT, 'Step 1 · 간이 전기 전도 장치');
             if (sim.phase === 1) return svg(`${title('Step 2 · 전류를 흘려 움직이는 이온 찾기','전류를 흘리면 이온이 반대 전하의 전극 쪽으로 끌려가요')}${migrationScene(sim,'acid')}`, '리트머스 종이 위 이온의 이동');
-            return svg(modelScene(sim), '이온화 모형');
+            return svg(modelScene(sim, 'Dr.에시드'), '이온화 모형');
         },
         readings(sim) {
-            if (sim.phase !== 0 || !sim.cell) return '';
-            const w = LED_WORD[S[sim.cell].conduct];
-            return `<div class="reading-row"><div class="reading current"><small>담은 용액</small><b style="font-size:1.1rem">${esc(S[sim.cell].name)}</b></div><div class="reading voltage"><small>전구</small><b style="font-size:1.1rem">${esc(w)}</b></div></div>`;
+            return sim.phase === 0 ? conductReadings(sim) : '';
         },
         note(sim) {
             return ['전구가 켜지면 수용액 속에 움직일 수 있는 이온이 있다는 뜻이에요. 설탕처럼 이온으로 나뉘지 않는 물질의 수용액은 전류가 흐르지 않아요.', '종이 전체에는 질산 칼륨의 K⁺와 NO₃⁻가 있지만 색을 바꾸지 않아요. 색이 바뀐 곳은 실에서 나온 이온이 움직인 자리예요.', '입자 모형: 초록 = 양이온, 주황 = 음이온, 노랑 = 녹기만 하고 이온화하지 않은 분자.'][sim.phase];
         },
         controls(sim) {
-            if (sim.phase === 0) return `<p class="compact-rule">그림 아래의 병을 눌러 한 가지씩 담아 봐요. 네 가지(염산·황산·아세트산·설탕물)는 꼭 확인해요.</p><button type="button" data-lab="empty">↺ 장치 비우기</button>`;
+            if (sim.phase === 0) return `<p class="compact-rule">그림 아래의 병을 눌러 한 가지씩 담아 봐요. 네 가지(염산·황산·아세트산·설탕물)는 꼭 확인해요.</p><div class="tool-tray"><button type="button" data-lab="empty">↺ 장치 비우기</button></div>`;
             if (sim.phase === 1) return migrationControls(sim);
-            return modelControls(sim);
+            return modelControls(sim, 'Dr.에시드');
         },
         act(sim, a, d) {
-            if (sim.phase === 0) {
-                if (a === 'pour' && S[d.sol]) {
-                    sim.cell = d.sol;
-                    sim.tested[d.sol] = true;
-                    return {
-                        sound: S[d.sol].conduct === 'off' ? 'click' : 'switch-close'
-                    };
-                }
-                if (a === 'empty') sim.cell = null;
-                return;
-            }
+            if (sim.phase === 0) return conductAct(sim, a, d, ACID_CONDUCT);
             if (sim.phase === 1) return migrationAct(sim, a);
             return modelAct(sim, a, d);
         },
         capture(sim) {
-            if (sim.phase === 0) {
-                const miss = CONDUCT_NEED.filter(k => !sim.tested[k]);
-                if (miss.length) return {
-                    error: `${miss.map(k=>S[k].name).join(', ')}도 담아 본 뒤 기록해요.`
-                };
-                const list = CONDUCT.filter(k => sim.tested[k]);
-                return {
-                    tag: 'conduct',
-                    label: '간이 전기 전도 장치로 전구 밝기 비교',
-                    fields: list.map(k => choiceField(k, S[k].name + ' (1 M)', ['밝게 켜짐', '희미하게 켜짐', '켜지지 않음'], LED_WORD[S[k].conduct], '오른쪽 표에 적힌 내 관찰을 옮겨 적어요.')),
-                    snap: {
-                        list
-                    }
-                };
-            }
+            if (sim.phase === 0) return conductCapture(sim, ACID_CONDUCT, ACID_NEED, 'conduct', '간이 전기 전도 장치로 전구 밝기 비교');
             if (sim.phase === 1) {
                 if (!sim.migration.ran) return {
                     error: '먼저 ‘전류 흘리기’를 눌러 붉은색의 움직임을 관찰해요.'
@@ -670,11 +710,10 @@
             return modelCapture(sim);
         },
         after(sim, tags) {
-            if (sim.phase === 0 && has(tags, 'conduct')) sim.phase = 1;
-            else if (sim.phase === 1 && has(tags, 'migrate-acid')) sim.phase = 2;
+            sim.phase = this.phaseOf(tags);
             for (const k of Object.keys(sim.built)) sim.built[k] = has(tags, 'model-' + k);
-            if (sim.phase === 2) {
-                const next = ['HCl', 'H2SO4', 'CH3COOH'].find(k => !has(tags, 'model-' + k));
+            if (sim.phase === 2 && sim.model.pick !== 'HCl') {
+                const next = ACID_MODELS.find(k => !has(tags, 'model-' + k));
                 if (next) sim.model.pick = next;
             }
         },
@@ -692,17 +731,24 @@
             C: 'CaOH2',
             D: 'sugar'
         };
-    const BASE_TOOLS = ['blueLitmus', 'redLitmus', 'btb', 'pp'];
+    const BASE_TOOLS = ['blueLitmus', 'redLitmus', 'btb', 'pp'],
+        BASE_CONDUCT = ['NaOH', 'KOH', 'NH3', 'sugar', 'water'],
+        BASE_NEED = ['NaOH', 'KOH', 'NH3', 'sugar'],
+        BASE_MODELS = ['KOH', 'CaOH2', 'NH3'];
     Labs[3] = {
         title: '베이스 연구실 · 염기 실험대',
-        steps: ['염기를 알려 주는 지시약 두 가지를 골라 용액 A~D를 검사하고 기록해요.', '리트머스 종이 위에서 전류를 흘려, 푸른색을 만든 이온을 찾아 기록해요.', '수산화 나트륨·수산화 칼슘·암모니아의 이온화 모형을 만들어 기록해요.'],
+        steps: ['염기를 알려 주는 지시약 두 가지를 골라 용액 A~D를 검사하고 기록해요.', '간이 전기 전도 장치로 염기 수용액과 설탕물의 전구 밝기를 비교해 기록해요.', '리트머스 종이 위에서 전류를 흘려, 푸른색을 만든 이온을 찾아 기록해요.', '베이스 박사의 수산화 나트륨 예시를 보고, 수산화 칼륨·수산화 칼슘·암모니아의 이온화 모형을 만들어 기록해요.'],
         prediction: ['비눗방울 물질 같은 염기에 BTB를 떨어뜨리면?', ['노란색', '초록색', '파란색']],
-        principle: '염기 수용액은 붉은 리트머스를 푸르게, BTB를 파랗게, 페놀프탈레인을 붉게 바꿔요. 염기는 물에 녹아 수산화 이온(OH⁻)을 내놓아요. 푸른 리트머스는 염기에서 변하지 않아서 염기를 찾는 데는 쓸모가 적어요.',
+        principle: '염기 수용액은 붉은 리트머스를 푸르게, BTB를 파랗게, 페놀프탈레인을 붉게 바꿔요. 염기는 물에 녹아 수산화 이온(OH⁻)을 내놓고, 그 수용액에는 전류가 흘러요. 대부분 이온화하면 강염기, 일부만 이온화하면 약염기예요. 푸른 리트머스는 염기에서 변하지 않아서 염기를 찾는 데는 쓸모가 적어요.',
         safety: '염기 수용액은 단백질을 녹여 미끌거려요. 그래서 맨손으로 만지지 않고 장갑과 보안경을 써요.',
+        indicatorDone: tags => ['ind-redLitmus', 'ind-btb', 'ind-pp'].filter(t => tags.includes(t)).length >= 2,
+        phaseOf(tags) {
+            return !this.indicatorDone(tags) ? 0 : !has(tags, 'conduct-base') ? 1 : !has(tags, 'migrate-base') ? 2 : 3;
+        },
         init(tags) {
-            const phase = has(tags, 'migrate-base') ? 2 : this.indicatorDone(tags) ? 1 : 0;
+            const phase = this.phaseOf(tags);
             const built = {};
-            for (const k of ['NaOH', 'CaOH2', 'NH3', 'KOH']) built[k] = has(tags, 'model-' + k);
+            for (const k of ['NaOH', ...BASE_MODELS]) built[k] = has(tags, 'model-' + k);
             return {
                 phase,
                 tool: 'redLitmus',
@@ -712,18 +758,19 @@
                     btb: {},
                     pp: {}
                 },
+                tested: {},
+                cell: null,
                 migration: {
                     polarity: 'left-neg',
                     ran: false,
                     ranAt: 0
                 },
-                model: modelInit(['NaOH', 'CaOH2', 'NH3', 'KOH']),
+                model: modelInit(['NaOH', 'KOH', 'CaOH2', 'NH3'], 'NaOH'),
                 built
             };
         },
-        indicatorDone: tags => ['ind-redLitmus', 'ind-btb', 'ind-pp'].filter(t => tags.includes(t)).length >= 2,
         checks(tags) {
-            return [this.indicatorDone(tags), has(tags, 'migrate-base'), ['NaOH', 'CaOH2', 'NH3'].every(k => has(tags, 'model-' + k))];
+            return [this.indicatorDone(tags), has(tags, 'conduct-base'), has(tags, 'migrate-base'), BASE_MODELS.every(k => has(tags, 'model-' + k))];
         },
         hint(sim, tags) {
             if (sim.phase === 0) {
@@ -742,17 +789,28 @@
                     copy: `${I[sim.tool].short} 결과를 ‘증거 남기기’로 기록해요. 염기를 알려 주는 지시약 두 가지가 필요해요.`
                 };
             }
-            if (sim.phase === 1) return !sim.migration.ran ? {
+            if (sim.phase === 1) {
+                const next = BASE_NEED.find(k => !sim.tested[k]);
+                if (next) return {
+                    selector: `[data-lab="pour"][data-sol="${next}"]`,
+                    copy: `‘${S[next].name}’ 병을 눌러 전도 장치에 담아 봐요.`
+                };
+                return {
+                    selector: '[data-action="capture"]',
+                    copy: '네 용액의 전구 밝기를 봤어요. ‘증거 남기기’로 기록해요.'
+                };
+            }
+            if (sim.phase === 2) return !sim.migration.ran ? {
                 selector: '[data-lab="run"]',
                 copy: '‘전류 흘리기’를 눌러 푸른색이 어느 쪽으로 넓어지는지 봐요.'
             } : {
                 selector: '[data-action="capture"]',
                 copy: '푸른 띠가 넓어진 쪽을 확인했어요. ‘증거 남기기’로 기록해요.'
             };
-            const next = ['NaOH', 'CaOH2', 'NH3'].find(k => !has(tags, 'model-' + k));
+            const next = BASE_MODELS.find(k => !has(tags, 'model-' + k));
             if (next && sim.model.pick !== next) return {
                 selector: `[data-lab="pick-model"][data-model="${next}"]`,
-                copy: `${M.models[next].label} 모형을 골라 입자 수를 맞춰 봐요.`
+                copy: sim.model.pick === 'NaOH' ? `수산화 나트륨 예시를 봤다면 이제 ${M.models[next].label}을(를) 골라 직접 만들어 봐요.` : `${M.models[next].label} 모형을 골라 입자 수를 맞춰 봐요.`
             };
             if (next) {
                 const err = modelCheck(sim);
@@ -769,6 +827,19 @@
                 copy: '염기의 정체를 밝혔어요! ‘부탁 해결하기’를 눌러요.'
             };
         },
+        say(tag, tags) {
+            if (tag === 'start') return [2, '앞에 있는 용액들 중 염기성을 띠는 용액을 찾아볼래? 이번엔 어떤 지시약을 쓸지 네가 골라 봐!'];
+            if (tag === 'ind-blueLitmus') return [2, '음… 푸른 리트머스는 하나도 변하지 않았네. 염기를 찾으려면 다른 지시약이 필요해 보여.'];
+            if (/^ind-/.test(tag)) return this.indicatorDone(tags) ? [2, '좋아! 앞에 있던 용액들은 사실 수산화 나트륨, 수산화 칼륨, 석회수(수산화 칼슘), 설탕물이야. NaOH, KOH, Ca(OH)₂ — 공통으로 OH를 갖고 있지. 이제 함께 전기가 흐르는지 체크해 보자!'] : [2, '테스트가 너무 쉬웠구나. 바로 다음! 다른 지시약으로도 한 번 더 확인해 볼래?'];
+            if (tag === 'conduct-base') return [2, '염기 수용액도 전기가 흐르는 걸 보니 전해질이야! 수산화 이온을 찾을 수 있겠어. 그런데 암모니아수는 희미했지? 그 까닭은 모형에서 알아보자.'];
+            if (tag === 'migrate-base') return [2, '(+)극 쪽이 푸른색으로 변했지? 음이온 때문이야. 수산화 나트륨 수용액의 음이온은 수산화 이온이니까, OH⁻가 붉은 리트머스를 파랗게 바꾼 거구나! 수산화 나트륨 모형은 내가 예시로 보여 줄게.'];
+            if (/^model-/.test(tag)) {
+                const all = BASE_MODELS.every(k => has(tags, 'model-' + k));
+                if (tag === 'model-NH3') return [2, '앞의 염기들과 다른 점 찾았어? 암모니아는 물과 반응해 OH⁻를 조금만 내놓아. 수산화 나트륨·수산화 칼륨·수산화 칼슘처럼 대부분 이온화하면 강염기, 암모니아처럼 일부만 이온화하면 약염기라고 하자!' + (all ? ' 그래도 물에 녹아 수산화 이온(OH⁻)을 내놓는 건 모두 같아.' : '')];
+                return [2, all ? '이제 좀 알 것 같아! 염기는 모두 물에 녹아 수산화 이온(OH⁻)을 내놓는구나. 대부분 이온화하면 강염기, 암모니아처럼 일부만 이온화하면 약염기야.' : '수산화 나트륨을 참고해서 잘 만들었어! 스스로 해 보다가 질문 있으면 언제든 불러.'];
+            }
+            return null;
+        },
         scene(sim) {
             if (sim.phase === 0) {
                 const xs = [70, 300, 530, 760],
@@ -778,19 +849,23 @@
                     const r = indicatorResult(t, L3SOL[k]);
                     return `<g transform="translate(${i*36} 0)"><circle r="14" fill="${r.color}" stroke="#ffffff" stroke-width="3"/><text y="34" class="t-mini" text-anchor="middle">${{blueLitmus:'푸리',redLitmus:'붉리',btb:'BTB',pp:'페놀'}[t]}</text></g>`;
                 }).join('');
-                return svg(`${title('Step 1 · 염기를 알려 주는 지시약 고르기','오른쪽에서 지시약을 고르고 용액 자리를 눌러요')}${L3.map((k,i)=>{const x=xs[i],t=!!map[k],r=indicatorResult(tool,L3SOL[k]);return hit(`${beaker(x,300,150,150,k==='C'?'#e6f0f0':'#dcecf2',.6,{label:'용액 '+k,sub:S[L3SOL[k]].short||S[L3SOL[k]].name})}${t?stripOrDrop(x+60,150,tool,L3SOL[k],true):slot(x+14,150,122,100,I[tool].short)}${t?tag(x+75,140,r.word,'#4c5a52'):''}<g transform="translate(${x+22} 270)">${badges(k)}</g>`,'apply',{cup:k},`용액 ${k}를 ${I[tool].short}(으)로 검사`,t?'is-done':'');}).join('')}`, '네 용액과 여러 지시약');
+                return svg(`${title('Step 1 · 염기를 알려 주는 지시약 고르기','오른쪽에서 지시약을 고르고 용액 자리를 눌러요')}${L3.map((k,i)=>{const x=xs[i],t=!!map[k],r=indicatorResult(tool,L3SOL[k]);return hit(`${beaker(x,300,150,150,k==='C'?'#e6f0f0':'#dcecf2',.6,{label:'용액 '+k})}${t?stripOrDrop(x+60,150,tool,L3SOL[k],true):slot(x+14,150,122,100,I[tool].short)}${t?tag(x+75,140,r.word,'#4c5a52'):''}<g transform="translate(${x+22} 270)">${badges(k)}</g>`,'apply',{cup:k},`용액 ${k}를 ${I[tool].short}(으)로 검사`,t?'is-done':'');}).join('')}`, '네 용액과 여러 지시약');
             }
-            if (sim.phase === 1) return svg(`${title('Step 2 · 전류를 흘려 움직이는 이온 찾기','이번엔 붉은 리트머스 종이 위에 수산화 나트륨 수용액을 적신 실을 올렸어요')}${migrationScene(sim,'base')}`, '리트머스 종이 위 이온의 이동');
-            return svg(modelScene(sim), '이온화 모형');
+            if (sim.phase === 1) return conductScene(sim, BASE_CONDUCT, 'Step 2 · 염기 수용액에도 전류가 흐를까?');
+            if (sim.phase === 2) return svg(`${title('Step 3 · 전류를 흘려 움직이는 이온 찾기','이번엔 붉은 리트머스 종이 위에 수산화 나트륨 수용액을 적신 실을 올렸어요')}${migrationScene(sim,'base')}`, '리트머스 종이 위 이온의 이동');
+            return svg(modelScene(sim, 'Dr.베이스'), '이온화 모형');
         },
-        readings: () => '',
+        readings(sim) {
+            return sim.phase === 1 ? conductReadings(sim) : '';
+        },
         note(sim) {
-            return ['지시약마다 알려 주는 것이 달라요. 염기에서 색이 변하는 지시약을 찾아 보세요.', '종이 전체의 K⁺와 NO₃⁻는 색을 바꾸지 않아요. 색이 바뀐 곳은 실에서 나온 이온이 움직인 자리예요.', '암모니아는 물과 반응해 OH⁻를 조금만 내놓아요(약염기). 입자 모형에서는 대부분 NH₃ 분자로 남겨요.'][sim.phase];
+            return ['지시약마다 알려 주는 것이 달라요. 염기에서 색이 변하는 지시약을 찾아 보세요.', '전구가 켜지면 움직이는 이온이 있다는 뜻이에요. 밝기를 비교하면 이온이 얼마나 많은지 짐작할 수 있어요.', '종이 전체의 K⁺와 NO₃⁻는 색을 바꾸지 않아요. 색이 바뀐 곳은 실에서 나온 이온이 움직인 자리예요.', '암모니아는 물과 반응해 OH⁻를 조금만 내놓아요(약염기). 입자 모형에서는 대부분 NH₃ 분자로 남겨요.'][sim.phase];
         },
         controls(sim) {
             if (sim.phase === 0) return `<div class="tool-tray">${toolButton(sim,'blueLitmus','푸른 리트머스','📘')}${toolButton(sim,'redLitmus','붉은 리트머스','📕')}${toolButton(sim,'btb','BTB 용액','💧')}${toolButton(sim,'pp','페놀프탈레인','🧴')}</div><p class="compact-rule">지금 고른 지시약: <b>${esc(I[sim.tool].name)}</b> · 한 지시약으로 네 용액을 다 검사하면 기록할 수 있어요.</p>`;
-            if (sim.phase === 1) return migrationControls(sim);
-            return modelControls(sim);
+            if (sim.phase === 1) return `<p class="compact-rule">그림 아래의 병을 눌러 한 가지씩 담아 봐요. 수산화 나트륨·수산화 칼륨·암모니아수·설탕물은 꼭 확인해요.</p><div class="tool-tray"><button type="button" data-lab="empty">↺ 장치 비우기</button></div>`;
+            if (sim.phase === 2) return migrationControls(sim);
+            return modelControls(sim, 'Dr.베이스');
         },
         act(sim, a, d) {
             if (sim.phase === 0) {
@@ -803,10 +878,11 @@
                 }
                 return;
             }
-            if (sim.phase === 1) return migrationAct(sim, a);
+            if (sim.phase === 1) return conductAct(sim, a, d, BASE_CONDUCT);
+            if (sim.phase === 2) return migrationAct(sim, a);
             return modelAct(sim, a, d);
         },
-        capture(sim, tags) {
+        capture(sim) {
             if (sim.phase === 0) {
                 const tool = sim.tool,
                     map = sim.tests[tool];
@@ -815,14 +891,15 @@
                 };
                 return {
                     tag: 'ind-' + tool,
-                    label: `${I[tool].name}로 네 용액 검사`,
-                    fields: L3.map(k => choiceField(k, `용액 ${k} (${S[L3SOL[k]].short||S[L3SOL[k]].name})`, I[tool].options, I[tool].word(S[L3SOL[k]].pH), '그림에 보이는 색을 골라요.')),
+                    label: `${I[tool].name}${/[가-힣]$/.test(I[tool].name) && (I[tool].name.charCodeAt(I[tool].name.length - 1) - 0xac00) % 28 && (I[tool].name.charCodeAt(I[tool].name.length - 1) - 0xac00) % 28 !== 8 ? '으로' : '로'} 네 용액 검사`,
+                    fields: L3.map(k => choiceField(k, `용액 ${k}`, I[tool].options, I[tool].word(S[L3SOL[k]].pH), '그림에 보이는 색을 골라요.')),
                     snap: {
                         tool
                     }
                 };
             }
-            if (sim.phase === 1) {
+            if (sim.phase === 1) return conductCapture(sim, BASE_CONDUCT, BASE_NEED, 'conduct-base', '간이 전기 전도 장치로 염기 수용액 전구 밝기 비교');
+            if (sim.phase === 2) {
                 if (!sim.migration.ran) return {
                     error: '먼저 ‘전류 흘리기’를 눌러 푸른색의 움직임을 관찰해요.'
                 };
@@ -838,11 +915,10 @@
             return modelCapture(sim);
         },
         after(sim, tags) {
-            if (sim.phase === 0 && this.indicatorDone(tags)) sim.phase = 1;
-            else if (sim.phase === 1 && has(tags, 'migrate-base')) sim.phase = 2;
+            sim.phase = this.phaseOf(tags);
             for (const k of Object.keys(sim.built)) sim.built[k] = has(tags, 'model-' + k);
-            if (sim.phase === 2) {
-                const next = ['NaOH', 'CaOH2', 'NH3'].find(k => !has(tags, 'model-' + k));
+            if (sim.phase === 3 && sim.model.pick !== 'NaOH') {
+                const next = BASE_MODELS.find(k => !has(tags, 'model-' + k));
                 if (next) sim.model.pick = next;
             }
         },
@@ -855,6 +931,14 @@
             }
             return '';
         }
+    };
+
+    /* 수산화 나트륨 20 mL 와 넣은 염산의 부피비 — 원본 실험 결과표 그대로 */
+    const ratio = hcl => {
+        if (!hcl) return '20 : 0';
+        const g = (a, b) => b ? g(b, a % b) : a,
+            d = g(20, hcl);
+        return `${20/d} : ${hcl/d}`;
     };
 
     /* ═══ 4. 중화병의 원인 — 혼합 실험 ★ ═══ */
@@ -889,13 +973,22 @@
                 copy: `지금 ${want} mL예요. 색·온도·입자 수를 보고 ‘증거 남기기’로 기록해요.`
             };
         },
+        say(tag) {
+            if (tag === 'start') return [2, '산과 염기의 반응을 눈으로 확인할 수 있게 BTB 용액을 쓸 거야! 수산화 나트륨 수용액 20 mL에 BTB를 떨어뜨렸어. 이제 염산을 10 mL씩 넣으면서 색과 온도를 잘 봐.'];
+            if (tag === 'mix-0') return [2, '염산을 넣기 전이라 H⁺는 하나도 없고 OH⁻가 있어서 파란색이야. 이제 염산을 10 mL 넣어 봐!'];
+            if (tag === 'mix-10') return [2, '아직 파란색이지? 그런데 입자를 봐. H⁺와 OH⁻가 만나서 물이 생겼어! 온도도 조금 올랐고.'];
+            if (tag === 'mix-20') return [2, '1:1로 섞였더니 수소 이온과 수산화 이온이 모두 물이 되어 사라졌어! 산도 염기도 아닌 중성이 되어서 초록색이 된 거야. 사라진 이온들이 힌트야!'];
+            if (tag === 'mix-30') return [2, '초록색을 지나 노란색이 됐어! 입자를 세어 봐. 이번엔 무엇이 남았지?'];
+            if (tag === 'mix-40') return [2, '왜 노란색이 되었을까? 그렇지! 산을 결정하는 수소 이온이 남아 있기 때문이야. 드디어 중화병의 단서를 다 모았어!'];
+            return null;
+        },
         scene(sim) {
             const m = M.mix(sim.hcl);
             const listed = [...Array(m.Na).fill('Na+'), ...Array(m.Cl).fill('Cl-'), ...Array(m.H).fill('H+'), ...Array(m.OH).fill('OH-'), ...Array(m.water).fill('H2O')];
             const level = .3 + (20 + sim.hcl) / 60 * .55;
             const temp = m.temp,
                 tH = Math.max(0, Math.min(1, (temp - 15) / 15));
-            return svg(`${title('수산화 나트륨 수용액 20 mL + BTB','묽은 염산을 10 mL씩 넣어요 · 두 용액의 농도는 같아요')}<g transform="translate(0 0)"><rect x="186" y="96" width="30" height="120" rx="8" fill="#eef6f8" stroke="#7d93a0" stroke-width="3"/><rect x="190" y="${100+ (1-(40-sim.hcl)/40)*112}" width="22" height="${(40-sim.hcl)/40*112}" rx="5" fill="#dcecf2"/><path d="M193 216 L209 216 L203 238 L199 238 Z" fill="#7d93a0"/><text x="232" y="140" class="t-small">묽은 염산</text><text x="232" y="164" class="t-small">남은 양 ${40-sim.hcl} mL</text></g>${beaker(90,250,280,200,C[m.color],level)}<text x="230" y="498" class="t-label" text-anchor="middle">넣은 염산 ${sim.hcl} mL · ${m.colorWord}</text><g transform="translate(410 250)"><rect x="-10" y="0" width="20" height="170" rx="10" fill="#ffffff" stroke="#7d93a0" stroke-width="3"/><rect x="-5" y="${160-tH*150}" width="10" height="${tH*150+4}" rx="5" fill="#e0555a"/><circle cy="182" r="18" fill="#e0555a" stroke="#7d93a0" stroke-width="3"/><text x="0" y="-12" class="t-small" text-anchor="middle">${temp.toFixed(1)} °C</text></g><g transform="translate(470 110)"><rect width="500" height="340" rx="22" fill="#ffffff" stroke="#e2dccb" stroke-width="2"/><text x="24" y="40" class="t-label">비커 속 입자 (10 mL에 이온 한 쌍)</text>${scatter(listed,{x:20,y:60,w:460,h:260},listed.length>8?26:30)}</g>`, '중화 반응 실험');
+            return svg(`${title('수산화 나트륨 수용액 20 mL + BTB','묽은 염산을 10 mL씩 넣어요 · 두 용액의 농도는 같아요')}<g transform="translate(0 0)"><rect x="186" y="96" width="30" height="120" rx="8" fill="#eef6f8" stroke="#7d93a0" stroke-width="3"/><rect x="190" y="${100+ (1-(40-sim.hcl)/40)*112}" width="22" height="${(40-sim.hcl)/40*112}" rx="5" fill="#dcecf2"/><path d="M193 216 L209 216 L203 238 L199 238 Z" fill="#7d93a0"/><text x="232" y="140" class="t-small">묽은 염산</text><text x="232" y="164" class="t-small">남은 양 ${40-sim.hcl} mL</text></g>${beaker(90,250,280,200,C[m.color],level)}<text x="230" y="498" class="t-label" text-anchor="middle">넣은 염산 ${sim.hcl} mL · ${m.colorWord}</text><text x="230" y="526" class="t-small" text-anchor="middle">부피비 NaOH : HCl = ${ratio(sim.hcl)}</text><g transform="translate(410 250)"><rect x="-10" y="0" width="20" height="170" rx="10" fill="#ffffff" stroke="#7d93a0" stroke-width="3"/><rect x="-5" y="${160-tH*150}" width="10" height="${tH*150+4}" rx="5" fill="#e0555a"/><circle cy="182" r="18" fill="#e0555a" stroke="#7d93a0" stroke-width="3"/><text x="0" y="-12" class="t-small" text-anchor="middle">${temp.toFixed(1)} °C</text></g><g transform="translate(470 110)"><rect width="500" height="340" rx="22" fill="#ffffff" stroke="#e2dccb" stroke-width="2"/><text x="24" y="40" class="t-label">비커 속 입자 (10 mL에 이온 한 쌍)</text>${scatter(listed,{x:20,y:60,w:460,h:260},listed.length>8?26:30)}</g>`, '중화 반응 실험');
         },
         readings(sim) {
             const m = M.mix(sim.hcl);
@@ -1139,6 +1232,13 @@
                 fields: UNKNOWN.map(([u, sol, label]) => choiceField(u, label, ['산성', '중성', '염기성'], kindWord(sol), '메틸 오렌지와 페놀프탈레인의 결과를 함께 봐요.')),
                 snap: {}
             };
+        },
+        say(tag, tags) {
+            if (tag === 'start') return [3, '새콤이의 체액 모형이에요. 베이스 박사님이 치료제는 한 방울씩 넣고 pH를 꼭 확인하래요. 너무 적어도, 너무 많아도 안 된대요!'];
+            if (tag === 'cure') return [2, '(쪽지) 레몬 종족에게 알맞은 산성으로 돌아왔구나! 이번엔 마을 사람들이 쓸 지시약이야. BTB 말고도 페놀프탈레인 용액, 메틸 오렌지 용액을 쓸 수 있어. 산성·중성·염기성 용액에 하나씩 떨어뜨려 표를 채워 줘.'];
+            if (/^table-/.test(tag)) return TABLE_TOOLS.every(t => has(tags, 'table-' + t)) ? [2, '(쪽지) 여러 가지 지시약의 사용법이 완성됐어! 지시약을 알맞게 쓰면 염기성 물질이 든 것을 찾을 수 있을 거야. 창고 시료로 시험해 봐.'] : [3, '표가 채워지고 있어요! 다른 지시약도 떨어뜨려 봐 주세요.'];
+            if (tag === 'unknown') return [3, '시료 ③이 비눗방울처럼 염기성이었군요! 이제 마을 사람들도 지시약으로 가려낼 수 있겠어요.'];
+            return null;
         },
         after(sim, tags) {
             if (sim.phase === 0 && has(tags, 'cure')) sim.phase = 1;

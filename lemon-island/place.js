@@ -28,8 +28,8 @@
     const ROADS = [{
             w: 2.2,
             pts: [
-                [-11.5, -10.2],
-                [-10.5, -7.5],
+                [-13.5, -5.9],
+                [-11.8, -4.4],
                 [-8, -3.5],
                 [-5, -0.5],
                 [-1, 1.5],
@@ -107,12 +107,30 @@
         x: 0.6,
         z: -13.2
     };
+    /* 레몬 성 안뜰: 낮은 성벽(카메라가 넘겨다볼 수 있게)과 앞쪽 성문. 처음 탐험은 여기, 레몬 백작 앞에서 시작한다. */
+    const COURT = {
+        x0: -18.4,
+        x1: -8.6,
+        z0: -12.4,
+        z1: -6.6,
+        gate: [-14.6, -11.4],
+        spawn: {
+            x: -13.5,
+            z: -7.8
+        },
+        outside: {
+            x: -13.5,
+            z: -5.2
+        }
+    };
+    const inCastle = (x, z, pad = 0) => x > -19.8 - pad && x < COURT.x1 + .6 + pad && z < COURT.z1 + .6 + pad;
     P.islandLayout = {
         roads: ROADS,
         lands: LANDS,
         bridges: BRIDGES,
         plaza: PLAZA,
         camp: CAMP,
+        court: COURT,
         channel: [3.4, 6.6]
     };
 
@@ -134,15 +152,48 @@
 
     P.blocked = function(x, z) {
         if (x < -19.5 || x > 20.6 || z < -16.4 || z > 16.4) return true;
+        if (x < COURT.x0 - .2 && z < COURT.z1 - .3 || x < -16.9 && z < COURT.z0) return true;
         if (x > 3.4 && x < 6.6 && BRIDGES.every(b => Math.abs(z - b) > 1.13)) return true;
         return this.colliders.some(c => c.r ? Math.hypot(x - c.x, z - c.z) < c.r + .28 : Math.abs(x - c.x) < c.w + .28 && Math.abs(z - c.z) < c.d + .28);
     };
 
     /* 구역 = 부탁 자리. 창문·등불·나무 장식이 가까운 부탁 자리의 구역에 묶여, 그 부탁을 풀면 켜진다. */
+    const REGION_ANCHORS = M.quests.map(q => q.id === 0 ? {
+        id: 0,
+        x: -10.5,
+        z: -5
+    } : {
+        id: q.id,
+        x: q.x,
+        z: q.z
+    });
+    const baseGo = P.go;
+    P.go = function(q) {
+        if (Math.hypot(q.x - this.player.position.x, q.z - this.player.position.z) < 3) {
+            this.path = [];
+            this.pendingNpc = null;
+            this.cb.interact(q.id);
+            return;
+        }
+        return baseGo.call(this, q);
+    };
+
+    const baseFindPath = P.findPath;
+    P.findPath = function(tx, tz) {
+        let path = baseFindPath.call(this, tx, tz);
+        if (path.length || !this.blocked(tx, tz)) return path;
+        for (const r of [.75, 1.5, 2.25])
+            for (const [dx, dz] of [[0, 1], [1, 0], [-1, 0], [0, -1], [1, 1], [-1, 1], [1, -1], [-1, -1]]) {
+                path = baseFindPath.call(this, tx + dx * r, tz + dz * r);
+                if (path.length) return path;
+            }
+        return [];
+    };
+
     P.regionAt = function(x, z) {
         let region = 0,
             distance = Infinity;
-        for (const q of M.quests) {
+        for (const q of REGION_ANCHORS) {
             const d = Math.hypot(x - q.x, z - q.z);
             if (d < distance) {
                 distance = d;
@@ -199,21 +250,25 @@
         this.cylinder(.17, .27, 1.55, '#9a6c43', 0, .75, 0, g, 7);
         const leaves = new T.Group();
         g.add(leaves);
-        const greens = ['#4f8f4a', '#5e9f53', '#6aab58'];
+        const yellows = ['#fff09a', '#fff6bf', '#ffe57c'].map(c => this.leafMat(c, .2));
         [
             [0, 2.2, 0, 1.15],
             [-.6, 1.85, .1, .85],
             [.58, 1.95, .15, .9],
             [.05, 1.9, -.6, .85],
             [.05, 2.8, .02, .75]
-        ].forEach((a, i) => this.ball(a[3], greens[i % 3], a[0], a[1], a[2], leaves, 1, .88, 1));
+        ].forEach((a, i) => this.ball(a[3], yellows[i % 3], a[0], a[1], a[2], leaves, 1, .88, 1));
         [
             [-.72, 1.75, .72],
             [.66, 2.15, .7],
             [.1, 2.65, .66],
             [-.35, 2.3, -.8],
             [.8, 1.8, -.3]
-        ].forEach(p => this.ball(.17, '#f5d23a', ...p, leaves, .92, 1.25, .92));
+        ].forEach(p => {
+            this.ball(.2, this.leafMat('#ffc000', .32), ...p, leaves, .92, 1.25, .92);
+            this.ball(.07, '#4f9a3f', p[0] + .06, p[1] + .23, p[2], leaves, 1.6, .5, .9);
+        });
+        this.mergeGroup(leaves);
         this.trees.push({
             g: leaves,
             offset: this.rnd() * 8
@@ -223,6 +278,149 @@
             z,
             r: .62 * size
         });
+    };
+
+    /* 한 무리(나무 잎 등) 안의 메시를 재질마다 하나로 합친다 — 흔들림은 그대로, 그리는 횟수는 줄어든다 */
+    P.mergeGroup = function(group) {
+        const byMat = new Map();
+        for (const m of [...group.children]) {
+            if (!m.isMesh) continue;
+            m.updateMatrix();
+            if (!byMat.has(m.material)) byMat.set(m.material, []);
+            byMat.get(m.material).push(m);
+        }
+        for (const [material, list] of byMat) {
+            if (list.length < 2) continue;
+            const pos = [],
+                normal = [];
+            let cast = false;
+            for (const m of list) {
+                const g = m.geometry.index ? m.geometry.toNonIndexed() : m.geometry.clone();
+                g.applyMatrix4(m.matrix);
+                pos.push(...g.attributes.position.array);
+                normal.push(...g.attributes.normal.array);
+                g.dispose();
+                m.geometry.dispose();
+                cast = cast || m.castShadow;
+                group.remove(m);
+            }
+            const geo = new T.BufferGeometry();
+            geo.setAttribute('position', new T.Float32BufferAttribute(pos, 3));
+            geo.setAttribute('normal', new T.Float32BufferAttribute(normal, 3));
+            const mesh = new T.Mesh(geo, material);
+            mesh.castShadow = cast;
+            mesh.receiveShadow = true;
+            group.add(mesh);
+        }
+    };
+
+    /* 해 질 녘 빛에서도 노란 잎이 탁한 갈색으로 보이지 않게, 제 색으로 살짝 빛나는 재질 */
+    P.leafMat = function(color, glow = .2) {
+        const key = 'leaf_' + color + '_' + glow;
+        return this.materials[key] || (this.materials[key] = new T.MeshStandardMaterial({
+            color: new T.Color(color).convertSRGBToLinear(),
+            emissive: new T.Color(color).convertSRGBToLinear(),
+            emissiveIntensity: glow,
+            roughness: .85
+        }));
+    };
+
+    /* 나무 — 레몬 마을(서쪽)은 노란 잎, 비눗방울 마을(동쪽)은 비눗방울 덩어리 */
+    P.tree = function(x, z, size = 1, fruit = false) {
+        if (x > 5) return this.bubbleTree(x, z, size);
+        const g = new T.Group();
+        g.position.set(x, .45, z);
+        g.scale.setScalar(size);
+        this.scene.add(g);
+        this.cylinder(.19, .31, 1.75, '#a57449', 0, .83, 0, g, 7);
+        const colors = ['#ffd23f', '#ffe36a', '#f6bf22'].map(c => this.leafMat(c, .22));
+        const leaves = new T.Group();
+        g.add(leaves);
+        [
+            [0, 2.5, 0, 1.32],
+            [-.65, 2.05, .12, .96],
+            [.6, 2.18, .18, 1.0],
+            [.08, 2.07, -.65, .95],
+            [.05, 3.08, .03, .87]
+        ].forEach((a, i) => this.ball(a[3], colors[i % 3], a[0], a[1], a[2], leaves, 1, .86, 1));
+        if (fruit)[[-.66, 2.12, .87], [.6, 2.49, .78], [.06, 3, .72]].forEach(p => this.ball(.19, this.leafMat('#ff9a2a', .3), ...p, leaves));
+        this.mergeGroup(leaves);
+        this.trees.push({
+            g: leaves,
+            offset: this.rnd() * 8
+        });
+        this.colliders.push({
+            x,
+            z,
+            r: .65 * size
+        });
+    };
+
+    P.bubbleTree = function(x, z, size = 1) {
+        const g = new T.Group();
+        g.position.set(x, .45, z);
+        g.scale.setScalar(size);
+        this.scene.add(g);
+        this.cylinder(.13, .22, 1.75, '#9a82c2', 0, .83, 0, g, 7);
+        const mats = this.bubbleLeafMats || (this.bubbleLeafMats = [this.glass('#f4e4ff', .55, '#ff9fe6', .42), this.glass('#e2f2ff', .55, '#8fdcff', .4)]),
+            mat = mats[Math.abs(Math.round(x * 3 + z)) % 2];
+        const leaves = new T.Group();
+        g.add(leaves);
+        this.ball(.55, '#8f72c9', 0, 2.45, 0, leaves, 1, .9, 1);
+        const cam = new T.Vector3(13, 21, 19.5).normalize();
+        [
+            [0, 2.62, .05, .92],
+            [-.74, 2.12, .28, .64],
+            [.72, 2.24, .22, .68],
+            [.1, 2.18, -.72, .62],
+            [.02, 3.3, .04, .56],
+            [-.5, 2.92, .58, .44],
+            [.58, 2.95, -.42, .42]
+        ].map((b, i) => [...b, i]).sort((a, b) => (a[0] * cam.x + a[1] * cam.y + a[2] * cam.z) - (b[0] * cam.x + b[1] * cam.y + b[2] * cam.z)).forEach(([bx, by, bz, r, i]) => {
+            const b = this.mesh(new T.SphereGeometry(r, 16, 12), mat, bx, by, bz, leaves);
+            b.castShadow = false;
+            this.ball(r * .17, '#ffffff', bx - r * .36, by + r * .46, bz + r * .56, leaves).castShadow = false;
+        });
+        this.mergeGroup(leaves);
+        this.trees.push({
+            g: leaves,
+            offset: this.rnd() * 8
+        });
+        this.colliders.push({
+            x,
+            z,
+            r: .6 * size
+        });
+    };
+
+    /* 길 — 레몬 마을은 모래빛, 비눗방울 마을은 연보랏빛 돌길 */
+    P.pathLine = function(points, width = 2) {
+        const tone = x => x > 5 ? ['#e3d6f3', '#ebe2f8', '#efe8fb'] : ['#c4905c', '#d3a26c', '#dcb07a'];
+        for (let i = 1; i < points.length; i++) {
+            const a = points[i - 1],
+                b = points[i],
+                dx = b[0] - a[0],
+                dz = b[1] - a[1],
+                len = Math.hypot(dx, dz),
+                c = tone((a[0] + b[0]) / 2);
+            const p = this.box(width, .055, len + .2, c[0], (a[0] + b[0]) / 2, .46, (a[1] + b[1]) / 2);
+            p.rotation.y = Math.atan2(dx, dz);
+            p.castShadow = false;
+            for (let d = .45; d < len; d += .85) {
+                const f = d / len;
+                for (let j = -1; j <= 1; j++) {
+                    const xx = a[0] + dx * f + (dz / len) * j * .62,
+                        zz = a[1] + dz * f - (dx / len) * j * .62;
+                    const stone = this.box(.52, .018, .55, j % 2 ? tone(xx)[1] : tone(xx)[2], xx, .5, zz);
+                    stone.rotation.y = Math.atan2(dx, dz) + (this.rnd() - .5) * .15;
+                    stone.castShadow = false;
+                }
+            }
+        }
+        for (const p of points) {
+            const m = this.cylinder(width * .52, width * .52, .04, tone(p[0])[0], p[0], .47, p[1], undefined, 20);
+            m.castShadow = false;
+        }
     };
 
     /* ── 인물: 모두 도형으로 만든다. userData.legs 는 걷기·숨쉬기 움직임에 쓰인다 ── */
@@ -326,11 +524,11 @@
     P.makeBubbleFolk = function() {
         const g = new T.Group();
         this.bodyParts(g, {
-            shirt: '#b49ddd',
-            arms: '#dcd2f2',
+            shirt: '#f1ebff',
+            arms: '#fbf8ff',
             legs: '#6d5f8e'
         });
-        this.cylinder(.2, .56, .72, '#c3aee8', 0, .55, 0, g, 16);
+        this.cylinder(.2, .56, .72, '#e9e1ff', 0, .55, 0, g, 16);
         const head = this.mesh(new T.SphereGeometry(.5, 20, 16), this.glass('#d7f1ff', .42, '#8fdcff', .35), 0, 1.5, .02, g);
         head.castShadow = false;
         this.ball(.3, '#ece6ff', 0, 1.45, 0, g);
@@ -373,9 +571,12 @@
         if (cid === 4) return done.includes(5) ? {
             x: 13.6,
             z: 8.7
+        } : this.state.sealedEntries?.[1] ? {
+            x: 13.6,
+            z: 8.7
         } : {
-            x: -8.6,
-            z: -6.4
+            x: -16.3,
+            z: -8.9
         };
         const mine = M.quests.filter(q => q.npc === cid);
         const q = mine.find(x => !done.includes(x.id)) || mine[mine.length - 1];
@@ -446,6 +647,253 @@
         return g;
     };
 
+    P.buildCourtyard = function() {
+        const T0 = .4,
+            wall = (x, z, w, d, H = 1.25) => {
+                this.box(w, H, d, '#f3e2b0', x, .44 + H / 2, z);
+                const along = w > d,
+                    len = along ? w : d;
+                for (let o = -len / 2 + .3; o < len / 2 - .15; o += .78) this.box(.36, .3, .36, '#e9cf8e', along ? x + o : x, .44 + H + .15, along ? z : z + o);
+                this.colliders.push({
+                    x,
+                    z,
+                    w: w / 2,
+                    d: d / 2
+                });
+            };
+        const midZ = (COURT.z0 + COURT.z1) / 2,
+            depth = COURT.z1 - COURT.z0,
+            [g0, g1] = COURT.gate;
+        wall(COURT.x0, midZ, T0, depth);
+        wall(COURT.x1, midZ, T0, depth);
+        // 앞 성벽은 낮게 — 카메라 쪽이라 안뜰의 캐릭터를 가리지 않도록
+        wall((COURT.x0 + g0 - .5) / 2, COURT.z1, g0 - .5 - COURT.x0, T0, .85);
+        // 동쪽 앞은 열린 뜰 — 오른쪽 성벽 끝에 작은 기둥만
+        this.cylinder(.22, .26, 1.3, '#f3dea6', COURT.x1, .44 + .65, COURT.z1, undefined, 10);
+        this.ball(.26, '#f5cf3a', COURT.x1, .44 + 1.45, COURT.z1, undefined, 1, 1.25, 1);
+        // 성문 탑과 아치, 깃발 — 캐릭터를 가리면 집처럼 흐려진다
+        const gate = new T.Group();
+        this.scene.add(gate);
+        for (const gx of [g0 - .25, g1 + .25]) {
+            this.cylinder(.5, .56, 2.4, '#f3dea6', gx, .44 + 1.2, COURT.z1, gate, 14);
+            this.ball(.54, '#f5cf3a', gx, .44 + 2.62, COURT.z1, gate, 1, 1.3, 1);
+            this.cylinder(0, .1, .32, '#e0b52a', gx, .44 + 3.45, COURT.z1, gate, 8);
+            this.cylinder(.025, .025, 1, '#8a6a4a', gx, .44 + 3.9, COURT.z1, gate, 5);
+            this.box(.5, .3, .03, gx < -13.5 ? '#e8643c' : '#3f9fb2', gx + .26, .44 + 4.22, COURT.z1, gate);
+            // 네모 충돌 상자(안쪽 면은 성벽 면과 나란히): 비스듬히 부딪혀도 옆으로 미끄러져 성문으로 나가도록
+            this.colliders.push({
+                x: gx,
+                z: COURT.z1 + .26,
+                w: .46,
+                d: .46
+            });
+        }
+        this.box(g1 - g0 + 1.1, .26, .34, '#e9cf8e', (g0 + g1) / 2, .44 + 2.3, COURT.z1, gate);
+        this.ball(.22, '#f7d543', (g0 + g1) / 2, .44 + 2.62, COURT.z1, gate, 1, 1.25, 1);
+        const fade = new Map();
+        gate.traverse(m => {
+            if (!m.isMesh) return;
+            if (!fade.has(m.material.uuid)) {
+                const mt = m.material.clone();
+                mt.transparent = true;
+                fade.set(m.material.uuid, mt);
+            }
+            m.material = fade.get(m.material.uuid);
+        });
+        this.houseFades.push({
+            box: new T.Box3(new T.Vector3(g0 - .9, .45, COURT.z1 - .7), new T.Vector3(g1 + .9, 5, COURT.z1 + .7)),
+            materials: [...fade.values()]
+        });
+        // 안뜰 돌바닥
+        const floor = this.box(COURT.x1 - COURT.x0 - .2, .02, COURT.z1 + 10.8 + .2, '#ddd7e6', (COURT.x0 + COURT.x1) / 2, .462, (-10.8 + COURT.z1) / 2);
+        floor.castShadow = false;
+        for (let x = COURT.x0 + 1.2; x < COURT.x1 - .5; x += 1.2) this.box(.03, .022, COURT.z1 - -10.8, '#c9c1d6', x, .466, (-10.8 + COURT.z1) / 2).castShadow = false;
+        // 성문에서 왕좌까지 붉은 융단
+        const carpet = this.box(1.4, .03, 3.9, '#b83a4b', -13.5, .47, -8.5);
+        carpet.castShadow = false;
+        for (const dx of [-.62, .62]) this.box(.08, .035, 3.9, '#f0c24a', -13.5 + dx, .475, -8.5).castShadow = false;
+        // 왕좌와 단 — 성 바닥판(앞 가장자리 z -10.8) 앞에 놓는다
+        this.box(2.6, .36, .95, '#e9cf8e', -13.5, .62, -10.3);
+        this.box(1.05, .5, .7, '#9b3a4d', -13.5, 1.05, -10.4);
+        this.box(1.15, 1.5, .22, '#9b3a4d', -13.5, 1.55, -10.72);
+        this.box(1.3, .14, .3, '#f0c24a', -13.5, 2.35, -10.72);
+        for (let i = 0; i < 3; i++) this.cylinder(0, .09, .26, '#f0c24a', -13.85 + i * .35, 2.54, -10.72, undefined, 6);
+        this.colliders.push({
+            x: -13.5,
+            z: -10.3,
+            w: 1.3,
+            d: .48
+        });
+        // 왕좌 옆 횃불
+        for (const dx of [-1.7, 1.7]) {
+            this.cylinder(.05, .07, 1.3, '#8a6a4a', -13.5 + dx, 1.1, -10.2);
+            this.glow(.15, '#ffd96a', -13.5 + dx, 1.85, -10.2, 0);
+        }
+        // 의무실 구석: 침대와 즙 비교대
+        this.box(1.1, .34, 1.9, '#d9b98a', -17.4, .62, -9.4);
+        this.box(1, .14, 1.78, '#fff8e8', -17.4, .86, -9.4);
+        this.box(.8, .16, .42, '#f6e7bd', -17.4, .98, -10.1);
+        this.box(.9, .06, 1.2, '#f2b8c6', -17.4, .95, -9.0);
+        this.colliders.push({
+            x: -17.4,
+            z: -9.4,
+            w: .6,
+            d: 1
+        });
+        this.box(.7, .08, 1.2, '#e8d6a8', -17.75, 1.2, -11.3);
+        for (const dz of [-.46, .46]) this.box(.5, .75, .08, '#b89468', -17.75, .82, -11.3 + dz);
+        [
+            ['#f6d95a', -11.7],
+            ['#e6e1b9', -11.3],
+            ['#d4ecf6', -10.9]
+        ].forEach(([c, z]) => this.mesh(new T.CylinderGeometry(.12, .1, .26, 12), this.glass(c, .75, c, .3), -17.75, 1.37, z).castShadow = false);
+        this.colliders.push({
+            x: -17.75,
+            z: -11.3,
+            w: .38,
+            d: .62
+        });
+        // 오른쪽 성벽 아래 꽃밭
+        for (let i = 0; i < 10; i++) this.flower(-9.7 + (i % 2) * .32, -10.4 + i * .36, ['#fff1a8', '#ffe066', '#f7c96b'][i % 3]);
+        // 성 서쪽 틈·성 뒤 좁은 길 막기
+        this.colliders.push({
+            x: -19.1,
+            z: COURT.z1,
+            w: .55,
+            d: .3
+        }, {
+            x: -13.5,
+            z: -16.2,
+            w: 4.2,
+            d: .35
+        });
+        for (let i = 0; i < 3; i++) this.ball(.34, '#e0c24a', -19.2 + i * .12, .7, COURT.z1 - .1 + i * .05, undefined, 1.2, .8, 1);
+    };
+
+    /* ── Dr.에시드의 흩어진 실험 도구: 나무 상자 위 소품 + 빛나는 고리 + 떠 있는 표시. 필요한 하나만 보인다 ── */
+    P.buildTools = function() {
+        this.toolProps = {};
+        const ringMat = new T.MeshStandardMaterial({
+            color: new T.Color('#c9f6ff').convertSRGBToLinear(),
+            emissive: new T.Color('#5fd8ff').convertSRGBToLinear(),
+            emissiveIntensity: .9,
+            roughness: .4
+        });
+        const markMat = new T.MeshStandardMaterial({
+            color: new T.Color('#bff3ff').convertSRGBToLinear(),
+            emissive: new T.Color('#46cfff').convertSRGBToLinear(),
+            emissiveIntensity: .8,
+            roughness: .35
+        });
+        const draw = {
+            litmus: g => {
+                for (let i = 0; i < 4; i++) this.box(.44, .025, .13, i % 2 ? '#6a93dc' : '#5580cf', -.02 + i * .03, .74 + i * .028, -.08 + i * .06, g).rotation.y = -.35 + i * .22;
+                this.box(.46, .08, .1, '#f1e7c8', 0, .74, .2, g);
+            },
+            btb: g => {
+                this.mesh(new T.CylinderGeometry(.11, .12, .3, 14), this.glass('#5db36d', .8, '#5db36d', .35), 0, .87, 0, g).castShadow = false;
+                this.cylinder(.05, .06, .14, '#2f3a33', 0, 1.09, 0, g, 10);
+                this.cylinder(.03, .02, .12, '#f6f5ee', 0, 1.2, 0, g, 8);
+                this.cylinder(.121, .121, .08, '#fff8e6', 0, .85, 0, g, 14);
+            },
+            mg: g => {
+                const coil = this.mesh(new T.TorusGeometry(.13, .028, 8, 18), '#cfd6dc', -.1, .76, 0, g);
+                coil.rotation.x = Math.PI / 2;
+                this.box(.24, .08, .15, '#d8483c', .14, .77, .02, g);
+                this.box(.2, .02, .11, '#f5e3b8', .14, .82, .02, g);
+                this.cylinder(.012, .012, .26, '#e8d2a0', .12, .84, .14, g, 5).rotation.z = Math.PI / 2;
+                this.ball(.025, '#b0342b', .25, .84, .14, g);
+            },
+            conduct: g => {
+                this.box(.36, .16, .24, '#3b4b5a', 0, .8, 0, g);
+                this.ball(.08, '#ffe066', 0, .94, 0, g);
+                for (const dx of [-.08, .08]) this.cylinder(.015, .015, .26, '#9aa3ad', dx, .62, .14, g, 5);
+            },
+            power: g => {
+                this.box(.42, .24, .3, '#3b4b5a', 0, .84, 0, g);
+                this.ball(.04, '#e05555', -.1, .98, .12, g);
+                this.ball(.04, '#2f353c', .1, .98, .12, g);
+                this.box(.3, .015, .1, '#6a93dc', .02, .97, -.06, g);
+            },
+            model: g => {
+                this.box(.5, .06, .36, '#e8d6a8', 0, .75, 0, g);
+                [
+                    ['#7fca7c', -.14, -.08],
+                    ['#f2a35b', 0, -.08],
+                    ['#7fca7c', .14, -.08],
+                    ['#f2a35b', -.14, .08],
+                    ['#f3d766', 0, .08],
+                    ['#f2a35b', .14, .08]
+                ].forEach(([c, x, z]) => this.ball(.06, c, x, .83, z, g));
+            }
+        };
+        for (const t of M.tools) {
+            const g = new T.Group();
+            g.position.set(t.x, .45, t.z);
+            g.scale.setScalar(1.45);
+            this.scene.add(g);
+            this.box(.62, .36, .48, '#c89a5e', 0, .2, 0, g);
+            this.box(.66, .06, .52, '#b3844b', 0, .4, 0, g);
+            const prop = new T.Group();
+            prop.position.y = -.3;
+            g.add(prop);
+            draw[t.id]?.(prop);
+            this.mergeGroup(prop);
+            g.traverse(m => {
+                if (m.isMesh) m.castShadow = false;
+            });
+            const ring = this.mesh(new T.TorusGeometry(.62, .05, 8, 30), ringMat, 0, .03, 0, g);
+            ring.rotation.x = Math.PI / 2;
+            ring.castShadow = false;
+            const mark = this.mesh(new T.OctahedronGeometry(.2), markMat, 0, 1.75, 0, g);
+            mark.castShadow = false;
+            g.visible = false;
+            this.dynamic.push(g);
+            this.toolProps[t.id] = {
+                t,
+                g,
+                prop,
+                ring,
+                mark
+            };
+        }
+    };
+
+    /* 흩어진 도구 보이기: visible = 섬에 놓인 도구 id 들, focus = 지금 찾아야 할 하나(고리·표시·이름표) */
+    P.setTools = function(visible = [], focus = null) {
+        this.toolShown = null;
+        this.toolsVisible = [];
+        for (const [key, p] of Object.entries(this.toolProps || {})) {
+            const on = visible.includes(key);
+            p.g.visible = on;
+            p.ring.visible = p.mark.visible = key === focus;
+            if (on) this.toolsVisible.push(p);
+            if (on && key === focus) this.toolShown = p;
+        }
+    };
+
+    /* 보이는 도구 머리 위의 화면 좌표 — 이름표를 띄울 때 쓴다 */
+    P.toolScreen = function() {
+        const p = this.toolShown;
+        if (!p) return null;
+        const v = new T.Vector3(p.t.x, 2.7, p.t.z).project(this.camera);
+        return {
+            id: p.t.id,
+            x: (v.x * .5 + .5) * this.canvas.clientWidth,
+            y: (-.5 * v.y + .5) * this.canvas.clientHeight,
+            visible: v.z < 1
+        };
+    };
+
+    /* 도구 자리로 걸어가기 */
+    P.goTool = function(id) {
+        const p = this.toolProps?.[id];
+        if (!p) return false;
+        this.path = this.findPath(p.t.x, p.t.z);
+        this.pendingNpc = null;
+        return this.path.length > 0 || Math.hypot(p.t.x - this.player.position.x, p.t.z - this.player.position.z) < 1.5;
+    };
+
     P.buildDomeLab = function(cx, cz, region) {
         const g = new T.Group();
         g.position.set(cx, .44, cz);
@@ -501,13 +949,14 @@
 
     P.build = function() {
         this.lemonGrass = new T.MeshStandardMaterial({
-            map: this.grassTexture('#a8cf6c', 'rgba(250,240,150,.2)', 'rgba(60,110,40,.1)'),
-            color: new T.Color('#fbfff0').convertSRGBToLinear(),
+            map: this.grassTexture('#e8d46e', 'rgba(255,246,175,.35)', 'rgba(165,120,30,.12)'),
+            color: new T.Color('#fffbe6').convertSRGBToLinear(),
+            emissive: new T.Color('#2b2408').convertSRGBToLinear(),
             roughness: 1
         });
         this.borderGrass = new T.MeshStandardMaterial({
-            map: this.grassTexture('#98cfa0', 'rgba(210,240,255,.18)', 'rgba(50,100,90,.1)'),
-            color: new T.Color('#f6fbff').convertSRGBToLinear(),
+            map: this.grassTexture('#a590d2', 'rgba(240,226,255,.26)', 'rgba(80,55,140,.14)'),
+            color: new T.Color('#fcf8ff').convertSRGBToLinear(),
             roughness: 1
         });
         this.waterMat = new T.MeshStandardMaterial({
@@ -537,11 +986,12 @@
             }
         }
         // 강 한가운데 경계 표지 — 노랑(산 대륙)과 하늘(버블 왕국) 부표
-        for (let i = 0; i < 7; i++) this.cylinder(.22, .28, .5, i % 2 ? '#8fd0f0' : '#f3d24a', 5, -.1, -15 + i * 5, undefined, 10);
+        for (let i = 0; i < 7; i++) this.cylinder(.22, .28, .5, i % 2 ? '#b49ddd' : '#f3d24a', 5, -.1, -15 + i * 5, undefined, 10);
 
         /* 레몬 왕국 */
         this.buildCastle(-13.5, -13.6);
-        this.house(-14, 6.3, '#5d8f8a', '#f3ead2');
+        this.buildCourtyard();
+        this.house(-14, 6.3, '#e2a23a', '#fff3d2');
         for (const [dx, dz, c] of [
                 [2.6, 2.1, '#9ee07a'],
                 [3.1, 1.7, '#f2d24a'],
@@ -562,27 +1012,23 @@
             });
         }
         this.benchTable(-5.8, 12.3);
-        this.box(.55, .5, .35, '#3b4b5a', -6.6, 1.63, 12.3);
-        this.box(.14, .1, .14, '#e05555', -6.72, 1.93, 12.3);
-        this.box(.14, .1, .14, '#333b44', -6.48, 1.93, 12.3);
         for (let i = 0; i < 3; i++) {
             const cup = this.mesh(new T.CylinderGeometry(.18, .16, .38, 14), this.glass('#d7eef7', .45), -5.8 + i * .5, 1.57, 12.1);
             cup.castShadow = false;
         }
-        this.glow(.12, '#ffd96a', -4.7, 1.72, 12.3, 2);
         this.box(1.8, .03, .03, '#c77a3a', -5.6, 1.42, 12.62);
 
         /* 경계 마을 */
         this.buildDomeLab(14.6, -12.2, 3);
-        this.benchTable(19.2, -5.2, '#a8b9d6');
+        this.benchTable(19.2, -5.2, '#b9a6e2');
         for (let i = 0; i < 3; i++) {
             const b = this.mesh(new T.CylinderGeometry(.2, .17, .44, 14), this.glass(['#6fa0e8', '#5db36d', '#f2d24a'][i], .65, ['#6fa0e8', '#5db36d', '#f2d24a'][i], .3), 18.6 + i * .6, 1.6, -5.1);
             b.castShadow = false;
         }
         this.cylinder(.04, .04, 1.6, '#8c95a6', 20.1, 2.1, -5.4, undefined, 6);
         this.cylinder(.06, .04, .9, '#e3eef7', 20.1, 2.65, -5.25, undefined, 8);
-        this.house(10.3, 11.6, '#efc23b', '#fff4d8');
-        this.house(17.2, 12.1, '#79b8dd', '#eef5ff');
+        this.house(10.3, 11.6, '#9b7ed6', '#f7f0ff');
+        this.house(17.2, 12.1, '#c29be8', '#fbf5ff');
         this.house(9.6, -14.6, '#b7a2e0', '#f6f0ff');
         // 비눗방울 지붕 오두막
         this.cylinder(1.5, 1.6, 1.8, '#f0f5ff', 20, 1.34, 9.2, undefined, 20);
@@ -595,11 +1041,11 @@
             r: 1.7
         });
         // 광장과 분수
-        const plaza = this.cylinder(PLAZA.r, PLAZA.r, .1, '#e7cfa6', PLAZA.x, .49, PLAZA.z, undefined, 40);
+        const plaza = this.cylinder(PLAZA.r, PLAZA.r, .1, '#e6dbf4', PLAZA.x, .49, PLAZA.z, undefined, 40);
         plaza.castShadow = false;
         for (let i = 0; i < 20; i++) {
             const a = i * Math.PI * 2 / 20;
-            this.box(.55, .018, .6, i % 2 ? '#efdcb8' : '#d9bf8f', PLAZA.x + Math.cos(a) * 2.75, .555, PLAZA.z + Math.sin(a) * 2.75).rotation.y = -a;
+            this.box(.55, .018, .6, i % 2 ? '#f1eafb' : '#cdb9ec', PLAZA.x + Math.cos(a) * 2.75, .555, PLAZA.z + Math.sin(a) * 2.75).rotation.y = -a;
         }
         this.cylinder(1.25, 1.35, .42, '#dfe6ef', PLAZA.x, .72, PLAZA.z, undefined, 24);
         const pool = this.mesh(new T.CylinderGeometry(1.08, 1.08, .06, 24), this.glass('#7fc6ee', .75, '#7fc6ee', .3), PLAZA.x, .93, PLAZA.z);
@@ -628,7 +1074,7 @@
             });
         }
         // 동쪽 모래사장과 비눗방울 기계
-        const beach = this.box(1.7, .05, 31, '#efdcaa', 21.1, .47, 0);
+        const beach = this.box(1.7, .05, 31, '#eadff5', 21.1, .47, 0);
         beach.castShadow = false;
         this.cylinder(.5, .6, 1.1, '#9f8bd0', 20.4, 1, -12.4, undefined, 14);
         this.mesh(new T.TorusGeometry(.42, .07, 8, 20), '#e3d8ff', 20.4, 1.8, -12.4).rotation.x = Math.PI / 2;
@@ -637,6 +1083,8 @@
             z: -12.4,
             r: .7
         });
+
+        this.buildTools();
 
         /* 내 연구 텐트 */
         const tent = new T.ConeGeometry(1.75, 2.1, 4);
@@ -653,14 +1101,15 @@
         this.scene.add(this.campDecor);
         this.lamp(CAMP.x + 1.6, CAMP.z + 1.4, 0);
 
-        /* 과수원·나무·꽃 */
+        /* 과수원·나무·꽃 — 여기서부터는 고정 씨앗(길·건물을 고쳐도 숲 배치가 그대로) */
+        this.seed = 4871;
         for (const [x, z] of [
-                [-17.5, -6],
+                [-17.6, -4.9],
                 [-15.5, -3.5],
                 [-18, -1],
                 [-16, 1.5],
                 [-18.5, 3.5],
-                [-7.5, -9.5],
+                [-6.4, -9.8],
                 [-4.5, -12.5],
                 [-17.6, 12.5],
                 [-9.5, 13.8],
@@ -672,7 +1121,12 @@
             const x = west ? -19 + this.rnd() * 21 : 8 + this.rnd() * 12.5,
                 z = -15.5 + this.rnd() * 31;
             if (this.nearPath(x, z) || this.colliders.some(c => c.r ? Math.hypot(x - c.x, z - c.z) < c.r + 1.4 : Math.abs(x - c.x) < c.w + 1.5 && Math.abs(z - c.z) < c.d + 1.5)) continue;
-            if (M.quests.some(q => Math.hypot(x - q.x, z - q.z) < 3) || Math.hypot(x - CAMP.x, z - CAMP.z) < 3 || Math.hypot(x + 8.6, z + 6.4) < 2.5) continue;
+            if (M.quests.some(q => Math.hypot(x - q.x, z - q.z) < 3) || Math.hypot(x - CAMP.x, z - CAMP.z) < 3 || inCastle(x, z, 1) || M.tools.some(t => {
+                    const dx = x - t.x,
+                        dz = z - t.z,
+                        along = dx * .555 + dz * .832;
+                    return Math.hypot(dx, dz) < 2.2 || along > 0 && along < 4 && Math.abs(dx * .832 - dz * .555) < 1.5;
+                })) continue;
             if (!west && x > 20) continue;
             if (west && this.rnd() < .35) this.lemonTree(x, z, .8 + this.rnd() * .35);
             else this.tree(x, z, .75 + this.rnd() * .4, false);
@@ -681,11 +1135,12 @@
             const west = i % 2 === 0;
             const x = west ? -19 + this.rnd() * 21.5 : 8 + this.rnd() * 12,
                 z = -15.5 + this.rnd() * 31;
-            if (this.nearPath(x, z, .8) || Math.hypot(x - PLAZA.x, z - PLAZA.z) < PLAZA.r + .4) continue;
+            if (this.nearPath(x, z, .8) || Math.hypot(x - PLAZA.x, z - PLAZA.z) < PLAZA.r + .4 || inCastle(x, z) || M.tools.some(t => Math.hypot(x - t.x, z - t.z) < 1.2)) continue;
             this.flower(x, z, west ? ['#fff1a8', '#ffe066', '#f8f9e6', '#f7c96b'][i % 4] : ['#b3abe9', '#8dcced', '#f8f9ff', '#d9c2ff'][i % 4]);
         }
         for (const [x, z] of [
-                [-8.8, -8.8],
+                [-16.2, -5.5],
+                [-10.8, -5.5],
                 [-3.5, -2.8],
                 [-9.2, 4.6],
                 [-6.6, 9.6],
@@ -799,6 +1254,42 @@
         g.visible = true;
     };
 
+    /* 축제 때 나무에 켜지는 등불 — 엔진과 같되 색만 섬에 맞춘다 */
+    P.buildFestivalDecor = function() {
+        const positions = Array.from({
+            length: this.regionCount
+        }, () => []);
+        this.scene.updateMatrixWorld(true);
+        for (const tree of this.trees) {
+            const trunk = tree.g.parent,
+                q = this.regionAt(trunk.position.x, trunk.position.z);
+            for (let k = 0; k < 7; k++) {
+                const a = k * Math.PI * 2 / 7,
+                    p = new T.Vector3(Math.cos(a) * 1.04, 2.2 + Math.sin(a * 2) * .13, Math.sin(a) * 1.04);
+                trunk.localToWorld(p);
+                positions[q].push(p.x, p.y, p.z);
+            }
+        }
+        for (let q = 0; q < this.regionCount; q++) {
+            if (!positions[q].length) continue;
+            const geometry = new T.BufferGeometry();
+            geometry.setAttribute('position', new T.Float32BufferAttribute(positions[q], 3));
+            const material = new T.PointsMaterial({
+                color: 0xffdf9b,
+                size: 3.5,
+                sizeAttenuation: false,
+                transparent: true,
+                opacity: 0,
+                depthWrite: false
+            });
+            this.scene.add(new T.Points(geometry, material));
+            this.registerFestivalLight(material, q, {
+                on: q <= 2 ? '#bff4ff' : '#ffe1a1',
+                points: true
+            });
+        }
+    };
+
     /* 움직이는 소품은 한데 묶어(배칭) 굳히지 않는다 */
     const baseBatch = P.batchStatic;
     P.batchStatic = function() {
@@ -811,6 +1302,23 @@
     /* 진행에 따라 섬이 달라진다: 주민의 자리, 새콤과 아이들의 색, 텐트의 선물 */
     P.applyProgress = function() {
         const done = this.state.completed;
+        if (this.player && !this.spawnChecked) {
+            this.spawnChecked = true;
+            const p = this.player.position;
+            if (this.blocked(p.x, p.z)) {
+                let spot = null;
+                for (const r of [.75, 1.5, 2.25, 3])
+                    for (const [dx, dz] of [[0, 1], [1, 0], [-1, 0], [0, -1], [1, 1], [-1, 1], [1, -1], [-1, -1]])
+                        if (!spot && !this.blocked(p.x + dx * r, p.z + dz * r)) spot = [p.x + dx * r, p.z + dz * r];
+                if (!spot) spot = [COURT.outside.x, COURT.outside.z];
+                p.set(spot[0], p.y, spot[1]);
+                this.camTarget.copy(p);
+            }
+            if (Math.hypot(p.x - COURT.outside.x, p.z - COURT.outside.z) > 1 && !this.findPath(COURT.outside.x, COURT.outside.z).length) {
+                p.set(COURT.spawn.x, p.y, COURT.spawn.z);
+                this.camTarget.copy(p);
+            }
+        }
         if (!this.festivalRun) this.restoreFestivalLights();
         const healed = done.includes(5);
         for (const n of this.npcs) {
@@ -886,6 +1394,24 @@
             }
         }
         this.islandLast = now;
+        const tool = this.toolShown;
+        if (tool) {
+            tool.mark.position.y = 1.55 + (this.state.calm ? 0 : Math.sin(t * 2.4) * .1);
+            tool.mark.rotation.y = this.state.calm ? 0 : t * 1.6;
+            tool.ring.scale.setScalar(this.state.calm ? 1 : 1 + Math.sin(t * 3) * .06);
+        }
+        if (this.toolsVisible?.length && !this.paused && !this.festivalRun && this.player && this.state.started)
+            for (const p of this.toolsVisible)
+                if (p.g.visible && Math.hypot(p.t.x - this.player.position.x, p.t.z - this.player.position.z) < 1.3) {
+                    p.g.visible = false;
+                    this.toolsVisible = this.toolsVisible.filter(x => x !== p);
+                    if (this.toolShown === p) {
+                        this.toolShown = null;
+                        if (this.pendingNpc == null) this.path = [];
+                    }
+                    this.cb.pick?.(p.t.id);
+                    break;
+                }
         if (!this.state.calm) {
             if (this.fountainTop) this.fountainTop.scale.setScalar(1 + Math.sin(t * 3) * .06);
             for (const [i, p] of (this.puffs || []).entries()) p.m.position.y = p.y + Math.sin(t * .9 + i) * .12;

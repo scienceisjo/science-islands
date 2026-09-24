@@ -7,7 +7,33 @@
     const val = (rec, key) => rec?.entered?.[key];
     const hasTag = (all, qid, pred) => (all[qid] || []).some(e => e.manual && pred(e.tag));
 
+    /* 보기 순서를 문항마다 고정된 방식으로 섞는다 — 정답이 늘 첫째 자리에 오지 않게(다시 그려도 순서는 그대로) */
+    function mix(q) {
+        const list = q.type === 'pick' ? q.options : q.choices;
+        let h = 0;
+        for (const ch of q.prompt) h = (h * 31 + ch.codePointAt(0)) >>> 0;
+        const order = list.map((_, i) => i);
+        for (let i = order.length - 1; i > 0; i--) {
+            h = (Math.imul(h, 1103515245) + 12345) >>> 0;
+            const j = h % (i + 1);
+            [order[i], order[j]] = [order[j], order[i]];
+        }
+        if (order.every((v, i) => v === i)) order.push(order.shift());
+        return q.type === 'pick' ? Object.assign({}, q, {
+            options: order.map(i => list[i])
+        }) : Object.assign({}, q, {
+            choices: order.map(i => list[i]),
+            correct: order.indexOf(q.correct)
+        });
+    }
+
     function build(id, all) {
+        const d = raw(id, all);
+        d.questions = d.questions.map(mix);
+        return d;
+    }
+
+    function raw(id, all) {
         const mine = all[id] || [];
         if (id === 1) {
             const lit = find(mine, 'litmus'),
@@ -48,7 +74,7 @@
                         ok: true,
                         mine: hasTag(all, 2, t => t === 'migrate-acid')
                     }, {
-                        text: '염산·황산·아세트산의 이온화 모형에 공통으로 H⁺가 있었다.',
+                        text: '염산(예시)·질산·황산·아세트산의 이온화 모형에 공통으로 H⁺가 있었다.',
                         ok: true,
                         mine: hasTag(all, 2, t => t.startsWith('model-'))
                     }, {
@@ -73,13 +99,20 @@
             };
         }
         if (id === 3) {
-            const mig = find(mine, 'migrate-base');
+            const mig = find(mine, 'migrate-base'),
+                con = find(mine, 'conduct-base');
             const ind = mine.filter(e => e.manual && /^ind-(redLitmus|btb|pp)$/.test(e.tag));
             if (!mig || !ind.length) throw Error('지시약과 이온 이동의 직접 기록이 필요해요.');
             return {
                 title: '베이스 박사의 확인 · 염기의 정체',
-                observation: `내 기록: ${ind.map(e=>e.label.replace(/로 네 용액 검사$/,'')+' → 용액 A '+val(e,'A')).join(' / ')} · 푸른색이 ${val(mig,'side')}으로 넓어짐`,
+                observation: `내 기록: ${ind.map(e=>e.label.replace(/(으로|로) 네 용액 검사$/,'')+' → 용액 A '+val(e,'A')).join(' / ')}${con?` · 암모니아수 전구 ${val(con,'NH3')}`:''} · 푸른색이 ${val(mig,'side')}으로 넓어짐`,
                 questions: [{
+                    type: 'choice',
+                    prompt: '수산화 나트륨 NaOH, 수산화 칼륨 KOH, 수산화 칼슘 Ca(OH)₂의 화학식에 공통으로 들어 있는 부분은?',
+                    choices: ['OH', 'Na', 'O₂'],
+                    correct: 0,
+                    explanation: '세 염기 모두 OH를 가지고 있어요. 물에 녹으면 이 부분이 수산화 이온(OH⁻)으로 나뉘어요. 암모니아(NH₃)는 OH가 없지만 물과 반응해 OH⁻를 만들어요.'
+                }, {
                     type: 'choice',
                     prompt: '염기의 공통적인 성질을 만드는 입자는?',
                     choices: ['OH⁻ (수산화 이온)', 'Na⁺ (나트륨 이온)', 'H⁺ (수소 이온)'],
@@ -122,6 +155,18 @@
                     correct: 0,
                     explanation: 'Na⁺와 Cl⁻는 반응에 참여하지 않는 구경꾼 이온이에요. 물을 증발시켜야 비로소 염화 나트륨 고체로 남아요.'
                 }, {
+                    type: 'choice',
+                    prompt: '연습 ① 질산 HNO₃과 수산화 칼륨 KOH 수용액을 섞었어요. 물이 되는 이온과 물속에 남는 이온을 바르게 짝 지은 것은?',
+                    choices: ['물이 되는 이온 H⁺·OH⁻ / 남는 이온 K⁺·NO₃⁻', '물이 되는 이온 K⁺·NO₃⁻ / 남는 이온 H⁺·OH⁻', '물이 되는 이온 H⁺·NO₃⁻ / 남는 이온 K⁺·OH⁻'],
+                    correct: 0,
+                    explanation: 'HNO₃ + KOH → H₂O + KNO₃. H⁺와 OH⁻가 만나 물이 되고, K⁺와 NO₃⁻는 구경꾼 이온으로 물속에 남아요. 물을 증발시키면 질산 칼륨(KNO₃)이 남아요.'
+                }, {
+                    type: 'choice',
+                    prompt: '연습 ② 묽은 황산 H₂SO₄에 수산화 바륨 Ba(OH)₂ 수용액을 넣었더니 흰 앙금이 생겼어요. 이 반응을 바르게 나타낸 것은?',
+                    choices: ['H₂SO₄ + Ba(OH)₂ → 2H₂O + BaSO₄', 'H₂SO₄ + Ba(OH)₂ → H₂O + BaSO₄', 'H₂SO₄ + Ba(OH)₂ → 2H₂ + BaSO₆'],
+                    correct: 0,
+                    explanation: 'H⁺ 2개와 OH⁻ 2개가 만나 물 2개가 돼요. 남은 Ba²⁺와 SO₄²⁻는 물에 녹지 않는 황산 바륨(BaSO₄) 앙금이 되어 가라앉아요. 물속에 그대로 남는 Na⁺·Cl⁻와 다른 점이에요.'
+                }, {
                     type: 'pick',
                     prompt: '레몬 아이들에게 중화병이 생긴 과정을 설명하는 조각을 모두 고르세요.',
                     options: [{
@@ -147,7 +192,7 @@
                     }],
                     explanation: '비눗방울의 OH⁻가 아이들 몸속의 H⁺와 만나 물이 되면서 산성이 약해졌어요(새콤의 즙 결과). 마그네슘·전구 결과는 참이지만 이 사건의 원인과는 관계가 없어요.'
                 }],
-                summary: '중화 반응: H⁺ + OH⁻ → H₂O. 같은 수만큼 만나면 중성, 남는 쪽이 액성을 정해요. 구경꾼 이온(Na⁺·Cl⁻)은 물속에 그대로 있어요. 반응하면 열이 나와 온도가 올라가요.'
+                summary: '중화 반응: H⁺ + OH⁻ → H₂O. 같은 수만큼 만나면 중성, 남는 쪽이 액성을 정해요. 반응하면 열이 나와 온도가 올라가요. 남은 이온은 물속에 그대로 있거나(Na⁺·Cl⁻, K⁺·NO₃⁻), 물에 녹지 않는 앙금이 되기도 해요(BaSO₄).'
             };
         }
         if (id === 5) {

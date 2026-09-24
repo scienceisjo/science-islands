@@ -104,6 +104,7 @@
     dlgIds.forEach(id => $(id).addEventListener('close', () => {
         if (id === 'lab') demo = false;
         pause();
+        if (state.started && (id === 'lab' || id === 'dialogue' || id === 'concept' || id === 'journal')) updateHud();
     }));
     $('journal').addEventListener('cancel', e => {
         if (!comfort.confirmJournal()) e.preventDefault();
@@ -120,6 +121,98 @@
         return id === 0 || state.completed.includes(id - 1) || state.completed.includes(id);
     }
 
+    /* ── Dr.에시드의 흩어진 도구 ─────────────────────── */
+    const josa = (w, a, b) => {
+        const c = String(w).charCodeAt(String(w).length - 1);
+        return w + (c >= 0xac00 && c <= 0xd7a3 && (c - 0xac00) % 28 ? a : b);
+    };
+    const tagsOf = qid => state.evidence[qid].filter(e => e.manual).map(e => e.tag);
+    const toolById = id => M.tools.find(t => t.id === id) || null;
+    const hasTools = qid => M.tools.some(t => t.quest === qid);
+    /* 부탁 qid 의 지금 단계에 필요한데 아직 건네지 않은 도구(없으면 null). 첫 도구는 부탁을 들은 뒤부터 */
+    function toolFor(qid) {
+        if (!hasTools(qid) || state.completed.includes(qid)) return null;
+        const step = L[qid].checks(tagsOf(qid)).findIndex(ok => !ok),
+            t = M.tools.find(x => x.quest === qid && x.step === step);
+        if (!t || state.fetch.given.includes(t.id)) return null;
+        if (t.step === 0 && !state.fetch.heard.includes(qid)) return null;
+        return t;
+    }
+    const holding = t => !!t && state.fetch.got.includes(t.id) && !state.fetch.given.includes(t.id);
+    /* 지금 찾아야 할 도구: 다음 부탁이 열려 있고, 그 부탁을 들었고, 아직 줍지 않은 것 하나(고리·표시·이름표·지도 별) */
+    function worldTool() {
+        const q = next();
+        if (!q || !state.started || !accessible(q.id) || pendingEntry() >= 0 || !state.fetch.heard.includes(q.id)) return null;
+        const t = toolFor(q.id);
+        return t && !holding(t) ? t : null;
+    }
+    /* 섬에 흩어져 보이는 도구: 에시드의 이야기를 들은 뒤, 아직 줍지도 건네지도 않은 것 모두 */
+    const scatteredTools = () => state.started && state.fetch.heard.length ? M.tools.filter(t => !state.fetch.got.includes(t.id) && !state.fetch.given.includes(t.id) && !state.completed.includes(t.quest)).map(t => t.id) : [];
+    function syncTools() {
+        world?.setTools?.(scatteredTools(), worldTool()?.id || null);
+    }
+    let fetchAuto = null;
+
+    function pickTool(id) {
+        const t = toolById(id);
+        if (!t || state.fetch.got.includes(id)) return;
+        state.fetch.got.push(id);
+        save();
+        sound('success');
+        const npc = M.cast[M.quests[t.quest].npc].name,
+            q = next(),
+            needed = q && toolFor(q.id)?.id === id;
+        toast(needed ? `${t.icon} ${josa(t.name, '을', '를')} 주웠어요! ${npc}에게 건네요.` : `${t.icon} ${josa(t.name, '을', '를')} 주웠어요! 나중에 ${npc}가 찾을 때 건네요.`);
+        updateHud();
+        if (needed && fetchAuto === id) {
+            fetchAuto = null;
+            setTimeout(() => {
+                if (!dlgIds.some(d => $(d).open)) navigate(t.quest);
+            }, 500);
+        }
+    }
+
+    function giveTool(id) {
+        const t = toolById(id);
+        if (!t || !holding(t)) return;
+        state.fetch.given.push(id);
+        save();
+        beep();
+        updateHud();
+        const npc = M.quests[t.quest].npc;
+        if (sim && !demo && sim.id === t.quest && $('lab').open) {
+            sim.quip = [npc, t.thanks, 'give'];
+            renderLab();
+            return;
+        }
+        beginLab(t.quest);
+        if (sim && sim.id === t.quest && $('lab').open) {
+            sim.quip = [npc, t.thanks, 'give'];
+            renderLab();
+        }
+    }
+
+    function fetchGo(id) {
+        const t = toolById(id);
+        if (!t) return;
+        comfort.stopTalk(true);
+        dlgIds.forEach(d => $(d).open && $(d).close());
+        pause();
+        updateHud();
+        if (holding(t)) {
+            navigate(t.quest);
+            return;
+        }
+        if (!state.fetch.heard.includes(t.quest)) {
+            state.fetch.heard.push(t.quest);
+            save();
+            updateHud();
+        }
+        fetchAuto = t.id;
+        if (world?.goTool(t.id)) toast(`${t.icon} ${josa(t.name, '을', '를')} 찾으러 가요. 하늘빛으로 빛나는 상자 위로 걸어가면 저절로 주워요.`);
+        else toast(`${t.where}에서 하늘빛으로 빛나는 ${josa(t.name, '을', '를')} 찾아보세요.`);
+    }
+
     function castQuest(cid) {
         const mine = M.quests.filter(q => q.npc === cid);
         return mine.find(q => !state.completed.includes(q.id)) || mine[mine.length - 1] || null;
@@ -132,6 +225,17 @@
             hud = $('questHud');
         hud.hidden = !state.started;
         hud.innerHTML = `<div class="eyebrow">${state.festival?'두 왕국의 비눗방울 축제':state.mode==='beginner'?'함께 알아가는 첫 탐험':'레몬 백작의 부탁'}</div><h2>${q?esc(q.name):state.festival?'축제가 열렸어요!':'마지막 안내문을 남겨요'}</h2><p>${q?esc(M.cast[q.npc].name+'에게 가서 이야기를 들어요.'):state.festival?'주민을 만나고 비눗방울 축제를 둘러보세요.':'기록을 완성하고 축제를 열어요.'}</p><button data-action="${q?'navigate':'journal'}" ${q?'data-id="'+q.id+'"':''}>${q?'⌖ '+esc(q.place)+' 길 안내':'▤ 탐험일지 펼치기'}</button><div class="progress"><span style="width:${done/QN*100}%"></span></div><div class="small-row"><span>${done} / ${QN} 부탁 해결</span><span>${state.nickname?disp(state.nickname)+'의 여정':''}</span></div>`;
+        const need = q && pending < 0 && accessible(q.id) && state.fetch.heard.includes(q.id) ? toolFor(q.id) : null;
+        if (need) {
+            const npc = M.cast[q.npc].name;
+            hud.querySelector('p').textContent = holding(need) ? `${need.icon} ${josa(need.name, '을', '를')} 찾았어요! ${npc}에게 건네요.` : `조수의 일 · ${need.icon} ${josa(need.name, '을', '를')} 찾아 ${npc}에게 건네요. (${need.where})`;
+            const button = hud.querySelector('button');
+            button.dataset.action = holding(need) ? 'navigate' : 'fetch-go';
+            button.dataset.tool = need.id;
+            button.dataset.id = q.id;
+            button.textContent = holding(need) ? `⌖ ${npc}에게 건네러 가기` : `⌖ ${need.icon} ${need.name} 찾기`;
+        }
+        syncTools();
         if (pending >= 0) hud.innerHTML = `<div class="eyebrow">다음 여정 전에 · 필수 기록</div><h2>${esc(M.entries[pending].title)}</h2><p>알아낸 것·증거와 이유·새로운 적용을 적고 서명해요.</p><button data-action="journal" data-tab="${pending}">✎ 기록 완성하기</button><div class="small-row">부탁 ${done}/${QN} · 필수 기록 ${sealedCount()}/${EN}</div>`;
         if (!q && !state.festival && M.ready(state)) {
             hud.querySelector('h2').textContent = '비눗방울 축제를 열 준비 완료!';
@@ -156,7 +260,8 @@
                 open = mine.find(x => !state.completed.includes(x.id));
             l.classList.toggle('done', !open);
             l.classList.toggle('locked', !!open && !accessible(open.id));
-            l.innerHTML = `${esc(c.short)} <span>${!open?'✓':accessible(open.id)?'!':'·'}</span>`;
+            const tw = open && accessible(open.id) && pending < 0 && state.fetch.heard.includes(open.id) ? toolFor(open.id) : null;
+            l.innerHTML = `${esc(c.short)} <span>${!open?'✓':tw?(holding(tw)?'🧪':'🔎'):accessible(open.id)?'!':'·'}</span>`;
         }
         document.body.classList.toggle('calm', state.calm);
     }
@@ -198,7 +303,7 @@
         if (cid === 4) {
             const healed = state.completed.includes(5);
             talk([
-                [4, healed ? '이제 뛰어놀 수 있어요! 비눗방울은 장갑 끼고 구경할 거예요. 과학자님, 고마워요!' : state.completed.includes(0) ? '백작님이 과학자님이 꼭 방법을 찾아 주실 거래요… 전 괜찮아요. 조금 졸릴 뿐이에요.' : '안녕하세요… 저는 새콤이에요. 요즘 자꾸 힘이 없어요.']
+                [4, healed ? '이제 뛰어놀 수 있어요! 비눗방울은 장갑 끼고 구경할 거예요. 과학자님, 고마워요!' : state.completed.includes(0) ? '백작님이 그러셨어요. 손님이 연구자님들을 도와 꼭 방법을 찾아 주실 거라고요… 전 괜찮아요. 조금 졸릴 뿐이에요.' : '안녕하세요… 저는 새콤이에요. 요즘 자꾸 힘이 없어요.']
             ]);
             return;
         }
@@ -224,6 +329,36 @@
             ], mine.map(x => `<button class="${x===q?'primary':''}" data-action="lab" data-id="${x.id}">다시 살펴보기 · ${esc(x.name)}</button>`).join(''));
             return;
         }
+        if (hasTools(q.id)) {
+            const first = !state.fetch.heard.includes(q.id);
+            if (first) {
+                state.fetch.heard.push(q.id);
+                save();
+            }
+            const t = toolFor(q.id),
+                labButton = `<button data-action="lab" data-id="${q.id}">실험대 보기</button>`;
+            updateHud();
+            if (t && holding(t) && !first) {
+                giveTool(t.id);
+                return;
+            }
+            if (t && holding(t)) {
+                talk([...q.lines.slice(0, -1), [q.npc, `어라, ${josa(t.name, '을', '를')} 벌써 챙겨 왔군? 역시 준비성 좋은 조수야! ${t.thanks}`]], `<button class="primary" data-action="tool-give" data-tool="${t.id}">${t.icon} ${josa(t.name, '을', '를')} 건네고 실험하기</button>`);
+                return;
+            }
+            if (t) {
+                talk(first && t.step === 0 ? q.lines : first ? [q.lines[1], [q.npc, t.ask]] : [
+                    [q.npc, t.ask]
+                ], `<button class="primary" data-action="fetch-go" data-tool="${t.id}">🔎 ${t.name} 찾으러 가기</button>${first?'':labButton}`);
+                return;
+            }
+            if (!first) {
+                talk([
+                    [q.npc, '좋아, 필요한 도구는 챙겼군! 실험대에서 이어서 해 보세.']
+                ], `<button class="primary" data-action="lab" data-id="${q.id}">실험대로 가기</button>`);
+                return;
+            }
+        }
         talk(q.lines, `<button class="primary" data-action="lab" data-id="${q.id}">같이 살펴볼게!</button>`);
     }
 
@@ -244,6 +379,8 @@
             record: null,
             localEvidence: []
         }, L[id].init(known));
+        const first = L[id].say?.('start', known);
+        sim.quip = !known.length && first ? [...first, 'start'] : null;
         renderLab();
         show('lab');
         demo = teacher;
@@ -264,19 +401,36 @@
             npc = M.cast[q.npc],
             cs = checks(),
             can = demo || state.predictions[q.id] != null,
-            current = cs.findIndex(c => !c[0]);
-        $('labContent').innerHTML = `<header class="modal-head"><div class="eyebrow">${demo?'교사 시연 · 학생 기록에 저장되지 않아요':esc(q.place)+' · 부탁 '+(q.id+1)+' / '+QN}</div><h2 id="labTitle">${esc(q.name)}</h2><button class="close" data-close aria-label="실험 닫기">×</button><p>${esc(q.goal)}</p></header><div class="lab-layout"><aside class="lab-side"><div class="lab-task-head"><h3 class="task-heading">${esc(npc.name)}의 부탁을 들어주기 위해 할 일</h3><details class="lab-guide"><summary>부탁·원리 다시 보기</summary><div class="lab-guide-content"><b>${npc.icon} ${esc(npc.name)}의 부탁</b><p>${esc(q.lines.filter(l=>l[0]===q.npc).map(l=>l[1]).join(' '))}</p><h4>원리 다시 살펴보기</h4><p>${esc(lab.principle)}</p><p class="science-note">${esc(lab.safety)}</p></div></details><button class="hint-button" data-action="next-hint">💡 다음에 무엇을 하지?</button></div><ol class="mission-steps">${cs.map((c,i)=>`<li class="${c[0]?'done':i===current?'current':''}"><span class="step-number">Step ${i+1}${c[0]?' ✓':''}</span><div><b>${c[0]?'해냈어요':i===current?'지금 할 일':'다음 할 일'}</b><p>${esc(c[1])}</p></div></li>`).join('')}</ol><p id="nextHint" class="hint-message" role="status"></p></aside><section class="lab-main">${!can?`<div class="prediction"><div class="prediction-scene"><div class="circuit-wrap lab-scene" inert>${lab.scene(sim)}</div></div><div class="prediction-choices"><p><b>먼저 나의 예상</b><br>${esc(lab.prediction[0])}</p><div class="choices">${lab.prediction[1].map((t,i)=>`<button data-action="predict" data-value="${i}">${esc(t)}</button>`).join('')}</div><p class="muted">예상은 틀려도 괜찮아요. 실험 뒤 생각을 바꿀 수 있어요.</p></div></div>`:renderExperiment()}</section></div>`;
+            current = cs.findIndex(c => !c[0]),
+            gateTool = !demo && toolFor(sim.id);
+        $('labContent').innerHTML = `<header class="modal-head"><div class="eyebrow">${demo?'교사 시연 · 학생 기록에 저장되지 않아요':esc(q.place)+' · 부탁 '+(q.id+1)+' / '+QN}</div><h2 id="labTitle">${esc(q.name)}</h2><button class="close" data-close aria-label="실험 닫기">×</button><p>${esc(q.goal)}</p></header><div class="lab-layout"><aside class="lab-side"><div class="lab-task-head"><h3 class="task-heading">${esc(npc.name)}의 부탁을 들어주기 위해 할 일</h3><details class="lab-guide"><summary>부탁·원리 다시 보기</summary><div class="lab-guide-content"><b>${npc.icon} ${esc(npc.name)}의 부탁</b><p>${esc(q.lines.filter(l=>l[0]===q.npc).map(l=>l[1]).join(' '))}</p><h4>원리 다시 살펴보기</h4><p>${esc(lab.principle)}</p><p class="science-note">${esc(lab.safety)}</p></div></details><button class="hint-button" data-action="next-hint">💡 다음에 무엇을 하지?</button></div><ol class="mission-steps">${cs.map((c,i)=>`<li class="${c[0]?'done':i===current?'current':''}"><span class="step-number">Step ${i+1}${c[0]?' ✓':''}</span><div><b>${c[0]?'해냈어요':i===current?'지금 할 일':'다음 할 일'}</b><p>${i===current&&gateTool?`🔎 먼저 ${esc(josa(gateTool.name,'을','를'))} ${holding(gateTool)?'건네요':'찾아와 건네요'}. `:''}${esc(c[1])}</p></div></li>`).join('')}</ol><p id="nextHint" class="hint-message" role="status"></p></aside><section class="lab-main">${!can?`<div class="prediction"><div class="prediction-scene"><div class="circuit-wrap lab-scene" inert>${lab.scene(sim)}</div></div><div class="prediction-choices"><p><b>먼저 나의 예상</b><br>${esc(lab.prediction[0])}</p><div class="choices">${lab.prediction[1].map((t,i)=>`<button data-action="predict" data-value="${i}">${esc(t)}</button>`).join('')}</div><p class="muted">예상은 틀려도 괜찮아요. 실험 뒤 생각을 바꿀 수 있어요.</p></div></div>`:renderExperiment()}</section></div>`;
+    }
+
+    /* 실험대 곁 과학자의 한마디(원본 수업 대사) — 기록을 붙일 때마다 바뀐다 */
+    function quipHTML() {
+        const q = sim.quip,
+            c = q && M.cast[q[0]];
+        if (!c) return '';
+        return `<div class="npc-quip" role="status"><span class="npc-quip-face" aria-hidden="true">${c.icon}</span><p><b>${esc(c.name)}</b>${esc(q[1])}</p></div>`;
+    }
+
+    function gateHTML(t) {
+        const has = holding(t),
+            npc = M.cast[M.quests[t.quest].npc].name;
+        return `<div class="tool-gate" role="status"><div class="tool-gate-icon" aria-hidden="true">${t.icon}</div><div><div class="eyebrow">조수의 일 · 필요한 도구</div><h3>${esc(t.name)}</h3><p>${esc(has?`찾아온 ${josa(t.name,'을','를')} ${npc}에게 건네면 이 단계 실험을 시작해요.`:t.ask)}</p>${has?'':`<p class="muted">하늘빛으로 빛나는 상자 위로 걸어가면 저절로 주워요.</p>`}<button class="primary" data-action="${has?'tool-give':'fetch-go'}" data-tool="${t.id}">${has?`${t.icon} ${esc(josa(t.name,'을','를'))} 건네기`:`🔎 ${esc(t.name)} 찾으러 가기`}</button></div></div>`;
     }
 
     function renderExperiment() {
         const lab = L[sim.id],
-            list = evid();
-        return `<div class="experiment-workbench ${sim.record?'is-recording':''}"><section class="circuit-pane" aria-label="실험 장면"><div class="sim-badges"><span class="pill amber">${esc(lab.title)}</span></div><div id="labScene" class="circuit-wrap lab-scene">${lab.scene(sim)}</div><div id="labReadings">${lab.readings(sim)}</div><p id="labNote" class="circuit-note">${esc(lab.note(sim))}</p></section><section class="lab-tools" aria-label="실험 조작과 직접 기록"><fieldset class="experiment-controls" ${sim.record?'disabled':''}><legend>실험 조작</legend><p id="labFeedback" class="lab-feedback" role="alert" hidden></p><div id="labControls">${lab.controls(sim)}</div><div class="action-row"><button class="secondary" data-action="capture">▣ 증거 남기기</button><button class="primary" data-action="complete" ${doneChecks()?'':'disabled'}>${state.completed.includes(sim.id)&&!demo?'조사 마치기':'부탁 해결하기 ✓'}</button></div><p class="record-invite">관찰한 뒤 ‘증거 남기기’를 누르면 이 자리에서 결과를 직접 기록해요.</p></fieldset>${recorderHTML()}${list.length?`<details class="evidence-list"><summary>내가 남긴 증거 ${list.length}개 보기</summary><div class="evidence-history">${list.slice(-5).map(e=>`<div class="evidence-item">✎ ${esc(e.label)}</div>`).join('')}</div></details>`:''}</section></div>`;
+            list = evid(),
+            gate = !demo && toolFor(sim.id);
+        if (gate) return `<div class="experiment-workbench is-gated"><section class="circuit-pane" aria-label="실험 장면"><div class="sim-badges"><span class="pill amber">${esc(lab.title)}</span></div><div id="labScene" class="circuit-wrap lab-scene" inert>${lab.scene(sim)}</div><p id="labNote" class="circuit-note">${esc(lab.note(sim))}</p></section><section class="lab-tools" aria-label="필요한 도구">${sim.quip&&sim.quip[2]!=='start'?quipHTML():''}${gateHTML(gate)}${list.length?`<details class="evidence-list"><summary>내가 남긴 증거 ${list.length}개 보기</summary><div class="evidence-history">${list.slice(-5).map(e=>`<div class="evidence-item">✎ ${esc(e.label)}</div>`).join('')}</div></details>`:''}</section></div>`;
+        return `<div class="experiment-workbench ${sim.record?'is-recording':''}"><section class="circuit-pane" aria-label="실험 장면"><div class="sim-badges"><span class="pill amber">${esc(lab.title)}</span></div><div id="labScene" class="circuit-wrap lab-scene">${lab.scene(sim)}</div><div id="labReadings">${lab.readings(sim)}</div><p id="labNote" class="circuit-note">${esc(lab.note(sim))}</p></section><section class="lab-tools" aria-label="실험 조작과 직접 기록">${quipHTML()}<fieldset class="experiment-controls" ${sim.record?'disabled':''}><legend>실험 조작</legend><p id="labFeedback" class="lab-feedback" role="alert" hidden></p><div id="labControls">${lab.controls(sim)}</div><div class="action-row"><button class="secondary" data-action="capture">▣ 증거 남기기</button><button class="primary" data-action="complete" ${doneChecks()?'':'disabled'}>${state.completed.includes(sim.id)&&!demo?'조사 마치기':'부탁 해결하기 ✓'}</button></div><p class="record-invite">관찰한 뒤 ‘증거 남기기’를 누르면 이 자리에서 결과를 직접 기록해요.</p></fieldset>${recorderHTML()}${list.length?`<details class="evidence-list"><summary>내가 남긴 증거 ${list.length}개 보기</summary><div class="evidence-history">${list.slice(-5).map(e=>`<div class="evidence-item">✎ ${esc(e.label)}</div>`).join('')}</div></details>`:''}</section></div>`;
     }
 
     /* 실험 조작 뒤에는 그림·계기·조작 칸만 다시 그리고, 누르던 단추로 초점을 돌려 둔다 */
     function refreshLab() {
-        if (!$('labScene')) return renderLab();
+        if (!$('labScene') || !$('labControls')) return renderLab();
         const lab = L[sim.id],
             active = document.activeElement,
             key = active?.dataset?.lab ? '[data-lab="' + active.dataset.lab + '"]' + ['tool', 'model', 'key', 'delta', 'sample', 'cup', 'sol', 'row', 'u'].filter(k => active.dataset[k] != null).map(k => `[data-${k}="${CSS.escape(active.dataset[k])}"]`).join('') : null;
@@ -290,7 +444,7 @@
     }
 
     function labAct(action, data) {
-        if (!sim || sim.record) return;
+        if (!sim || sim.record || (!demo && toolFor(sim.id))) return;
         const res = L[sim.id].act(sim, action, data) || {};
         if (res.sound) sound(res.sound);
         refreshLab();
@@ -306,6 +460,9 @@
         } : !(demo || state.predictions[sim.id] != null) ? {
             selector: '[data-action="predict"]',
             copy: '먼저 내 예상을 하나 골라요. 틀려도 괜찮아요.'
+        } : !demo && toolFor(sim.id) ? {
+            selector: '[data-action="fetch-go"],[data-action="tool-give"]',
+            copy: holding(toolFor(sim.id)) ? '찾아온 도구를 건네면 실험을 시작해요.' : '먼저 필요한 도구를 찾아와요. ‘찾으러 가기’를 누르면 길을 안내해요.'
         } : L[sim.id].hint(sim, tags());
         const target = $('lab').querySelector(hint.selector) || $('recordForm')?.querySelector('button[type=submit]');
         $('nextHint').textContent = hint.copy;
@@ -397,9 +554,12 @@
         else list.push(record);
         sim.record = null;
         L[sim.id].after(sim, tags());
+        const said = L[sim.id].say?.(r.tag, tags());
+        if (said) sim.quip = [...said, r.tag];
         if (!demo) save();
         beep();
         renderLab();
+        if (!demo) updateHud();
         toast('직접 적은 관찰을 탐험일지에 붙였어요.');
     }
 
@@ -580,28 +740,43 @@
         g.fillStyle = '#6ea4c4';
         g.fillRect(0, 0, w, h);
         LAYOUT.lands.forEach(([x0, x1, z0, z1], i) => {
-            g.fillStyle = i ? '#a6d4b2' : '#bcd780';
+            g.fillStyle = i ? '#c6b4e8' : '#e2d77c';
             g.beginPath();
             g.roundRect(xx(x0), zz(z0), (x1 - x0) * sx, (z1 - z0) * sy, 8);
             g.fill();
         });
         g.fillStyle = '#d9b98a';
         for (const z of LAYOUT.bridges) g.fillRect(xx(2.5), zz(z - 1.3), 5 * sx, 2.6 * sy);
-        g.strokeStyle = '#ecdcaf';
         g.lineCap = 'round';
         g.lineJoin = 'round';
         for (const r of LAYOUT.roads) {
             g.lineWidth = (large ? 4 : 2) * r.w;
-            g.beginPath();
-            r.pts.forEach((p, i) => i ? g.lineTo(xx(p[0]), zz(p[1])) : g.moveTo(xx(p[0]), zz(p[1])));
-            g.stroke();
+            for (let i = 1; i < r.pts.length; i++) {
+                const a = r.pts[i - 1],
+                    b = r.pts[i];
+                g.strokeStyle = (a[0] + b[0]) / 2 > 5 ? '#f1e9fb' : '#b98a55';
+                g.beginPath();
+                g.moveTo(xx(a[0]), zz(a[1]));
+                g.lineTo(xx(b[0]), zz(b[1]));
+                g.stroke();
+            }
         }
         g.fillStyle = '#e7cfa6';
         g.beginPath();
         g.arc(xx(LAYOUT.plaza.x), zz(LAYOUT.plaza.z), LAYOUT.plaza.r * sx, 0, Math.PI * 2);
         g.fill();
-        g.fillStyle = '#f5cf3a';
-        g.fillRect(xx(-16.5), zz(-15.5), 6 * sx, 4 * sy);
+        const court = LAYOUT.court;
+        g.fillStyle = '#f7e9b0';
+        g.fillRect(xx(court.x0), zz(court.z0), (court.x1 - court.x0) * sx, (court.z1 - court.z0) * sy);
+        g.strokeStyle = '#d8b24a';
+        g.lineWidth = large ? 2.5 : 1.2;
+        g.strokeRect(xx(court.x0), zz(court.z0), (court.x1 - court.x0) * sx, (court.z1 - court.z0) * sy);
+        g.fillStyle = '#e8d6a8';
+        g.fillRect(xx(court.gate[0]), zz(court.z1) - 2, (court.gate[1] - court.gate[0]) * sx, 4);
+        g.fillStyle = '#f6e3a0';
+        g.fillRect(xx(-16.9), zz(-15.8), 6.8 * sx, 4.2 * sy);
+        g.strokeStyle = '#a8753a';
+        g.strokeRect(xx(-16.9), zz(-15.8), 6.8 * sx, 4.2 * sy);
         if (large) {
             g.font = 'bold 12px "Malgun Gothic"';
             g.textAlign = 'center';
@@ -612,15 +787,34 @@
         }
         for (const q of M.quests) {
             g.fillStyle = state.completed.includes(q.id) ? '#6d9c6b' : accessible(q.id) ? '#e1a93a' : '#9ab393';
+            g.strokeStyle = '#4a3a1a';
+            g.lineWidth = large ? 2 : 1;
             g.beginPath();
             g.arc(xx(q.x), zz(q.z), large ? 8 : 4, 0, Math.PI * 2);
             g.fill();
+            g.stroke();
             if (large) {
                 g.font = 'bold 12px "Malgun Gothic"';
                 g.textAlign = 'center';
                 g.fillStyle = '#3f5847';
                 g.fillText((q.id + 1) + '. ' + M.cast[q.npc].short, xx(q.x), zz(q.z) - 12);
             }
+        }
+        const wt = worldTool();
+        if (wt) {
+            const r = large ? 9 : 5;
+            g.fillStyle = '#d9462f';
+            g.strokeStyle = '#ffffff';
+            g.lineWidth = large ? 2.5 : 1.5;
+            g.beginPath();
+            for (let k = 0; k < 10; k++) {
+                const a = -Math.PI / 2 + k * Math.PI / 5,
+                    rr = k % 2 ? r * .45 : r;
+                g.lineTo(xx(wt.x) + Math.cos(a) * rr, zz(wt.z) + Math.sin(a) * rr);
+            }
+            g.closePath();
+            g.fill();
+            g.stroke();
         }
         const pos = world ? world.player.position : state.pos;
         g.fillStyle = '#fffaf0';
@@ -651,7 +845,7 @@
     const storyPages = [{
         tag: '레몬 왕국에서 온 편지',
         title: '산성이 곧 기운인 나라',
-        text: '레몬 왕국 사람들은 몸속이 새콤한 산성일 때 가장 힘이 나요. 지구의 과학자인 당신에게 레몬 백작의 편지가 도착했어요.'
+        text: '레몬 왕국 사람들은 몸속이 새콤한 산성일 때 가장 힘이 나요. 지구에서 온 당신에게 레몬 성으로 와 달라는 레몬 백작의 초대장이 도착했어요.'
     }, {
         tag: '그런데… 아이들이 시들어요',
         title: '경계 마을에 번진 중화병',
@@ -659,7 +853,7 @@
     }, {
         tag: '과학자가 사건을 푸는 방법',
         title: '예상하고, 실험하고, 직접 기록해요',
-        text: '두 연구자의 조수가 되어 실험해요. 관찰한 색과 값을 ‘증거 남기기’로 직접 적고, 막히면 힌트를 눌러요. 다음에 누를 곳이 빛나요.'
+        text: '두 연구자의 조수가 되어 실험해요. 흩어진 실험 도구를 찾아 건네고, 관찰한 색과 값을 ‘증거 남기기’로 직접 적어요. 막히면 힌트를 눌러요. 다음에 누를 곳이 빛나요.'
     }, {
         tag: '세 편의 필수 기록',
         title: '증거로 말하는 과학자',
@@ -673,7 +867,7 @@
         }, (_, k) => `<circle cx="${560+((k*97)%260)}" cy="${60+((k*53)%150)}" r="${10+(k%3)*7}" fill="#dff5ff" fill-opacity=".25" stroke="#bfe9ff" stroke-width="2"/>`).join('');
         const lemon = (x, y, s, c) => `<g transform="translate(${x} ${y}) scale(${s})"><ellipse cx="0" cy="0" rx="34" ry="42" fill="${c}"/><path d="M0 -42 L-7 -56 L7 -56 Z" fill="${c}"/><ellipse cx="14" cy="-50" rx="12" ry="5" fill="#5fa54a" transform="rotate(-20 14 -50)"/><circle cx="-11" cy="-4" r="4" fill="#2f332c"/><circle cx="11" cy="-4" r="4" fill="#2f332c"/><path d="M-8 12 Q0 ${c==='#d8d3a6'?8:18} 8 12" fill="none" stroke="#6d3b2f" stroke-width="3" stroke-linecap="round"/></g>`;
         if (i >= 2) return `<svg viewBox="0 0 800 320" role="img" aria-label="${i===2?'실험대와 기록 공책':'세 편의 기록 공책'}"><rect width="800" height="320" fill="${sky[0]}"/><rect y="220" width="800" height="100" fill="#e6d2a8"/>${i===2?`<g transform="translate(150 110)"><path d="M0 0 L0 110 Q0 126 16 126 L94 126 Q110 126 110 110 L110 0" fill="#f2d24a" fill-opacity=".85" stroke="#7d93a0" stroke-width="4"/><path d="M180 0 L180 110 Q180 126 196 126 L274 126 Q290 126 290 110 L290 0" fill="#5db36d" fill-opacity=".85" stroke="#7d93a0" stroke-width="4"/><path d="M360 0 L360 110 Q360 126 376 126 L454 126 Q470 126 470 110 L470 0" fill="#3f79d4" fill-opacity=".85" stroke="#7d93a0" stroke-width="4"/><text x="55" y="-16" text-anchor="middle" font-size="22" fill="#6a5520">산성</text><text x="235" y="-16" text-anchor="middle" font-size="22" fill="#3f6f4a">중성</text><text x="415" y="-16" text-anchor="middle" font-size="22" fill="#2f5a9a">염기성</text></g>`:`${[0,1,2].map(k=>`<g transform="translate(${150+k*190} ${80+k*8}) rotate(${-6+k*6})"><rect width="150" height="180" rx="12" fill="#fffaf0" stroke="#d8c9a4" stroke-width="4"/><rect width="26" height="180" rx="8" fill="${['#f5cf3a','#8fcff0','#b7a2e0'][k]}"/>${[0,1,2,3].map(j=>`<line x1="46" x2="128" y1="${50+j*28}" y2="${50+j*28}" stroke="#d8cdb3" stroke-width="4"/>`).join('')}<text x="86" y="30" text-anchor="middle" font-size="26">${['🧪','🫧','🏡'][k]}</text></g>`).join('')}`}</svg>`;
-        return `<svg viewBox="0 0 800 320" role="img" aria-label="${i===0?'노을 진 레몬 왕국과 레몬 성':'기운을 잃은 레몬 아이와 날아드는 비눗방울'}"><defs><linearGradient id="sky${i}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${sky[0]}"/><stop offset="1" stop-color="${sky[1]}"/></linearGradient></defs><rect width="800" height="320" fill="url(#sky${i})"/><circle cx="140" cy="90" r="46" fill="#ffe9a0" opacity=".9"/><path d="M0 250 Q200 200 400 240 T800 230 V320 H0 Z" fill="${i===1?'#6f8f6a':'#8fbf5a'}"/><path d="M0 285 Q220 250 460 280 T800 270 V320 H0 Z" fill="${i===1?'#5d7a58':'#7aad4c'}"/>${i===0?`<g transform="translate(470 110)"><rect x="-70" y="40" width="140" height="100" fill="#f6e7bd"/><rect x="-100" y="20" width="36" height="120" fill="#f3dea6"/><rect x="64" y="20" width="36" height="120" fill="#f3dea6"/><ellipse cx="-82" cy="8" rx="26" ry="34" fill="#f5cf3a"/><ellipse cx="82" cy="8" rx="26" ry="34" fill="#f5cf3a"/><ellipse cx="0" cy="20" rx="44" ry="50" fill="#f7d543"/><rect x="-16" y="100" width="32" height="40" rx="14" fill="#7a5a3a"/></g>${lemon(250,240,1.1,'#f4cf2f')}`:`${lemon(300,240,1,'#d8d3a6')}${lemon(390,256,.8,'#d8d3a6')}${bubbles}`}</svg>`;
+        return `<svg viewBox="0 0 800 320" role="img" aria-label="${i===0?'노을 진 레몬 왕국과 레몬 성':'기운을 잃은 레몬 아이와 날아드는 비눗방울'}"><defs><linearGradient id="sky${i}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${sky[0]}"/><stop offset="1" stop-color="${sky[1]}"/></linearGradient></defs><rect width="800" height="320" fill="url(#sky${i})"/><circle cx="140" cy="90" r="46" fill="#ffe9a0" opacity=".9"/><path d="M0 250 Q200 200 400 240 T800 230 V320 H0 Z" fill="${i===1?'#8a78ad':'#d8c25a'}"/><path d="M0 285 Q220 250 460 280 T800 270 V320 H0 Z" fill="${i===1?'#76659a':'#c7ab46'}"/>${i===0?`<g transform="translate(470 110)"><rect x="-70" y="40" width="140" height="100" fill="#f6e7bd"/><rect x="-100" y="20" width="36" height="120" fill="#f3dea6"/><rect x="64" y="20" width="36" height="120" fill="#f3dea6"/><ellipse cx="-82" cy="8" rx="26" ry="34" fill="#f5cf3a"/><ellipse cx="82" cy="8" rx="26" ry="34" fill="#f5cf3a"/><ellipse cx="0" cy="20" rx="44" ry="50" fill="#f7d543"/><rect x="-16" y="100" width="32" height="40" rx="14" fill="#7a5a3a"/></g>${lemon(250,240,1.1,'#f4cf2f')}`:`${lemon(300,240,1,'#d8d3a6')}${lemon(390,256,.8,'#d8d3a6')}${bubbles}`}</svg>`;
     }
 
     function startStory(replay = false) {
@@ -908,7 +1102,7 @@
                 completeQuest(true);
                 break;
             case 'inventory':
-                $('inventoryContent').innerHTML = `<header class="modal-head"><h2 id="inventoryTitle">나의 선물 보관함</h2><button class="close" data-close aria-label="보관함 닫기">×</button></header><p>주민의 부탁을 해결할 때마다 선물을 받아요. 받은 선물은 연구 텐트 옆에도 놓여요.</p><div class="gift-grid">${M.quests.map(q=>{const got=state.completed.includes(q.id);return `<article class="gift-card ${got?'earned':'locked'}"><div class="gift-emoji" aria-hidden="true">${got?q.gift:'🎁'}</div><h3>${got?esc(q.reward):'아직 열지 않은 선물'}</h3><p>${esc(M.cast[q.npc].name)} · ${got?'부탁 해결 선물':'「'+esc(q.name)+'」을 해결해요'}</p></article>`;}).join('')}</div><button data-action="camp">내 연구 텐트 보러 가기 →</button>`;
+                $('inventoryContent').innerHTML = `<header class="modal-head"><h2 id="inventoryTitle">나의 선물 보관함</h2><button class="close" data-close aria-label="보관함 닫기">×</button></header><p>주민의 부탁을 해결할 때마다 선물을 받아요. 받은 선물은 연구 텐트 옆에도 놓여요.</p><div class="gift-grid">${M.quests.map(q=>{const got=state.completed.includes(q.id);return `<article class="gift-card ${got?'earned':'locked'}"><div class="gift-emoji" aria-hidden="true">${got?q.gift:'🎁'}</div><h3>${got?esc(q.reward):'아직 열지 않은 선물'}</h3><p>${esc(M.cast[q.npc].name)} · ${got?'부탁 해결 선물':'「'+esc(q.name)+'」을 해결해요'}</p></article>`;}).join('')}</div><h3 class="tool-bag-title">🧰 조수의 도구 가방</h3><p>Dr.에시드의 흩어진 실험 도구를 찾아 건넨 기록이에요.</p><div class="tool-bag">${M.tools.map(t=>{const given=state.fetch.given.includes(t.id),got=state.fetch.got.includes(t.id);return `<div class="tool-bag-item ${given?'given':got?'got':'missing'}"><span aria-hidden="true">${given||got?t.icon:'❔'}</span><b>${given||got?esc(t.name):'아직 찾지 못한 도구'}</b><small>${given?'에시드에게 건넴':got?'가방에 있음 · 건네러 가요':'부탁 '+(t.quest+1)+'에서 찾아요'}</small></div>`;}).join('')}</div><button data-action="camp">내 연구 텐트 보러 가기 →</button>`;
                 show('inventory');
                 break;
             case 'next-hint':
@@ -976,6 +1170,12 @@
                 break;
             case 'navigate':
                 navigate(id);
+                break;
+            case 'fetch-go':
+                fetchGo(b.dataset.tool);
+                break;
+            case 'tool-give':
+                giveTool(b.dataset.tool);
                 break;
             case 'lab':
                 beginLab(id);
@@ -1131,7 +1331,22 @@
         save();
         close('welcome');
         updateHud();
-        toast('반가워요! 레몬 성 앞의 레몬 백작에게 가 보세요.');
+        if (!state.visited.includes(0) && !state.completed.length) {
+            const sp = LAYOUT.court.spawn;
+            state.pos = {
+                x: sp.x,
+                z: sp.z
+            };
+            if (world) {
+                world.player.position.set(sp.x, world.player.position.y, sp.z);
+                world.camTarget.copy(world.player.position);
+                world.path = [];
+                world.player.rotation.y = Math.PI;
+            }
+            setTimeout(() => {
+                if (!dlgIds.some(d => $(d).open)) interact(0);
+            }, state.calm ? 60 : 600);
+        } else toast('반가워요! 레몬 성 안뜰이에요. 왕좌 앞의 레몬 백작에게 다가가 말을 걸어 보세요.');
     });
     document.addEventListener('focusout', e => {
         if (e.target.id === 'musicSeek') comfort.cancelMusicPosition();
@@ -1210,10 +1425,11 @@
         save,
         toast
     });
-    $('npcLabels').innerHTML = M.cast.map(c => `<button id="npc-${c.id}" class="npc-label" ${c.id===4?'':`data-action="navigate" data-id="${M.quests.find(q=>q.npc===c.id).id}"`} title="${esc(c.name)}">${esc(c.short)}</button>`).join('');
+    $('npcLabels').innerHTML = M.cast.map(c => `<button id="npc-${c.id}" class="npc-label" ${c.id===4?'':`data-action="navigate" data-id="${M.quests.find(q=>q.npc===c.id).id}"`} title="${esc(c.name)}">${esc(c.short)}</button>`).join('') + '<button id="toolLabel" class="npc-label tool-label" data-action="fetch-go" hidden></button>';
     try {
         world = new IslandWorld($('world'), {
             interact,
+            pick: id => pickTool(id),
             journal: () => openJournal(),
             toast,
             near: id => {
@@ -1228,6 +1444,18 @@
                     el.style.top = p.y + 'px';
                     el.hidden = !state.started || p.x < 15 || p.x > innerWidth - 15 || p.y < 90 || p.y > innerHeight - 40 || !p.visible;
                 });
+                const ts = world?.toolScreen?.(),
+                    tl = $('toolLabel');
+                if (tl) {
+                    const t = ts && toolById(ts.id);
+                    tl.hidden = !t || !state.started || !ts.visible || ts.x < 15 || ts.x > innerWidth - 15 || ts.y < 90 || ts.y > innerHeight - 40;
+                    if (t) {
+                        if (tl.dataset.tool !== t.id) tl.innerHTML = `${t.icon} ${esc(t.name)} <span>줍기</span>`;
+                        tl.dataset.tool = t.id;
+                        tl.style.left = ts.x + 'px';
+                        tl.style.top = ts.y + 'px';
+                    }
+                }
                 drawMap($('miniMap'));
             }
         }, state);

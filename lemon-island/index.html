@@ -163,6 +163,74 @@ span.tool-btn{cursor:default}
 .cover-credit a,#app-credit a,.credit-row a{color:#6a5516;font-weight:700}
 .credit-row{font-size:14px;line-height:1.7}
 #app-credit a{pointer-events:auto}
+
+/* 실험대 곁 과학자의 한마디 */
+.npc-quip{display:flex;gap:10px;align-items:flex-start;margin:0 0 10px}
+.npc-quip-face{flex:none;width:44px;height:44px;border-radius:50%;background:#fff3c4;border:2px solid #e8c95a;display:flex;align-items:center;justify-content:center;font-size:24px}
+.npc-quip p{position:relative;flex:1;margin:0;padding:10px 14px;background:#fffaf0;border:2px solid #ecd39a;border-radius:14px;font-size:14px;line-height:1.6;color:#4d4424;animation:quipIn .25s ease-out}
+.npc-quip p::before{content:'';position:absolute;left:-9px;top:14px;border:8px solid transparent;border-right-color:#ecd39a;border-left:0}
+.npc-quip b{display:block;font-size:12px;color:#8a6a12;margin-bottom:2px}
+@keyframes quipIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.calm .npc-quip p{animation:none}
+
+/* 조수의 일: 필요한 도구 카드 · 섬 위 도구 이름표 */
+.experiment-workbench.is-gated .circuit-pane .lab-scene{opacity:.55;filter:saturate(.7)}
+.tool-gate{display:flex;gap:14px;align-items:flex-start;padding:16px 18px;border-radius:18px;background:#fff6d8;border:2px dashed #e0b84a;margin:6px 0 10px}
+.tool-gate-icon{flex:none;width:56px;height:56px;border-radius:16px;background:#fffbe9;border:2px solid #f0d27a;display:flex;align-items:center;justify-content:center;font-size:30px}
+.tool-gate h3{margin:4px 0 6px;font-size:19px;color:#5e4a14}
+.tool-gate p{margin:0 0 8px;font-size:14px;line-height:1.65;color:#4d4424}
+.tool-gate .muted{font-size:12.5px}
+.tool-gate button{margin-top:4px}
+.npc-label.tool-label{background:#fff1b8;border-color:#ffe38a;color:#6a4f0e;font-weight:700;animation:toolBob 1.6s ease-in-out infinite}
+.npc-label.tool-label span{color:#a0761c;font-weight:400;margin-left:2px}
+.npc-label.tool-label::after{border-top-color:#ffe38a}
+@keyframes toolBob{50%{margin-top:-4px}}
+.tool-bag-title{margin:22px 0 4px;font-size:17px;color:#5e4a14}
+.tool-bag{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin:10px 0 16px}
+.tool-bag-item{display:flex;flex-direction:column;gap:2px;padding:10px 12px;border-radius:14px;background:#fff8e2;border:1px solid #efdca0}
+.tool-bag-item span{font-size:24px}
+.tool-bag-item b{font-size:13px;color:#4d4424}
+.tool-bag-item small{font-size:11.5px;color:#7a6f4c}
+.tool-bag-item.given{background:#eef6e6;border-color:#bcd8a8}
+.tool-bag-item.missing{opacity:.6}
+.calm .npc-label.tool-label{animation:none}
+
+/* 큰 화면: 실험대(예상 고르기·실험 화면)가 화면을 넉넉히 쓰도록 */
+@media (min-width:900px) and (orientation:landscape){
+#lab .prediction{max-width:min(1500px,100%);margin:auto;padding:clamp(16px,1.6vw,28px) clamp(18px,1.8vw,32px);grid-template-columns:minmax(0,1.8fr) minmax(280px,1fr);gap:clamp(18px,2vw,36px);align-items:center}
+#lab .prediction .circuit-wrap{display:block;flex:none;margin:0}
+#lab .prediction .circuit-wrap svg,#lab .prediction-scene svg{max-height:none;height:auto!important;aspect-ratio:1000/560}
+#lab .prediction p{font-size:clamp(15px,1.3vw,24px);line-height:1.6}
+#lab .prediction .choices{gap:clamp(8px,.8vw,14px)}
+#lab .prediction .choices button{font-size:clamp(15px,1.25vw,22px);min-height:clamp(48px,4.4vw,70px)}
+#lab .prediction .muted{font-size:clamp(13px,1vw,17px)}
+}
+@media (min-width:1200px) and (orientation:landscape){
+#lab .modal-head h2{font-size:clamp(26px,2vw,34px)}
+#lab .modal-head p{font-size:clamp(15px,1.1vw,19px)}
+#lab .lab-tools{font-size:clamp(15px,1.05vw,19px)}
+#lab .experiment-controls legend{font-size:clamp(15px,1.1vw,19px)}
+#lab .tool-tray button,#lab .tool-btn,#lab .model-picker button{font-size:clamp(15px,1.15vw,21px);min-height:clamp(46px,3.7vw,60px);padding:clamp(10px,.8vw,14px) clamp(14px,1.1vw,20px)}
+#lab .compact-rule,#lab .record-invite,#lab .circuit-note{font-size:clamp(14px,1.02vw,18px)}
+#lab .action-row button{font-size:clamp(15px,1.15vw,20px);min-height:clamp(48px,3.8vw,62px)}
+#lab .counter-row{grid-template-columns:1fr clamp(44px,3.4vw,56px) clamp(42px,3vw,52px) clamp(44px,3.4vw,56px)}
+#lab .counter-name{font-size:clamp(17px,1.3vw,23px)}
+#lab .counter-name small{font-size:clamp(12px,.85vw,15px)}
+#lab .counter-row button{min-height:clamp(40px,3.2vw,54px);font-size:clamp(20px,1.5vw,26px)}
+#lab .counter-row output{font-size:clamp(20px,1.5vw,26px)}
+#lab .reading small{font-size:clamp(12px,.9vw,16px)}
+#lab .reading b{font-size:clamp(22px,1.9vw,34px)}
+#lab .measurement-fields label{font-size:clamp(14px,1.02vw,18px)}
+#lab .measurement-fields select,#lab .measurement-fields input{font-size:clamp(15px,1.1vw,19px);min-height:clamp(44px,3.3vw,54px)}
+#lab .record-form h3{font-size:clamp(17px,1.3vw,23px)}
+#lab .hint-message{font-size:clamp(14px,1.05vw,18px)}
+#lab .npc-quip p{font-size:clamp(14px,1.05vw,18px)}
+#lab .tool-gate h3{font-size:clamp(19px,1.4vw,26px)}
+#lab .tool-gate p{font-size:clamp(14px,1.05vw,18px)}
+#lab .tool-gate-icon{width:clamp(56px,4.4vw,76px);height:clamp(56px,4.4vw,76px);font-size:clamp(30px,2.4vw,42px)}
+#lab .npc-quip b{font-size:clamp(12px,.85vw,15px)}
+#lab .npc-quip-face{width:clamp(44px,3.4vw,56px);height:clamp(44px,3.4vw,56px);font-size:clamp(24px,1.8vw,30px)}
+}
 </style>
 </head>
 <body>
@@ -184,7 +252,7 @@ span.tool-btn{cursor:default}
  <div id="saveStatus" class="save-status">기기에 저장됨</div>
  <footer id="app-credit">© 2026 조승재(과학이조선생) · 해누리중학교 · 원안: <a href="https://m.blog.naver.com/tady52/222403408526" target="_blank" rel="noopener">겨울쌤 「레몬 백작의 부탁」 수업</a> · 2026.09.24</footer>
 </main>
-<dialog id="welcome" class="welcome-dialog" aria-labelledby="welcomeTitle"><section id="coverPanel"><div class="cover-art" aria-hidden="true"><svg viewBox="0 0 1080 600" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="coverSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#241e44"/><stop offset=".52" stop-color="#7a4f86"/><stop offset="1" stop-color="#f1a45e"/></linearGradient><radialGradient id="coverMoon"><stop offset="0" stop-color="#fff6c8"/><stop offset=".6" stop-color="#ffe38a"/><stop offset="1" stop-color="#ffe38a" stop-opacity="0"/></radialGradient><radialGradient id="coverBubble" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#ffffff" stop-opacity=".55"/><stop offset=".5" stop-color="#cfefff" stop-opacity=".12"/><stop offset="1" stop-color="#b9a6ff" stop-opacity=".3"/></radialGradient></defs><rect width="1080" height="600" fill="url(#coverSky)"/><g fill="#fff8d8" opacity=".75"><circle cx="560" cy="60" r="2"/><circle cx="640" cy="120" r="1.6"/><circle cx="720" cy="44" r="2.2"/><circle cx="820" cy="90" r="1.4"/><circle cx="1010" cy="60" r="2"/><circle cx="600" cy="190" r="1.3"/><circle cx="960" cy="200" r="1.6"/></g><circle cx="905" cy="125" r="120" fill="url(#coverMoon)" opacity=".55"/><circle cx="905" cy="125" r="52" fill="#ffe9a0"/><path d="M0 420 Q220 360 470 400 T1080 380 V600 H0 Z" fill="#4f6d57" opacity=".7"/><g transform="translate(790 250)"><rect x="-95" y="80" width="190" height="150" fill="#f6e7bd"/><rect x="-108" y="228" width="216" height="14" fill="#d9c28a"/><rect x="-135" y="40" width="46" height="190" fill="#f3dea6"/><rect x="89" y="40" width="46" height="190" fill="#f3dea6"/><ellipse cx="-112" cy="26" rx="34" ry="44" fill="#f5cf3a"/><path d="M-112 -18 l-7 -16 h14 z" fill="#e0b52a"/><ellipse cx="112" cy="26" rx="34" ry="44" fill="#f5cf3a"/><path d="M112 -18 l-7 -16 h14 z" fill="#e0b52a"/><ellipse cx="0" cy="44" rx="62" ry="72" fill="#f7d543"/><path d="M0 -28 l-9 -20 h18 z" fill="#e0b52a"/><ellipse cx="20" cy="-40" rx="16" ry="6" fill="#5fa54a" transform="rotate(-24 20 -40)"/><g fill="#ffe3a4"><rect x="-60" y="120" width="22" height="34" rx="4"/><rect x="-12" y="120" width="22" height="34" rx="4"/><rect x="38" y="120" width="22" height="34" rx="4"/><rect x="-122" y="100" width="18" height="28" rx="4"/><rect x="104" y="100" width="18" height="28" rx="4"/></g><rect x="-20" y="170" width="40" height="60" rx="18" fill="#7a5a3a"/><path d="M-112 -34 v-26" stroke="#8a6a4a" stroke-width="3"/><path d="M-112 -60 h26 v16 h-26" fill="#e8643c"/><path d="M112 -34 v-26" stroke="#8a6a4a" stroke-width="3"/><path d="M112 -60 h26 v16 h-26" fill="#3f9fb2"/></g><path d="M0 470 Q260 430 540 468 T1080 452 V600 H0 Z" fill="#86b957"/><path d="M0 520 Q300 490 600 520 T1080 505 V600 H0 Z" fill="#74a64a"/><g><g transform="translate(610 440)"><rect x="-6" y="0" width="12" height="46" fill="#9a6c43"/><circle cx="0" cy="-12" r="34" fill="#4f8f4a"/><circle cx="-22" cy="4" r="22" fill="#5e9f53"/><circle cx="22" cy="2" r="24" fill="#5e9f53"/><ellipse cx="-14" cy="-6" rx="7" ry="9" fill="#f5d23a"/><ellipse cx="16" cy="-18" rx="7" ry="9" fill="#f5d23a"/><ellipse cx="4" cy="10" rx="7" ry="9" fill="#f5d23a"/></g><g transform="translate(1000 452) scale(.85)"><rect x="-6" y="0" width="12" height="46" fill="#9a6c43"/><circle cx="0" cy="-12" r="34" fill="#4f8f4a"/><circle cx="-22" cy="4" r="22" fill="#5e9f53"/><circle cx="22" cy="2" r="24" fill="#5e9f53"/><ellipse cx="-14" cy="-6" rx="7" ry="9" fill="#f5d23a"/><ellipse cx="16" cy="-18" rx="7" ry="9" fill="#f5d23a"/></g></g><g transform="translate(700 500)"><rect x="-16" y="10" width="32" height="46" rx="12" fill="#46365a"/><ellipse cx="0" cy="-12" rx="24" ry="30" fill="#f4cf2f"/><path d="M0 -42 l-5 -12 h10 z" fill="#f4cf2f"/><rect x="-12" y="-54" width="24" height="8" rx="3" fill="#e3b53f"/><circle cx="-8" cy="-14" r="3" fill="#2f332c"/><circle cx="8" cy="-14" r="3" fill="#2f332c"/></g><g transform="translate(748 520) scale(.7)"><rect x="-16" y="10" width="32" height="40" rx="12" fill="#f2a54a"/><ellipse cx="0" cy="-10" rx="24" ry="28" fill="#d8d3a6"/><ellipse cx="12" cy="-40" rx="10" ry="4" fill="#5fa54a" transform="rotate(-20 12 -40)"/><circle cx="-8" cy="-12" r="3" fill="#2f332c"/><circle cx="8" cy="-12" r="3" fill="#2f332c"/></g><g stroke="#e4f6ff" stroke-width="2.5" fill="url(#coverBubble)"><circle cx="1030" cy="330" r="28"/><circle cx="975" cy="275" r="17"/><circle cx="1050" cy="230" r="13"/><circle cx="930" cy="360" r="12"/><circle cx="1000" cy="410" r="20"/><circle cx="880" cy="300" r="9"/></g></svg></div><div class="cover-copy"><div class="eyebrow">놀러오세요 과학의 섬 · 산과 염기</div><h1>레몬 백작의<br>부탁</h1><p>경계 마을 아이들이 시들어 가요.<br>두 연구자의 조수가 되어 산과 염기의 정체를 밝히고,<br>한 권의 탐험일지를 완성해요.</p><button class="primary" data-action="story-begin">편지 이야기 시작 →</button><button class="text-button" data-action="import">저장한 일지 가져오기</button><p class="visit-line" id="visitLine" hidden aria-live="polite"></p><p class="cover-credit">원안 · <a href="https://m.blog.naver.com/tady52/222403408526" target="_blank" rel="noopener">겨울쌤의 「레몬 백작의 부탁」 수업 ↗</a></p></div></section><form id="startForm" hidden><div class="eyebrow">레몬 왕국에서 온 편지</div><h1 id="welcomeTitle">아이들을<br>구해 주게!</h1><p>실험으로 원인을 찾고, 증거로 설명해요.<br>나의 발견은 한 권의 탐험일지가 돼요.</p><label class="input-label" for="nickname">탐험가 이름 <small>별명을 사용해요</small></label><input id="nickname" name="nickname" maxlength="20" value="새싹" autocomplete="off"><fieldset class="mode-options"><legend>어떤 탐험을 시작할까요?</legend><label><input type="radio" name="mode" value="review" checked><span><b>복습 탐험</b><small>배운 내용을 써 봐요</small></span></label><label><input type="radio" name="mode" value="beginner"><span><b>첫 탐험</b><small>문장 도움을 받아요</small></span></label></fieldset><p class="required-note">✎ 필수 기록 3편을 쓰고 서명하면 비눗방울 축제가 열려요.</p><label class="music-start"><input type="checkbox" id="startMusic" checked> 배경음악과 함께 시작</label><button class="primary full" type="submit">레몬 왕국에 들어가기 <span>→</span></button><button type="button" class="text-button full" data-action="import">저장한 탐험일지 가져오기</button></form></dialog>
+<dialog id="welcome" class="welcome-dialog" aria-labelledby="welcomeTitle"><section id="coverPanel"><div class="cover-art" aria-hidden="true"><svg viewBox="0 0 1080 600" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="coverSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#241e44"/><stop offset=".52" stop-color="#7a4f86"/><stop offset="1" stop-color="#f1a45e"/></linearGradient><radialGradient id="coverMoon"><stop offset="0" stop-color="#fff6c8"/><stop offset=".6" stop-color="#ffe38a"/><stop offset="1" stop-color="#ffe38a" stop-opacity="0"/></radialGradient><radialGradient id="coverBubble" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#ffffff" stop-opacity=".55"/><stop offset=".5" stop-color="#cfefff" stop-opacity=".12"/><stop offset="1" stop-color="#b9a6ff" stop-opacity=".3"/></radialGradient></defs><rect width="1080" height="600" fill="url(#coverSky)"/><g fill="#fff8d8" opacity=".75"><circle cx="560" cy="60" r="2"/><circle cx="640" cy="120" r="1.6"/><circle cx="720" cy="44" r="2.2"/><circle cx="820" cy="90" r="1.4"/><circle cx="1010" cy="60" r="2"/><circle cx="600" cy="190" r="1.3"/><circle cx="960" cy="200" r="1.6"/></g><circle cx="905" cy="125" r="120" fill="url(#coverMoon)" opacity=".55"/><circle cx="905" cy="125" r="52" fill="#ffe9a0"/><path d="M0 420 Q220 360 470 400 T1080 380 V600 H0 Z" fill="#4f6d57" opacity=".7"/><g transform="translate(790 250)"><rect x="-95" y="80" width="190" height="150" fill="#f6e7bd"/><rect x="-108" y="228" width="216" height="14" fill="#d9c28a"/><rect x="-135" y="40" width="46" height="190" fill="#f3dea6"/><rect x="89" y="40" width="46" height="190" fill="#f3dea6"/><ellipse cx="-112" cy="26" rx="34" ry="44" fill="#f5cf3a"/><path d="M-112 -18 l-7 -16 h14 z" fill="#e0b52a"/><ellipse cx="112" cy="26" rx="34" ry="44" fill="#f5cf3a"/><path d="M112 -18 l-7 -16 h14 z" fill="#e0b52a"/><ellipse cx="0" cy="44" rx="62" ry="72" fill="#f7d543"/><path d="M0 -28 l-9 -20 h18 z" fill="#e0b52a"/><ellipse cx="20" cy="-40" rx="16" ry="6" fill="#5fa54a" transform="rotate(-24 20 -40)"/><g fill="#ffe3a4"><rect x="-60" y="120" width="22" height="34" rx="4"/><rect x="-12" y="120" width="22" height="34" rx="4"/><rect x="38" y="120" width="22" height="34" rx="4"/><rect x="-122" y="100" width="18" height="28" rx="4"/><rect x="104" y="100" width="18" height="28" rx="4"/></g><rect x="-20" y="170" width="40" height="60" rx="18" fill="#7a5a3a"/><path d="M-112 -34 v-26" stroke="#8a6a4a" stroke-width="3"/><path d="M-112 -60 h26 v16 h-26" fill="#e8643c"/><path d="M112 -34 v-26" stroke="#8a6a4a" stroke-width="3"/><path d="M112 -60 h26 v16 h-26" fill="#3f9fb2"/></g><path d="M0 470 Q260 430 540 468 T1080 452 V600 H0 Z" fill="#d8c25a"/><path d="M0 520 Q300 490 600 520 T1080 505 V600 H0 Z" fill="#c7ab46"/><g><g transform="translate(610 440)"><rect x="-6" y="0" width="12" height="46" fill="#9a6c43"/><circle cx="0" cy="-12" r="34" fill="#f9e48f"/><circle cx="-22" cy="4" r="22" fill="#fff0b8"/><circle cx="22" cy="2" r="24" fill="#fff0b8"/><ellipse cx="-14" cy="-6" rx="7" ry="9" fill="#f2b400"/><ellipse cx="16" cy="-18" rx="7" ry="9" fill="#f2b400"/><ellipse cx="4" cy="10" rx="7" ry="9" fill="#f2b400"/></g><g transform="translate(1000 452) scale(.85)"><rect x="-6" y="0" width="12" height="46" fill="#9a6c43"/><circle cx="0" cy="-12" r="34" fill="#f9e48f"/><circle cx="-22" cy="4" r="22" fill="#fff0b8"/><circle cx="22" cy="2" r="24" fill="#fff0b8"/><ellipse cx="-14" cy="-6" rx="7" ry="9" fill="#f2b400"/><ellipse cx="16" cy="-18" rx="7" ry="9" fill="#f2b400"/></g></g><g transform="translate(700 500)"><rect x="-16" y="10" width="32" height="46" rx="12" fill="#46365a"/><ellipse cx="0" cy="-12" rx="24" ry="30" fill="#f4cf2f"/><path d="M0 -42 l-5 -12 h10 z" fill="#f4cf2f"/><rect x="-12" y="-54" width="24" height="8" rx="3" fill="#e3b53f"/><circle cx="-8" cy="-14" r="3" fill="#2f332c"/><circle cx="8" cy="-14" r="3" fill="#2f332c"/></g><g transform="translate(748 520) scale(.7)"><rect x="-16" y="10" width="32" height="40" rx="12" fill="#f2a54a"/><ellipse cx="0" cy="-10" rx="24" ry="28" fill="#d8d3a6"/><ellipse cx="12" cy="-40" rx="10" ry="4" fill="#5fa54a" transform="rotate(-20 12 -40)"/><circle cx="-8" cy="-12" r="3" fill="#2f332c"/><circle cx="8" cy="-12" r="3" fill="#2f332c"/></g><g stroke="#e4f6ff" stroke-width="2.5" fill="url(#coverBubble)"><circle cx="1030" cy="330" r="28"/><circle cx="975" cy="275" r="17"/><circle cx="1050" cy="230" r="13"/><circle cx="930" cy="360" r="12"/><circle cx="1000" cy="410" r="20"/><circle cx="880" cy="300" r="9"/></g></svg></div><div class="cover-copy"><div class="eyebrow">놀러오세요 과학의 섬 · 산과 염기</div><h1>레몬 백작의<br>부탁</h1><p>경계 마을 아이들이 시들어 가요.<br>두 연구자의 조수가 되어 산과 염기의 정체를 밝히고,<br>한 권의 탐험일지를 완성해요.</p><button class="primary" data-action="story-begin">편지 이야기 시작 →</button><button class="text-button" data-action="import">저장한 일지 가져오기</button><p class="visit-line" id="visitLine" hidden aria-live="polite"></p><p class="cover-credit">원안 · <a href="https://m.blog.naver.com/tady52/222403408526" target="_blank" rel="noopener">겨울쌤의 「레몬 백작의 부탁」 수업 ↗</a></p></div></section><form id="startForm" hidden><div class="eyebrow">레몬 왕국에서 온 편지</div><h1 id="welcomeTitle">아이들을<br>구해 주게!</h1><p>실험으로 원인을 찾고, 증거로 설명해요.<br>나의 발견은 한 권의 탐험일지가 돼요.</p><label class="input-label" for="nickname">탐험가 이름 <small>별명을 사용해요</small></label><input id="nickname" name="nickname" maxlength="20" value="새싹" autocomplete="off"><fieldset class="mode-options"><legend>어떤 탐험을 시작할까요?</legend><label><input type="radio" name="mode" value="review" checked><span><b>복습 탐험</b><small>배운 내용을 써 봐요</small></span></label><label><input type="radio" name="mode" value="beginner"><span><b>첫 탐험</b><small>문장 도움을 받아요</small></span></label></fieldset><p class="required-note">✎ 필수 기록 3편을 쓰고 서명하면 비눗방울 축제가 열려요.</p><label class="music-start"><input type="checkbox" id="startMusic" checked> 배경음악과 함께 시작</label><button class="primary full" type="submit">레몬 성에 들어가기 <span>→</span></button><button type="button" class="text-button full" data-action="import">저장한 탐험일지 가져오기</button></form></dialog>
 <dialog id="dialogue" class="dialogue-dialog" aria-labelledby="npcName"><button class="close" data-close aria-label="대화 닫기">×</button><div id="dialogueContent"></div></dialog>
 <dialog id="lab" class="lab-dialog" aria-labelledby="labTitle"><div id="labContent"></div></dialog>
 <dialog id="journal" class="journal-dialog" aria-labelledby="journalTitle"><div id="journalContent"></div></dialog>
@@ -258,22 +326,23 @@ window.ISLAND_APP = 'lemon-island';</script>
             id: 0,
             npc: 0,
             name: '시들어 가는 새콤',
-            place: '레몬 성 앞',
-            x: -10.5,
-            z: -5,
+            place: '레몬 성',
+            x: -13.5,
+            z: -9.4,
             goal: '세 가지 즙에 푸른 리트머스 종이를 대 보고 색을 비교해요.',
             concept: '관찰 · 산성의 성질',
             reward: '레몬 왕실 배지',
             gift: '🏅',
             lines: [
-                [0, '안녕? 내가 ‘레몬 더 산(acid)’ 백작이야. 그냥 레몬이라고 불러 주렴. 산(acid) 대륙에 무사히 온 걸 환영하네!'],
-                [0, '우리 레몬 종족은 몸속이 새콤한 산성일 때 기운이 나. 그런데 요즘 경계 마을 아이들이 하나둘 시들어 가고 있어. 저기 새콤이도 그렇다네.'],
+                [0, '안녕? 내가 ‘레몬 더 산(acid)’ 백작이야. 그냥 레몬이라고 불러 주렴. 내가 앞으로 펼쳐질 이야기의 시작이자 끝이 될 거야.'],
+                [0, '우선 산(acid) 대륙의 레몬 성에 무사히 온 걸 환영하네! 지구에서 온 호기심 많은 손님이라지? 내 고민을 함께 풀어 주지 않겠나?'],
+                [0, '우리 레몬 종족은 몸속이 새콤한 산성일 때 기운이 나. 그런데 요즘 경계 마을 아이들이 하나둘 시들어 가고 있어. 가장 기운이 없는 새콤이는 성 안 의무실로 데려왔다네.'],
                 [4, '백작님… 요즘 자꾸 힘이 없어요. 제 노란색도 흐려졌어요.'],
-                [0, '지구에서 온 과학자라면 알아낼 수 있겠지? 왕궁 의사가 쓰는 푸른 리트머스 종이를 줄 테니, 건강한 레몬 즙과 새콤이의 즙, 그리고 샘물을 비교해 주게.']
+                [0, '먼저 새콤이 몸에 무슨 일이 생겼는지 살펴보세. 왕궁 의사가 쓰는 푸른 리트머스 종이를 줄 테니, 건강한 레몬 즙과 새콤이의 즙, 그리고 샘물을 비교해 주게.']
             ],
             done: [
                 [0, '새콤이의 즙은 푸른 리트머스를 붉게 바꾸지 못했어… 샘물과 똑같아. 산성이 약해진 거야!'],
-                [0, '산성을 되찾게 할 약이 필요해. 산을 연구하는 Dr.에시드를 찾아가 보게. 연구실은 과수원 아래쪽에 있다네.']
+                [0, '산성을 회복할 수 있는 궁극의 약, 산성 치료제가 필요하네. 마침 그걸 연구하는 사람이 있다니 Dr.에시드를 찾아가 보게! 분명 도움이 될 거야. 성문을 나가 길을 따라 내려가면 과수원 옆에 호박색 지붕의 연구실이 있다네.']
             ],
             again: '새콤이의 즙을 다시 살펴볼 텐가? 비교할 기준이 있으면 차이가 잘 보이지.'
         },
@@ -289,12 +358,12 @@ window.ISLAND_APP = 'lemon-island';</script>
             reward: '조수 실험 가운',
             gift: '🥼',
             lines: [
-                [1, '어이, 꼬맹이! 너도 소문을 듣고 왔구나. 난 산성 치료제를 연구하는 Dr.에시드라고 해.'],
-                [1, '치료제를 만들려면 먼저 산(acid)을 가려낼 줄 알아야겠지? 지구의 대단한 과학자라니, 조수로 쓸 만한지 시험해 보지!'],
-                [1, '용액 A·B·C·D가 있어. 푸른 리트머스 종이와 BTB 용액으로 산을 골라내고, 산에 마그네슘 조각을 넣었을 때 나오는 기체의 정체를 밝혀 봐.']
+                [1, '어이, 꼬맹이! 너도 소문을 듣고 왔구나. 난 산성 치료제를 만들고 있는 Dr.에시드라고 해. 마침 조수가 필요했지. 같이 산성 물질을 연구해 보지 않겠나?'],
+                [1, '지구에서 왔다고? 내 연구실에선 누구나 조수부터 시작이야! 치료제를 만들려면 먼저 산(acid)을 가려낼 줄 알아야 하는데… 어젯밤 버블 왕국 쪽에서 비눗방울 섞인 돌풍이 불어와 도구가 연구실과 전기 실험대 둘레로 다 날아가 버렸지 뭔가.'],
+                [1, '실험할 때마다 필요한 도구를 찾아서 나한테 건네주게. 도구를 잘 챙기고 내 테스트 셋을 통과하면 정식 조수로 인정하지! 용액 A·B·C·D 가운데 산을 가려낼 테니, 먼저 푸른 리트머스 종이부터 찾아와 주겠나?']
             ],
             done: [
-                [1, '합격이다! 산 수용액은 푸른 리트머스를 붉게, BTB를 노랗게 바꾸고, 마그네슘과 만나면 수소 기체(H₂)를 내놓는군.'],
+                [1, '테스트를 모두 통과했군. 자네를 정식 조수로 인정하마! 산 수용액은 푸른 리트머스를 붉게, BTB를 노랗게 바꾸고, 마그네슘과 만나면 수소 기체(H₂)를 내놓는군.'],
                 [1, '염산 HCl, 황산 H₂SO₄, 아세트산 CH₃COOH… 모두 수소(H)를 갖고 있지. 치료제의 실마리는 수소일 게야! 저쪽 전기 실험대에서 계속하자고.']
             ],
             again: '조수 시험을 다시 볼 텐가? 지시약은 몇 번을 써도 정직하지.'
@@ -311,13 +380,14 @@ window.ISLAND_APP = 'lemon-island';</script>
             reward: '이온 탐지 돋보기',
             gift: '🔎',
             lines: [
-                [1, '산에 공통으로 들어 있는 수소는 물에 녹으면 이온 상태일 거야. 그렇다면 산 수용액에는 전기가 통하겠지?'],
-                [1, '먼저 간이 전기 전도 측정 장치로 확인해 보자. 그다음엔 리트머스 종이 위에서 전류를 흘려 어느 이온이 움직이는지 보는 거야.'],
-                [1, '마지막으로 산이 물에 녹은 모습을 입자 모형으로 만들어 봐. 산마다 무엇이 같고 무엇이 다른지!']
+                [1, '밤새 실험했더니 피곤하구먼. 몸풀기로 우리가 알아낸 산의 공통점부터 훑어보자. 푸른 리트머스는 붉게, BTB는 노랗게, 금속을 넣으면 수소 기체!'],
+                [1, '산에 공통으로 들어 있는 수소는 물에 녹으면 이온 상태일 거야. 산 수용액에 전기가 흐른다면 전해질이니 수소 이온을 찾을 수 있겠지!'],
+                [1, '오늘의 체크리스트야. 전기가 흐르는지 체크하기, 전류를 흘려 움직이는 이온 찾기, 그리고 산의 이온화 모형과 반응식 완성하기!'],
+                [1, '정식 조수니까 이번에도 도구 담당은 자네야! 먼저 간이 전기 전도 장치를 찾아와 주게. 전기 실험대 앞쪽 풀밭 어딘가에 있을 게야.']
             ],
             done: [
-                [1, '물에 녹아 수소 이온(H⁺)을 내놓는 것 — 그게 산이었어! 염산처럼 대부분 이온화하면 강산, 아세트산처럼 일부만 이온화하면 약산이지.'],
-                [1, '이제 레몬 백작에게 보낼 연구 보고서를 써 주게. 네가 모은 증거로 말이야!']
+                [1, '산은 물에 녹아 수소 이온(H⁺)과 음이온으로 나뉘어. 이게 ‘산의 이온화’지! 염산·황산·질산처럼 대부분 이온화하면 강산, 아세트산처럼 일부만 이온화하면 약산이고.'],
+                [1, '우린 오늘 산(acid)에 대해 꽤 많은 걸 연구해 냈다고! 정리해서 레몬 백작에게 보고하자. 네가 모은 증거로 연구 보고서를 써 주게!']
             ],
             again: '전기 실험대는 언제든 비어 있어. 이온이 움직이는 걸 다시 볼 텐가?'
         },
@@ -333,13 +403,14 @@ window.ISLAND_APP = 'lemon-island';</script>
             reward: '비눗방울 채집병',
             gift: '🫧',
             lines: [
-                [2, '안녕? 내가 Dr.베이스야. 레몬이 보낸 과학자구나! 에시드 박사의 보고서 덕분에 연구 방향이 잡혔어.'],
-                [2, '경계 마을에는 버블 왕국에서 비눗방울이 날아와. 비눗방울 물질을 조사해 보니 산과 비슷하면서도 정반대인 것 같아.'],
-                [2, '이번에는 네가 실험 방법을 골라 볼래? 어떤 지시약이 염기를 알려 줄까? 그다음엔 전류를 흘려 염기의 성질을 만드는 이온을 찾자.']
+                [2, '안녕? 내가 Dr.베이스야. 네가 레몬이 보낸 과학자구나! 난 염기 대륙의 환경 호르몬을 연구하고 있어. 조수가 필요한데, 같이 연구하지 않을래?'],
+                [2, '산성 치료제의 실마리는 수소 이온(H⁺)이었구나! 에시드 박사의 보고서 덕분에 연구 방향이 잡혔어. 경계 마을로 날아오는 비눗방울 물질은 산과 굉장히 비슷하면서도 달라. 매우 흥미로워!'],
+                [2, '에시드 박사의 연구 과정을 따라 실험 목록을 짜 봤어. 염기성 테스트, 전기 전도도 확인, 이온 확인, 이온화 모형 만들기. 에시드 박사와 함께 연구한 과학자라니 조수 자격이 있는지 테스트해 볼게. 이번엔 어떤 지시약을 쓸지 네가 골라 봐!']
             ],
             done: [
-                [2, '염기는 물에 녹아 수산화 이온(OH⁻)을 내놓는구나! 붉은 리트머스를 푸르게, BTB를 파랗게 바꾸는 것도 OH⁻ 때문이야.'],
-                [2, '비눗방울 물질에서도 OH⁻가 잔뜩 나왔어. 그런데 왜 레몬 아이들만 아플까? 혼합 실험대에서 알아보자.']
+                [2, '이제 좀 알 것 같아! 염기는 물에 녹아 수산화 이온(OH⁻)을 내놓고, 이온화된 정도에 따라 강염기와 약염기로 나뉘어. 붉은 리트머스를 푸르게, BTB를 파랗게 바꾸는 것도 OH⁻ 때문이야.'],
+                [2, '그런데 이상한 게 있어. 레몬 왕국 사람들에게서는 H⁺가 검출되는데, 중화병에 걸린 아이들에게서만 특이하게 OH⁻가 나왔어. 병이 깊을수록 수치도 높고. 비눗방울 물질에서도 OH⁻가 잔뜩 나왔지.'],
+                [2, '비눗방울 속 OH⁻가 범인인 것 같아. 그런데 왜 산 대륙 아이들만 아플까? 혼합 실험대에서 밝혀 보자구!']
             ],
             again: '염기 실험을 다시 해 볼래? 이번엔 다른 지시약도 써 봐.'
         },
@@ -355,14 +426,14 @@ window.ISLAND_APP = 'lemon-island';</script>
             reward: '중화 반응 관찰 기록장',
             gift: '📒',
             lines: [
-                [2, '레몬 아이들의 몸속은 산성이고, 비눗방울 물질은 염기성이야. 둘이 만나면 무슨 일이 생길까?'],
-                [2, '같은 농도의 수산화 나트륨 수용액과 묽은 염산을 모형으로 쓸 거야. 수산화 나트륨 수용액 20 mL에 BTB를 떨어뜨리고, 염산을 10 mL씩 넣어 볼래?'],
+                [2, '레몬 아이들의 체액은 산성이고, 비눗방울 물질은 염기성이야. 오늘은 둘을 만나게 해 볼 거야. 산과 염기를 반응시키고 모형으로 나타내 보자!'],
+                [2, '같은 농도의 수산화 나트륨 수용액과 묽은 염산을 모형으로 쓸게. 수산화 나트륨 수용액 20 mL에 BTB를 떨어뜨리고, 염산을 10 mL씩 넣어 볼래? 온도는 손 대신 온도계로 재자.'],
                 [2, '입자 모형에서는 용액 10 mL에 이온을 한 쌍씩 그려. 무엇이 반응하고 무엇이 남는지 잘 봐 줘!']
             ],
             done: [
-                [2, '알아냈어! H⁺와 OH⁻가 같은 수만큼 만나면 모두 물(H₂O)이 되고 중성이 돼. 어느 한쪽이 남으면 그쪽의 성질이 남고.'],
-                [2, '레몬 아이들이 비눗방울을 만지며 놀 때, 몸속 H⁺가 비눗방울의 OH⁻와 만나 물이 되면서 산성을 잃은 거야. 이게 중화병의 정체야!'],
-                [2, '이 반응을 ‘중화 반응’이라고 부르자. 레몬에게 보낼 중화병 보고서를 써 줄래?']
+                [2, '알아냈어! H⁺와 OH⁻가 같은 수만큼 만나면 모두 물(H₂O)이 되고 중성이 돼. 어느 한쪽이 남으면 그쪽의 성질이 남고. 산과 염기가 만나 산성과 염기성이 함께 사라지는 거야!'],
+                [2, '레몬 아이들이 비눗방울을 만지며 놀 때, 산성을 지켜 주던 몸속 H⁺가 비눗방울의 OH⁻와 만나 물이 되면서 산성을 잃은 거야. 그래서 기운이 빠지고 점점 모습이 변했어. 이게 중화병의 정체야!'],
+                [2, '중화병에서 비롯된 반응이니 ‘중화 반응’이라고 부르자. 아이들이 아직 레몬 모습인 걸 보니 늦지 않았어! 하지만 OH⁻에 계속 닿으면 완전히 변해 버릴 거야. 어서 레몬에게 보낼 중화병 보고서를 써 줄래?']
             ],
             again: '혼합 실험을 다시 볼래? 이번엔 입자 하나하나를 세어 봐.'
         },
@@ -379,7 +450,7 @@ window.ISLAND_APP = 'lemon-island';</script>
             gift: '🏡',
             lines: [
                 [3, '어서 와요, 과학자님. 저는 경계 마을 이장 보라예요. 저희 버블 사람들은 비눗방울이 아이들을 아프게 할 줄 몰랐어요… 정말 미안해요.'],
-                [3, '베이스 박사님이 산성 치료제를 만들어 두셨어요. 새콤이의 체액 모형으로 알맞은 양을 찾아 주세요. 너무 적어도, 너무 많아도 안 된대요.'],
+                [3, '에시드 박사님의 산성 치료제가 도착했어요. 베이스 박사님 말씀으로는 새콤이의 체액 모형으로 알맞은 양을 찾아야 한대요. 너무 적어도, 너무 많아도 안 된대요.'],
                 [3, '그리고 마을 사람들이 스스로 염기성 물질을 알아볼 수 있게 지시약 사용법을 알려 주세요. 마을 창고에서 정체를 모르는 시료도 나왔거든요.']
             ],
             done: [
@@ -388,6 +459,82 @@ window.ISLAND_APP = 'lemon-island';</script>
                 [3, '마지막으로 마을 사람들에게 남길 안내문을 써 주세요. 안내문이 완성되면 두 왕국이 함께하는 비눗방울 축제를 열어요!']
             ],
             again: '마을 창고에 시료가 더 있어요. 다시 살펴봐 주실래요?'
+        }
+    ];
+
+    /* Dr.에시드의 흩어진 실험 도구 — 실험 단계(step = labs checks 순서)마다 하나.
+       도구를 찾아 에시드에게 건네야 그 단계 실험대가 열린다(교사 시연은 예외). x, z = 섬 위 자리 */
+    const tools = [{
+            id: 'litmus',
+            quest: 1,
+            step: 0,
+            name: '푸른 리트머스 종이',
+            icon: '📘',
+            x: -15.6,
+            z: 10.4,
+            where: '연구실 왼쪽 앞 풀밭',
+            ask: '백작님 리트머스 종이는 새콤이 즙을 보느라 다 썼을 테고… 내 푸른 리트머스 종이를 찾아와 주겠나? 연구실 왼쪽 앞 풀밭 어딘가에 떨어져 있을 게야.',
+            thanks: '오, 푸른 리트머스 종이로군! 조수의 기본은 도구 챙기기지. 자, 이걸로 앞에 있는 용액들 중 산성을 띠는 용액을 찾아보게나.'
+        },
+        {
+            id: 'btb',
+            quest: 1,
+            step: 1,
+            name: 'BTB 용액',
+            icon: '💧',
+            x: -12.9,
+            z: 11.8,
+            where: '연구실 앞 길 끝',
+            ask: '이번엔 BTB 용액이라는 지시약을 써 볼 거야. 초록색 병인데, 연구실 앞쪽으로 굴러갔을 게야. 찾아와 주겠나?',
+            thanks: 'BTB 용액이군, 고맙네! 지시약은 용액의 성질을 구별할 때 쓰는 거야. 산인지 알아보자는 거지!'
+        },
+        {
+            id: 'mg',
+            quest: 1,
+            step: 2,
+            name: '마그네슘 조각과 성냥',
+            icon: '🔥',
+            x: -9.6,
+            z: 2.4,
+            where: '연구실 오른쪽 위 갈림길 옆',
+            ask: '이번엔 산 수용액에 금속을 넣어 볼 차례야. 네 시험관 모두에 넣어 비교할 테니, 연구실 오른쪽 위 갈림길로 날아간 마그네슘 조각과 성냥을 찾아와 주게!',
+            thanks: '마그네슘 조각과 성냥이군, 고맙네! 네 시험관에 마그네슘을 넣고, 기체가 나오면 성냥불을 대 보게. 불은 조심해서 다루고!'
+        },
+        {
+            id: 'conduct',
+            quest: 2,
+            step: 0,
+            name: '간이 전기 전도 장치',
+            icon: '💡',
+            x: -0.8,
+            z: 13.2,
+            where: '전기 실험대 앞(아래쪽) 풀밭',
+            ask: '먼저 간이 전기 전도 장치를 찾아와 주게. 전기 실험대 앞쪽 풀밭 어딘가에 있을 게야.',
+            thanks: '간이 전기 전도 장치로군! 산 수용액에 전기가 흐르는지부터 체크해 보자고!'
+        },
+        {
+            id: 'power',
+            quest: 2,
+            step: 1,
+            name: '전원 장치와 질산 칼륨 종이',
+            icon: '🔋',
+            x: 1,
+            z: 8.4,
+            where: '전기 실험대 오른쪽 강가',
+            ask: '전류를 흘리려면 전원 장치와 질산 칼륨 종이가 있어야지. 전기 실험대 오른쪽 강가에 있을 게야. 찾아와 주겠나?',
+            thanks: '전원 장치와 질산 칼륨 종이까지! 질산 칼륨 수용액에 적신 푸른 리트머스 종이 가운데에 묽은 염산을 적신 실을 올리고, 전극을 연결해 보세.'
+        },
+        {
+            id: 'model',
+            quest: 2,
+            step: 2,
+            name: '입자 모형 상자',
+            icon: '🧩',
+            x: -7.6,
+            z: 15,
+            where: '전기 실험대 왼쪽 아래',
+            ask: '입자 모형 상자가 어디 갔더라… 전기 실험대 왼쪽 아래를 찾아봐 주겠나?',
+            thanks: '입자 모형 상자로군! 염산은 내가 예시로 먼저 보여 주지. 입자의 종류와 개수, 전하의 합을 잘 살펴보게.'
         }
     ];
 
@@ -409,8 +556,11 @@ window.ISLAND_APP = 'lemon-island';</script>
                 'X는 …이라고 생각해요. 왜냐하면 전구가 희미하다는 것은 … 이고, 모형으로 그리면 …'
             ],
             after: [
-                [0, '훌륭해, 훌륭해! 산의 성질은 수소 이온(H⁺)이 만드는 거였군. 이제 산성 치료제를 만들 수 있겠어!'],
-                [0, '그런데… 부탁이 하나 더 있네. 경계 마을의 Dr.베이스를 찾아가 주게. 중화병을 연구하는 내 오랜 친구야. 에시드 박사의 보고서를 전해 주고 연구를 도와주게나.']
+                [0, 'Dr.에시드! 오랜만일세! 산성 치료제의 뚜렷한 실마리를 찾았다지? 고생이 많았네. 어서 알려 주게나.'],
+                [1, '쉽지는 않은 일이었지. 결과는 심플하네! 물에 녹을 때 이온화되는 수소 이온(H⁺)이 산을 결정한다네. H⁺가 얼마나 잘 이온화되느냐에 따라 강산과 약산으로 나뉘고. H⁺를 잘 다룬다면 산성 치료제를 만드는 건 시간문제일세!'],
+                [0, '훌륭해, 훌륭해! 이제 산성 치료제를 완성할 수 있겠어. 자네는 정말 대단한 과학자야, 고맙네! 그런데… 부탁을 하나만 더 해도 될까?'],
+                [0, '경계 마을의 Dr.베이스를 찾아가 주게. 중화병을 연구하는 내 오랜 친구야. 경계 마을은 원래 평화로운 곳이었는데, 어느 날 어린 레몬들에게 중화병이 돌기 시작했네. 처음엔 기력이 떨어지고 탈수 증상이 오다가 점점 모습이 변해 가는 끔찍한 병이지.'],
+                [0, 'Dr.베이스는 염기 대륙의 환경 호르몬이 원인이라고 보고 연구하고 있어. 에시드 박사의 보고서를 전해 주고 연구를 도와주게나.']
             ],
             nextQuest: 3
         },
@@ -431,8 +581,11 @@ window.ISLAND_APP = 'lemon-island';</script>
                 '비눗방울의 … 가 아이들 몸속의 … 와 만나 … 이 되었기 때문이에요. Na⁺와 Cl⁻는 …'
             ],
             after: [
-                [0, '비눗방울이 문제였구나! 이제 우리 아이들을 구할 수 있겠어. 자네 덕분일세, 정말 고맙네!'],
-                [0, '면목은 없지만 마지막 부탁이야. 경계 마을 광장의 보라 이장이 자네를 기다리고 있네. 아이들을 치료하고, 마을이 스스로 지킬 방법을 알려 주게.']
+                [0, 'Dr.베이스! 먼 길 오느라 고생이 많았네. 드디어 중화병 연구가 끝났다지!'],
+                [2, '산과 염기는 pH로 따지면 양 끝에 있어. 산에 염기를 섞을수록 산성을 잃고 pH가 높아지고, 염기에 산을 섞을수록 염기성을 잃고 pH가 낮아지지. 비눗방울이 신기했던 레몬 아이들이 자꾸 만지면서 산성을 잃은 거야.'],
+                [2, '그러니 치료는 간단해. H⁺를 보충할 산성 치료제를 알맞게 투여하면 돼! 그리고 OH⁻가 있는 비눗방울을 맨손으로 만지지 않도록 알려 줘야 해.'],
+                [0, '버블 왕국에서 날아오는 비눗방울이 문제였구나. 우리 아이들을 구해 주어 너무도 고맙네! 면목은 없지만… 마지막으로 부탁 하나만 더 해도 될까?'],
+                [0, '경계 마을은 염기 대륙 바로 곁이라, 눈에 보이는 비눗방울 말고도 염기성 물질을 일일이 가려내기 어려울 걸세. BTB 용액은 비싸서 마을 사람들이 구해 쓰기도 어렵고. 광장의 보라 이장에게 가서 아이들을 치료하고, 마을 사람들이 쓸 지시약 사용법을 알려 주게. 새콤이도 광장으로 먼저 보내 두겠네. 그게 나의 마지막 부탁이야.']
             ],
             nextQuest: 5
         },
@@ -454,7 +607,8 @@ window.ISLAND_APP = 'lemon-island';</script>
             ],
             after: [
                 [3, '이 안내문은 마을 회관에 걸어 둘게요. 이제 마을 사람 누구나 비눗방울 물질을 알아볼 수 있어요!'],
-                [0, '모든 준비가 끝났네! 레몬 왕국과 버블 왕국이 함께하는 비눗방울 축제를 열자꾸나. YEAHHHHH!!!']
+                [0, '고맙네. 덕분에 모든 고민이 해결되었어. 그동안 우리 레몬 왕국을 위해 연구하느라 고생이 많았네. 지시약은 잘 쓰도록 하겠네, 정말 고마워!'],
+                [0, '이제 레몬 왕국과 버블 왕국이 함께하는 비눗방울 축제를 열자꾸나. YEAHHHHH!!!']
             ],
             nextQuest: null
         }
@@ -913,8 +1067,13 @@ window.ISLAND_APP = 'lemon-island';</script>
             notes: entries.map(() => ['', '', '']),
             predictions: {},
             pos: {
-                x: -6,
-                z: -1
+                x: -13.5,
+                z: -7.8
+            },
+            fetch: {
+                heard: [],
+                got: [],
+                given: []
             },
             festival: false,
             visited: [],
@@ -959,7 +1118,21 @@ window.ISLAND_APP = 'lemon-island';</script>
         s.sealedEntries = entries.map((_, i) => Array.isArray(raw.sealedEntries) ? !!raw.sealedEntries[i] : false);
         s.predictions = Object.fromEntries(Object.entries(raw.predictions || {}).filter(([k, v]) => /^\d$/.test(k) && typeof v === 'string').map(([k, v]) => [k, short(v, 300)]));
         s.visited = (raw.visited || []).filter(x => Number.isInteger(x) && x >= 0 && x < cast.length);
-        if (raw.pos && Number.isFinite(raw.pos.x) && Number.isFinite(raw.pos.z)) s.pos = {
+        const toolIds = tools.map(t => t.id),
+            f = raw.fetch && typeof raw.fetch === 'object' ? raw.fetch : {};
+        s.fetch = {
+            heard: [...new Set((Array.isArray(f.heard) ? f.heard : []).filter(x => tools.some(t => t.quest === x)))],
+            got: [...new Set((Array.isArray(f.got) ? f.got : []).filter(x => toolIds.includes(x)))],
+            given: [...new Set((Array.isArray(f.given) ? f.given : []).filter(x => toolIds.includes(x)))]
+        };
+        if (!raw.fetch)
+            for (const q of [...new Set(tools.map(t => t.quest))])
+                if (s.completed.includes(q) || (Array.isArray(raw.evidence[q]) && raw.evidence[q].some(e => e && e.manual))) {
+                    s.fetch.heard.push(q);
+                    for (const t of tools)
+                        if (t.quest === q) s.fetch.given.push(t.id);
+                }
+        if (s.started && raw.pos && Number.isFinite(raw.pos.x) && Number.isFinite(raw.pos.z)) s.pos = {
             x: Math.max(-19, Math.min(20, raw.pos.x)),
             z: Math.max(-15, Math.min(15, raw.pos.z))
         };
@@ -1059,6 +1232,7 @@ window.ISLAND_APP = 'lemon-island';</script>
         cast,
         quests,
         entries,
+        tools,
         solutions,
         indicators,
         colors,
@@ -2273,8 +2447,8 @@ window.ISLAND_APP = 'lemon-island';</script>
     const ROADS = [{
             w: 2.2,
             pts: [
-                [-11.5, -10.2],
-                [-10.5, -7.5],
+                [-13.5, -5.9],
+                [-11.8, -4.4],
                 [-8, -3.5],
                 [-5, -0.5],
                 [-1, 1.5],
@@ -2352,12 +2526,30 @@ window.ISLAND_APP = 'lemon-island';</script>
         x: 0.6,
         z: -13.2
     };
+    /* 레몬 성 안뜰: 낮은 성벽(카메라가 넘겨다볼 수 있게)과 앞쪽 성문. 처음 탐험은 여기, 레몬 백작 앞에서 시작한다. */
+    const COURT = {
+        x0: -18.4,
+        x1: -8.6,
+        z0: -12.4,
+        z1: -6.6,
+        gate: [-14.6, -11.4],
+        spawn: {
+            x: -13.5,
+            z: -7.8
+        },
+        outside: {
+            x: -13.5,
+            z: -5.2
+        }
+    };
+    const inCastle = (x, z, pad = 0) => x > -19.8 - pad && x < COURT.x1 + .6 + pad && z < COURT.z1 + .6 + pad;
     P.islandLayout = {
         roads: ROADS,
         lands: LANDS,
         bridges: BRIDGES,
         plaza: PLAZA,
         camp: CAMP,
+        court: COURT,
         channel: [3.4, 6.6]
     };
 
@@ -2379,15 +2571,48 @@ window.ISLAND_APP = 'lemon-island';</script>
 
     P.blocked = function(x, z) {
         if (x < -19.5 || x > 20.6 || z < -16.4 || z > 16.4) return true;
+        if (x < COURT.x0 - .2 && z < COURT.z1 - .3 || x < -16.9 && z < COURT.z0) return true;
         if (x > 3.4 && x < 6.6 && BRIDGES.every(b => Math.abs(z - b) > 1.13)) return true;
         return this.colliders.some(c => c.r ? Math.hypot(x - c.x, z - c.z) < c.r + .28 : Math.abs(x - c.x) < c.w + .28 && Math.abs(z - c.z) < c.d + .28);
     };
 
     /* 구역 = 부탁 자리. 창문·등불·나무 장식이 가까운 부탁 자리의 구역에 묶여, 그 부탁을 풀면 켜진다. */
+    const REGION_ANCHORS = M.quests.map(q => q.id === 0 ? {
+        id: 0,
+        x: -10.5,
+        z: -5
+    } : {
+        id: q.id,
+        x: q.x,
+        z: q.z
+    });
+    const baseGo = P.go;
+    P.go = function(q) {
+        if (Math.hypot(q.x - this.player.position.x, q.z - this.player.position.z) < 3) {
+            this.path = [];
+            this.pendingNpc = null;
+            this.cb.interact(q.id);
+            return;
+        }
+        return baseGo.call(this, q);
+    };
+
+    const baseFindPath = P.findPath;
+    P.findPath = function(tx, tz) {
+        let path = baseFindPath.call(this, tx, tz);
+        if (path.length || !this.blocked(tx, tz)) return path;
+        for (const r of [.75, 1.5, 2.25])
+            for (const [dx, dz] of [[0, 1], [1, 0], [-1, 0], [0, -1], [1, 1], [-1, 1], [1, -1], [-1, -1]]) {
+                path = baseFindPath.call(this, tx + dx * r, tz + dz * r);
+                if (path.length) return path;
+            }
+        return [];
+    };
+
     P.regionAt = function(x, z) {
         let region = 0,
             distance = Infinity;
-        for (const q of M.quests) {
+        for (const q of REGION_ANCHORS) {
             const d = Math.hypot(x - q.x, z - q.z);
             if (d < distance) {
                 distance = d;
@@ -2444,21 +2669,25 @@ window.ISLAND_APP = 'lemon-island';</script>
         this.cylinder(.17, .27, 1.55, '#9a6c43', 0, .75, 0, g, 7);
         const leaves = new T.Group();
         g.add(leaves);
-        const greens = ['#4f8f4a', '#5e9f53', '#6aab58'];
+        const yellows = ['#fff09a', '#fff6bf', '#ffe57c'].map(c => this.leafMat(c, .2));
         [
             [0, 2.2, 0, 1.15],
             [-.6, 1.85, .1, .85],
             [.58, 1.95, .15, .9],
             [.05, 1.9, -.6, .85],
             [.05, 2.8, .02, .75]
-        ].forEach((a, i) => this.ball(a[3], greens[i % 3], a[0], a[1], a[2], leaves, 1, .88, 1));
+        ].forEach((a, i) => this.ball(a[3], yellows[i % 3], a[0], a[1], a[2], leaves, 1, .88, 1));
         [
             [-.72, 1.75, .72],
             [.66, 2.15, .7],
             [.1, 2.65, .66],
             [-.35, 2.3, -.8],
             [.8, 1.8, -.3]
-        ].forEach(p => this.ball(.17, '#f5d23a', ...p, leaves, .92, 1.25, .92));
+        ].forEach(p => {
+            this.ball(.2, this.leafMat('#ffc000', .32), ...p, leaves, .92, 1.25, .92);
+            this.ball(.07, '#4f9a3f', p[0] + .06, p[1] + .23, p[2], leaves, 1.6, .5, .9);
+        });
+        this.mergeGroup(leaves);
         this.trees.push({
             g: leaves,
             offset: this.rnd() * 8
@@ -2468,6 +2697,149 @@ window.ISLAND_APP = 'lemon-island';</script>
             z,
             r: .62 * size
         });
+    };
+
+    /* 한 무리(나무 잎 등) 안의 메시를 재질마다 하나로 합친다 — 흔들림은 그대로, 그리는 횟수는 줄어든다 */
+    P.mergeGroup = function(group) {
+        const byMat = new Map();
+        for (const m of [...group.children]) {
+            if (!m.isMesh) continue;
+            m.updateMatrix();
+            if (!byMat.has(m.material)) byMat.set(m.material, []);
+            byMat.get(m.material).push(m);
+        }
+        for (const [material, list] of byMat) {
+            if (list.length < 2) continue;
+            const pos = [],
+                normal = [];
+            let cast = false;
+            for (const m of list) {
+                const g = m.geometry.index ? m.geometry.toNonIndexed() : m.geometry.clone();
+                g.applyMatrix4(m.matrix);
+                pos.push(...g.attributes.position.array);
+                normal.push(...g.attributes.normal.array);
+                g.dispose();
+                m.geometry.dispose();
+                cast = cast || m.castShadow;
+                group.remove(m);
+            }
+            const geo = new T.BufferGeometry();
+            geo.setAttribute('position', new T.Float32BufferAttribute(pos, 3));
+            geo.setAttribute('normal', new T.Float32BufferAttribute(normal, 3));
+            const mesh = new T.Mesh(geo, material);
+            mesh.castShadow = cast;
+            mesh.receiveShadow = true;
+            group.add(mesh);
+        }
+    };
+
+    /* 해 질 녘 빛에서도 노란 잎이 탁한 갈색으로 보이지 않게, 제 색으로 살짝 빛나는 재질 */
+    P.leafMat = function(color, glow = .2) {
+        const key = 'leaf_' + color + '_' + glow;
+        return this.materials[key] || (this.materials[key] = new T.MeshStandardMaterial({
+            color: new T.Color(color).convertSRGBToLinear(),
+            emissive: new T.Color(color).convertSRGBToLinear(),
+            emissiveIntensity: glow,
+            roughness: .85
+        }));
+    };
+
+    /* 나무 — 레몬 마을(서쪽)은 노란 잎, 비눗방울 마을(동쪽)은 비눗방울 덩어리 */
+    P.tree = function(x, z, size = 1, fruit = false) {
+        if (x > 5) return this.bubbleTree(x, z, size);
+        const g = new T.Group();
+        g.position.set(x, .45, z);
+        g.scale.setScalar(size);
+        this.scene.add(g);
+        this.cylinder(.19, .31, 1.75, '#a57449', 0, .83, 0, g, 7);
+        const colors = ['#ffd23f', '#ffe36a', '#f6bf22'].map(c => this.leafMat(c, .22));
+        const leaves = new T.Group();
+        g.add(leaves);
+        [
+            [0, 2.5, 0, 1.32],
+            [-.65, 2.05, .12, .96],
+            [.6, 2.18, .18, 1.0],
+            [.08, 2.07, -.65, .95],
+            [.05, 3.08, .03, .87]
+        ].forEach((a, i) => this.ball(a[3], colors[i % 3], a[0], a[1], a[2], leaves, 1, .86, 1));
+        if (fruit)[[-.66, 2.12, .87], [.6, 2.49, .78], [.06, 3, .72]].forEach(p => this.ball(.19, this.leafMat('#ff9a2a', .3), ...p, leaves));
+        this.mergeGroup(leaves);
+        this.trees.push({
+            g: leaves,
+            offset: this.rnd() * 8
+        });
+        this.colliders.push({
+            x,
+            z,
+            r: .65 * size
+        });
+    };
+
+    P.bubbleTree = function(x, z, size = 1) {
+        const g = new T.Group();
+        g.position.set(x, .45, z);
+        g.scale.setScalar(size);
+        this.scene.add(g);
+        this.cylinder(.13, .22, 1.75, '#9a82c2', 0, .83, 0, g, 7);
+        const mats = this.bubbleLeafMats || (this.bubbleLeafMats = [this.glass('#f4e4ff', .55, '#ff9fe6', .42), this.glass('#e2f2ff', .55, '#8fdcff', .4)]),
+            mat = mats[Math.abs(Math.round(x * 3 + z)) % 2];
+        const leaves = new T.Group();
+        g.add(leaves);
+        this.ball(.55, '#8f72c9', 0, 2.45, 0, leaves, 1, .9, 1);
+        const cam = new T.Vector3(13, 21, 19.5).normalize();
+        [
+            [0, 2.62, .05, .92],
+            [-.74, 2.12, .28, .64],
+            [.72, 2.24, .22, .68],
+            [.1, 2.18, -.72, .62],
+            [.02, 3.3, .04, .56],
+            [-.5, 2.92, .58, .44],
+            [.58, 2.95, -.42, .42]
+        ].map((b, i) => [...b, i]).sort((a, b) => (a[0] * cam.x + a[1] * cam.y + a[2] * cam.z) - (b[0] * cam.x + b[1] * cam.y + b[2] * cam.z)).forEach(([bx, by, bz, r, i]) => {
+            const b = this.mesh(new T.SphereGeometry(r, 16, 12), mat, bx, by, bz, leaves);
+            b.castShadow = false;
+            this.ball(r * .17, '#ffffff', bx - r * .36, by + r * .46, bz + r * .56, leaves).castShadow = false;
+        });
+        this.mergeGroup(leaves);
+        this.trees.push({
+            g: leaves,
+            offset: this.rnd() * 8
+        });
+        this.colliders.push({
+            x,
+            z,
+            r: .6 * size
+        });
+    };
+
+    /* 길 — 레몬 마을은 모래빛, 비눗방울 마을은 연보랏빛 돌길 */
+    P.pathLine = function(points, width = 2) {
+        const tone = x => x > 5 ? ['#e3d6f3', '#ebe2f8', '#efe8fb'] : ['#c4905c', '#d3a26c', '#dcb07a'];
+        for (let i = 1; i < points.length; i++) {
+            const a = points[i - 1],
+                b = points[i],
+                dx = b[0] - a[0],
+                dz = b[1] - a[1],
+                len = Math.hypot(dx, dz),
+                c = tone((a[0] + b[0]) / 2);
+            const p = this.box(width, .055, len + .2, c[0], (a[0] + b[0]) / 2, .46, (a[1] + b[1]) / 2);
+            p.rotation.y = Math.atan2(dx, dz);
+            p.castShadow = false;
+            for (let d = .45; d < len; d += .85) {
+                const f = d / len;
+                for (let j = -1; j <= 1; j++) {
+                    const xx = a[0] + dx * f + (dz / len) * j * .62,
+                        zz = a[1] + dz * f - (dx / len) * j * .62;
+                    const stone = this.box(.52, .018, .55, j % 2 ? tone(xx)[1] : tone(xx)[2], xx, .5, zz);
+                    stone.rotation.y = Math.atan2(dx, dz) + (this.rnd() - .5) * .15;
+                    stone.castShadow = false;
+                }
+            }
+        }
+        for (const p of points) {
+            const m = this.cylinder(width * .52, width * .52, .04, tone(p[0])[0], p[0], .47, p[1], undefined, 20);
+            m.castShadow = false;
+        }
     };
 
     /* ── 인물: 모두 도형으로 만든다. userData.legs 는 걷기·숨쉬기 움직임에 쓰인다 ── */
@@ -2571,11 +2943,11 @@ window.ISLAND_APP = 'lemon-island';</script>
     P.makeBubbleFolk = function() {
         const g = new T.Group();
         this.bodyParts(g, {
-            shirt: '#b49ddd',
-            arms: '#dcd2f2',
+            shirt: '#f1ebff',
+            arms: '#fbf8ff',
             legs: '#6d5f8e'
         });
-        this.cylinder(.2, .56, .72, '#c3aee8', 0, .55, 0, g, 16);
+        this.cylinder(.2, .56, .72, '#e9e1ff', 0, .55, 0, g, 16);
         const head = this.mesh(new T.SphereGeometry(.5, 20, 16), this.glass('#d7f1ff', .42, '#8fdcff', .35), 0, 1.5, .02, g);
         head.castShadow = false;
         this.ball(.3, '#ece6ff', 0, 1.45, 0, g);
@@ -2618,9 +2990,12 @@ window.ISLAND_APP = 'lemon-island';</script>
         if (cid === 4) return done.includes(5) ? {
             x: 13.6,
             z: 8.7
+        } : this.state.sealedEntries?.[1] ? {
+            x: 13.6,
+            z: 8.7
         } : {
-            x: -8.6,
-            z: -6.4
+            x: -16.3,
+            z: -8.9
         };
         const mine = M.quests.filter(q => q.npc === cid);
         const q = mine.find(x => !done.includes(x.id)) || mine[mine.length - 1];
@@ -2691,6 +3066,253 @@ window.ISLAND_APP = 'lemon-island';</script>
         return g;
     };
 
+    P.buildCourtyard = function() {
+        const T0 = .4,
+            wall = (x, z, w, d, H = 1.25) => {
+                this.box(w, H, d, '#f3e2b0', x, .44 + H / 2, z);
+                const along = w > d,
+                    len = along ? w : d;
+                for (let o = -len / 2 + .3; o < len / 2 - .15; o += .78) this.box(.36, .3, .36, '#e9cf8e', along ? x + o : x, .44 + H + .15, along ? z : z + o);
+                this.colliders.push({
+                    x,
+                    z,
+                    w: w / 2,
+                    d: d / 2
+                });
+            };
+        const midZ = (COURT.z0 + COURT.z1) / 2,
+            depth = COURT.z1 - COURT.z0,
+            [g0, g1] = COURT.gate;
+        wall(COURT.x0, midZ, T0, depth);
+        wall(COURT.x1, midZ, T0, depth);
+        // 앞 성벽은 낮게 — 카메라 쪽이라 안뜰의 캐릭터를 가리지 않도록
+        wall((COURT.x0 + g0 - .5) / 2, COURT.z1, g0 - .5 - COURT.x0, T0, .85);
+        // 동쪽 앞은 열린 뜰 — 오른쪽 성벽 끝에 작은 기둥만
+        this.cylinder(.22, .26, 1.3, '#f3dea6', COURT.x1, .44 + .65, COURT.z1, undefined, 10);
+        this.ball(.26, '#f5cf3a', COURT.x1, .44 + 1.45, COURT.z1, undefined, 1, 1.25, 1);
+        // 성문 탑과 아치, 깃발 — 캐릭터를 가리면 집처럼 흐려진다
+        const gate = new T.Group();
+        this.scene.add(gate);
+        for (const gx of [g0 - .25, g1 + .25]) {
+            this.cylinder(.5, .56, 2.4, '#f3dea6', gx, .44 + 1.2, COURT.z1, gate, 14);
+            this.ball(.54, '#f5cf3a', gx, .44 + 2.62, COURT.z1, gate, 1, 1.3, 1);
+            this.cylinder(0, .1, .32, '#e0b52a', gx, .44 + 3.45, COURT.z1, gate, 8);
+            this.cylinder(.025, .025, 1, '#8a6a4a', gx, .44 + 3.9, COURT.z1, gate, 5);
+            this.box(.5, .3, .03, gx < -13.5 ? '#e8643c' : '#3f9fb2', gx + .26, .44 + 4.22, COURT.z1, gate);
+            // 네모 충돌 상자(안쪽 면은 성벽 면과 나란히): 비스듬히 부딪혀도 옆으로 미끄러져 성문으로 나가도록
+            this.colliders.push({
+                x: gx,
+                z: COURT.z1 + .26,
+                w: .46,
+                d: .46
+            });
+        }
+        this.box(g1 - g0 + 1.1, .26, .34, '#e9cf8e', (g0 + g1) / 2, .44 + 2.3, COURT.z1, gate);
+        this.ball(.22, '#f7d543', (g0 + g1) / 2, .44 + 2.62, COURT.z1, gate, 1, 1.25, 1);
+        const fade = new Map();
+        gate.traverse(m => {
+            if (!m.isMesh) return;
+            if (!fade.has(m.material.uuid)) {
+                const mt = m.material.clone();
+                mt.transparent = true;
+                fade.set(m.material.uuid, mt);
+            }
+            m.material = fade.get(m.material.uuid);
+        });
+        this.houseFades.push({
+            box: new T.Box3(new T.Vector3(g0 - .9, .45, COURT.z1 - .7), new T.Vector3(g1 + .9, 5, COURT.z1 + .7)),
+            materials: [...fade.values()]
+        });
+        // 안뜰 돌바닥
+        const floor = this.box(COURT.x1 - COURT.x0 - .2, .02, COURT.z1 + 10.8 + .2, '#ddd7e6', (COURT.x0 + COURT.x1) / 2, .462, (-10.8 + COURT.z1) / 2);
+        floor.castShadow = false;
+        for (let x = COURT.x0 + 1.2; x < COURT.x1 - .5; x += 1.2) this.box(.03, .022, COURT.z1 - -10.8, '#c9c1d6', x, .466, (-10.8 + COURT.z1) / 2).castShadow = false;
+        // 성문에서 왕좌까지 붉은 융단
+        const carpet = this.box(1.4, .03, 3.9, '#b83a4b', -13.5, .47, -8.5);
+        carpet.castShadow = false;
+        for (const dx of [-.62, .62]) this.box(.08, .035, 3.9, '#f0c24a', -13.5 + dx, .475, -8.5).castShadow = false;
+        // 왕좌와 단 — 성 바닥판(앞 가장자리 z -10.8) 앞에 놓는다
+        this.box(2.6, .36, .95, '#e9cf8e', -13.5, .62, -10.3);
+        this.box(1.05, .5, .7, '#9b3a4d', -13.5, 1.05, -10.4);
+        this.box(1.15, 1.5, .22, '#9b3a4d', -13.5, 1.55, -10.72);
+        this.box(1.3, .14, .3, '#f0c24a', -13.5, 2.35, -10.72);
+        for (let i = 0; i < 3; i++) this.cylinder(0, .09, .26, '#f0c24a', -13.85 + i * .35, 2.54, -10.72, undefined, 6);
+        this.colliders.push({
+            x: -13.5,
+            z: -10.3,
+            w: 1.3,
+            d: .48
+        });
+        // 왕좌 옆 횃불
+        for (const dx of [-1.7, 1.7]) {
+            this.cylinder(.05, .07, 1.3, '#8a6a4a', -13.5 + dx, 1.1, -10.2);
+            this.glow(.15, '#ffd96a', -13.5 + dx, 1.85, -10.2, 0);
+        }
+        // 의무실 구석: 침대와 즙 비교대
+        this.box(1.1, .34, 1.9, '#d9b98a', -17.4, .62, -9.4);
+        this.box(1, .14, 1.78, '#fff8e8', -17.4, .86, -9.4);
+        this.box(.8, .16, .42, '#f6e7bd', -17.4, .98, -10.1);
+        this.box(.9, .06, 1.2, '#f2b8c6', -17.4, .95, -9.0);
+        this.colliders.push({
+            x: -17.4,
+            z: -9.4,
+            w: .6,
+            d: 1
+        });
+        this.box(.7, .08, 1.2, '#e8d6a8', -17.75, 1.2, -11.3);
+        for (const dz of [-.46, .46]) this.box(.5, .75, .08, '#b89468', -17.75, .82, -11.3 + dz);
+        [
+            ['#f6d95a', -11.7],
+            ['#e6e1b9', -11.3],
+            ['#d4ecf6', -10.9]
+        ].forEach(([c, z]) => this.mesh(new T.CylinderGeometry(.12, .1, .26, 12), this.glass(c, .75, c, .3), -17.75, 1.37, z).castShadow = false);
+        this.colliders.push({
+            x: -17.75,
+            z: -11.3,
+            w: .38,
+            d: .62
+        });
+        // 오른쪽 성벽 아래 꽃밭
+        for (let i = 0; i < 10; i++) this.flower(-9.7 + (i % 2) * .32, -10.4 + i * .36, ['#fff1a8', '#ffe066', '#f7c96b'][i % 3]);
+        // 성 서쪽 틈·성 뒤 좁은 길 막기
+        this.colliders.push({
+            x: -19.1,
+            z: COURT.z1,
+            w: .55,
+            d: .3
+        }, {
+            x: -13.5,
+            z: -16.2,
+            w: 4.2,
+            d: .35
+        });
+        for (let i = 0; i < 3; i++) this.ball(.34, '#e0c24a', -19.2 + i * .12, .7, COURT.z1 - .1 + i * .05, undefined, 1.2, .8, 1);
+    };
+
+    /* ── Dr.에시드의 흩어진 실험 도구: 나무 상자 위 소품 + 빛나는 고리 + 떠 있는 표시. 필요한 하나만 보인다 ── */
+    P.buildTools = function() {
+        this.toolProps = {};
+        const ringMat = new T.MeshStandardMaterial({
+            color: new T.Color('#c9f6ff').convertSRGBToLinear(),
+            emissive: new T.Color('#5fd8ff').convertSRGBToLinear(),
+            emissiveIntensity: .9,
+            roughness: .4
+        });
+        const markMat = new T.MeshStandardMaterial({
+            color: new T.Color('#bff3ff').convertSRGBToLinear(),
+            emissive: new T.Color('#46cfff').convertSRGBToLinear(),
+            emissiveIntensity: .8,
+            roughness: .35
+        });
+        const draw = {
+            litmus: g => {
+                for (let i = 0; i < 4; i++) this.box(.44, .025, .13, i % 2 ? '#6a93dc' : '#5580cf', -.02 + i * .03, .74 + i * .028, -.08 + i * .06, g).rotation.y = -.35 + i * .22;
+                this.box(.46, .08, .1, '#f1e7c8', 0, .74, .2, g);
+            },
+            btb: g => {
+                this.mesh(new T.CylinderGeometry(.11, .12, .3, 14), this.glass('#5db36d', .8, '#5db36d', .35), 0, .87, 0, g).castShadow = false;
+                this.cylinder(.05, .06, .14, '#2f3a33', 0, 1.09, 0, g, 10);
+                this.cylinder(.03, .02, .12, '#f6f5ee', 0, 1.2, 0, g, 8);
+                this.cylinder(.121, .121, .08, '#fff8e6', 0, .85, 0, g, 14);
+            },
+            mg: g => {
+                const coil = this.mesh(new T.TorusGeometry(.13, .028, 8, 18), '#cfd6dc', -.1, .76, 0, g);
+                coil.rotation.x = Math.PI / 2;
+                this.box(.24, .08, .15, '#d8483c', .14, .77, .02, g);
+                this.box(.2, .02, .11, '#f5e3b8', .14, .82, .02, g);
+                this.cylinder(.012, .012, .26, '#e8d2a0', .12, .84, .14, g, 5).rotation.z = Math.PI / 2;
+                this.ball(.025, '#b0342b', .25, .84, .14, g);
+            },
+            conduct: g => {
+                this.box(.36, .16, .24, '#3b4b5a', 0, .8, 0, g);
+                this.ball(.08, '#ffe066', 0, .94, 0, g);
+                for (const dx of [-.08, .08]) this.cylinder(.015, .015, .26, '#9aa3ad', dx, .62, .14, g, 5);
+            },
+            power: g => {
+                this.box(.42, .24, .3, '#3b4b5a', 0, .84, 0, g);
+                this.ball(.04, '#e05555', -.1, .98, .12, g);
+                this.ball(.04, '#2f353c', .1, .98, .12, g);
+                this.box(.3, .015, .1, '#6a93dc', .02, .97, -.06, g);
+            },
+            model: g => {
+                this.box(.5, .06, .36, '#e8d6a8', 0, .75, 0, g);
+                [
+                    ['#7fca7c', -.14, -.08],
+                    ['#f2a35b', 0, -.08],
+                    ['#7fca7c', .14, -.08],
+                    ['#f2a35b', -.14, .08],
+                    ['#f3d766', 0, .08],
+                    ['#f2a35b', .14, .08]
+                ].forEach(([c, x, z]) => this.ball(.06, c, x, .83, z, g));
+            }
+        };
+        for (const t of M.tools) {
+            const g = new T.Group();
+            g.position.set(t.x, .45, t.z);
+            g.scale.setScalar(1.45);
+            this.scene.add(g);
+            this.box(.62, .36, .48, '#c89a5e', 0, .2, 0, g);
+            this.box(.66, .06, .52, '#b3844b', 0, .4, 0, g);
+            const prop = new T.Group();
+            prop.position.y = -.3;
+            g.add(prop);
+            draw[t.id]?.(prop);
+            this.mergeGroup(prop);
+            g.traverse(m => {
+                if (m.isMesh) m.castShadow = false;
+            });
+            const ring = this.mesh(new T.TorusGeometry(.62, .05, 8, 30), ringMat, 0, .03, 0, g);
+            ring.rotation.x = Math.PI / 2;
+            ring.castShadow = false;
+            const mark = this.mesh(new T.OctahedronGeometry(.2), markMat, 0, 1.75, 0, g);
+            mark.castShadow = false;
+            g.visible = false;
+            this.dynamic.push(g);
+            this.toolProps[t.id] = {
+                t,
+                g,
+                prop,
+                ring,
+                mark
+            };
+        }
+    };
+
+    /* 흩어진 도구 보이기: visible = 섬에 놓인 도구 id 들, focus = 지금 찾아야 할 하나(고리·표시·이름표) */
+    P.setTools = function(visible = [], focus = null) {
+        this.toolShown = null;
+        this.toolsVisible = [];
+        for (const [key, p] of Object.entries(this.toolProps || {})) {
+            const on = visible.includes(key);
+            p.g.visible = on;
+            p.ring.visible = p.mark.visible = key === focus;
+            if (on) this.toolsVisible.push(p);
+            if (on && key === focus) this.toolShown = p;
+        }
+    };
+
+    /* 보이는 도구 머리 위의 화면 좌표 — 이름표를 띄울 때 쓴다 */
+    P.toolScreen = function() {
+        const p = this.toolShown;
+        if (!p) return null;
+        const v = new T.Vector3(p.t.x, 2.7, p.t.z).project(this.camera);
+        return {
+            id: p.t.id,
+            x: (v.x * .5 + .5) * this.canvas.clientWidth,
+            y: (-.5 * v.y + .5) * this.canvas.clientHeight,
+            visible: v.z < 1
+        };
+    };
+
+    /* 도구 자리로 걸어가기 */
+    P.goTool = function(id) {
+        const p = this.toolProps?.[id];
+        if (!p) return false;
+        this.path = this.findPath(p.t.x, p.t.z);
+        this.pendingNpc = null;
+        return this.path.length > 0 || Math.hypot(p.t.x - this.player.position.x, p.t.z - this.player.position.z) < 1.5;
+    };
+
     P.buildDomeLab = function(cx, cz, region) {
         const g = new T.Group();
         g.position.set(cx, .44, cz);
@@ -2746,13 +3368,14 @@ window.ISLAND_APP = 'lemon-island';</script>
 
     P.build = function() {
         this.lemonGrass = new T.MeshStandardMaterial({
-            map: this.grassTexture('#a8cf6c', 'rgba(250,240,150,.2)', 'rgba(60,110,40,.1)'),
-            color: new T.Color('#fbfff0').convertSRGBToLinear(),
+            map: this.grassTexture('#e8d46e', 'rgba(255,246,175,.35)', 'rgba(165,120,30,.12)'),
+            color: new T.Color('#fffbe6').convertSRGBToLinear(),
+            emissive: new T.Color('#2b2408').convertSRGBToLinear(),
             roughness: 1
         });
         this.borderGrass = new T.MeshStandardMaterial({
-            map: this.grassTexture('#98cfa0', 'rgba(210,240,255,.18)', 'rgba(50,100,90,.1)'),
-            color: new T.Color('#f6fbff').convertSRGBToLinear(),
+            map: this.grassTexture('#a590d2', 'rgba(240,226,255,.26)', 'rgba(80,55,140,.14)'),
+            color: new T.Color('#fcf8ff').convertSRGBToLinear(),
             roughness: 1
         });
         this.waterMat = new T.MeshStandardMaterial({
@@ -2782,11 +3405,12 @@ window.ISLAND_APP = 'lemon-island';</script>
             }
         }
         // 강 한가운데 경계 표지 — 노랑(산 대륙)과 하늘(버블 왕국) 부표
-        for (let i = 0; i < 7; i++) this.cylinder(.22, .28, .5, i % 2 ? '#8fd0f0' : '#f3d24a', 5, -.1, -15 + i * 5, undefined, 10);
+        for (let i = 0; i < 7; i++) this.cylinder(.22, .28, .5, i % 2 ? '#b49ddd' : '#f3d24a', 5, -.1, -15 + i * 5, undefined, 10);
 
         /* 레몬 왕국 */
         this.buildCastle(-13.5, -13.6);
-        this.house(-14, 6.3, '#5d8f8a', '#f3ead2');
+        this.buildCourtyard();
+        this.house(-14, 6.3, '#e2a23a', '#fff3d2');
         for (const [dx, dz, c] of [
                 [2.6, 2.1, '#9ee07a'],
                 [3.1, 1.7, '#f2d24a'],
@@ -2807,27 +3431,23 @@ window.ISLAND_APP = 'lemon-island';</script>
             });
         }
         this.benchTable(-5.8, 12.3);
-        this.box(.55, .5, .35, '#3b4b5a', -6.6, 1.63, 12.3);
-        this.box(.14, .1, .14, '#e05555', -6.72, 1.93, 12.3);
-        this.box(.14, .1, .14, '#333b44', -6.48, 1.93, 12.3);
         for (let i = 0; i < 3; i++) {
             const cup = this.mesh(new T.CylinderGeometry(.18, .16, .38, 14), this.glass('#d7eef7', .45), -5.8 + i * .5, 1.57, 12.1);
             cup.castShadow = false;
         }
-        this.glow(.12, '#ffd96a', -4.7, 1.72, 12.3, 2);
         this.box(1.8, .03, .03, '#c77a3a', -5.6, 1.42, 12.62);
 
         /* 경계 마을 */
         this.buildDomeLab(14.6, -12.2, 3);
-        this.benchTable(19.2, -5.2, '#a8b9d6');
+        this.benchTable(19.2, -5.2, '#b9a6e2');
         for (let i = 0; i < 3; i++) {
             const b = this.mesh(new T.CylinderGeometry(.2, .17, .44, 14), this.glass(['#6fa0e8', '#5db36d', '#f2d24a'][i], .65, ['#6fa0e8', '#5db36d', '#f2d24a'][i], .3), 18.6 + i * .6, 1.6, -5.1);
             b.castShadow = false;
         }
         this.cylinder(.04, .04, 1.6, '#8c95a6', 20.1, 2.1, -5.4, undefined, 6);
         this.cylinder(.06, .04, .9, '#e3eef7', 20.1, 2.65, -5.25, undefined, 8);
-        this.house(10.3, 11.6, '#efc23b', '#fff4d8');
-        this.house(17.2, 12.1, '#79b8dd', '#eef5ff');
+        this.house(10.3, 11.6, '#9b7ed6', '#f7f0ff');
+        this.house(17.2, 12.1, '#c29be8', '#fbf5ff');
         this.house(9.6, -14.6, '#b7a2e0', '#f6f0ff');
         // 비눗방울 지붕 오두막
         this.cylinder(1.5, 1.6, 1.8, '#f0f5ff', 20, 1.34, 9.2, undefined, 20);
@@ -2840,11 +3460,11 @@ window.ISLAND_APP = 'lemon-island';</script>
             r: 1.7
         });
         // 광장과 분수
-        const plaza = this.cylinder(PLAZA.r, PLAZA.r, .1, '#e7cfa6', PLAZA.x, .49, PLAZA.z, undefined, 40);
+        const plaza = this.cylinder(PLAZA.r, PLAZA.r, .1, '#e6dbf4', PLAZA.x, .49, PLAZA.z, undefined, 40);
         plaza.castShadow = false;
         for (let i = 0; i < 20; i++) {
             const a = i * Math.PI * 2 / 20;
-            this.box(.55, .018, .6, i % 2 ? '#efdcb8' : '#d9bf8f', PLAZA.x + Math.cos(a) * 2.75, .555, PLAZA.z + Math.sin(a) * 2.75).rotation.y = -a;
+            this.box(.55, .018, .6, i % 2 ? '#f1eafb' : '#cdb9ec', PLAZA.x + Math.cos(a) * 2.75, .555, PLAZA.z + Math.sin(a) * 2.75).rotation.y = -a;
         }
         this.cylinder(1.25, 1.35, .42, '#dfe6ef', PLAZA.x, .72, PLAZA.z, undefined, 24);
         const pool = this.mesh(new T.CylinderGeometry(1.08, 1.08, .06, 24), this.glass('#7fc6ee', .75, '#7fc6ee', .3), PLAZA.x, .93, PLAZA.z);
@@ -2873,7 +3493,7 @@ window.ISLAND_APP = 'lemon-island';</script>
             });
         }
         // 동쪽 모래사장과 비눗방울 기계
-        const beach = this.box(1.7, .05, 31, '#efdcaa', 21.1, .47, 0);
+        const beach = this.box(1.7, .05, 31, '#eadff5', 21.1, .47, 0);
         beach.castShadow = false;
         this.cylinder(.5, .6, 1.1, '#9f8bd0', 20.4, 1, -12.4, undefined, 14);
         this.mesh(new T.TorusGeometry(.42, .07, 8, 20), '#e3d8ff', 20.4, 1.8, -12.4).rotation.x = Math.PI / 2;
@@ -2882,6 +3502,8 @@ window.ISLAND_APP = 'lemon-island';</script>
             z: -12.4,
             r: .7
         });
+
+        this.buildTools();
 
         /* 내 연구 텐트 */
         const tent = new T.ConeGeometry(1.75, 2.1, 4);
@@ -2898,14 +3520,15 @@ window.ISLAND_APP = 'lemon-island';</script>
         this.scene.add(this.campDecor);
         this.lamp(CAMP.x + 1.6, CAMP.z + 1.4, 0);
 
-        /* 과수원·나무·꽃 */
+        /* 과수원·나무·꽃 — 여기서부터는 고정 씨앗(길·건물을 고쳐도 숲 배치가 그대로) */
+        this.seed = 4871;
         for (const [x, z] of [
-                [-17.5, -6],
+                [-17.6, -4.9],
                 [-15.5, -3.5],
                 [-18, -1],
                 [-16, 1.5],
                 [-18.5, 3.5],
-                [-7.5, -9.5],
+                [-6.4, -9.8],
                 [-4.5, -12.5],
                 [-17.6, 12.5],
                 [-9.5, 13.8],
@@ -2917,7 +3540,12 @@ window.ISLAND_APP = 'lemon-island';</script>
             const x = west ? -19 + this.rnd() * 21 : 8 + this.rnd() * 12.5,
                 z = -15.5 + this.rnd() * 31;
             if (this.nearPath(x, z) || this.colliders.some(c => c.r ? Math.hypot(x - c.x, z - c.z) < c.r + 1.4 : Math.abs(x - c.x) < c.w + 1.5 && Math.abs(z - c.z) < c.d + 1.5)) continue;
-            if (M.quests.some(q => Math.hypot(x - q.x, z - q.z) < 3) || Math.hypot(x - CAMP.x, z - CAMP.z) < 3 || Math.hypot(x + 8.6, z + 6.4) < 2.5) continue;
+            if (M.quests.some(q => Math.hypot(x - q.x, z - q.z) < 3) || Math.hypot(x - CAMP.x, z - CAMP.z) < 3 || inCastle(x, z, 1) || M.tools.some(t => {
+                    const dx = x - t.x,
+                        dz = z - t.z,
+                        along = dx * .555 + dz * .832;
+                    return Math.hypot(dx, dz) < 2.2 || along > 0 && along < 4 && Math.abs(dx * .832 - dz * .555) < 1.5;
+                })) continue;
             if (!west && x > 20) continue;
             if (west && this.rnd() < .35) this.lemonTree(x, z, .8 + this.rnd() * .35);
             else this.tree(x, z, .75 + this.rnd() * .4, false);
@@ -2926,11 +3554,12 @@ window.ISLAND_APP = 'lemon-island';</script>
             const west = i % 2 === 0;
             const x = west ? -19 + this.rnd() * 21.5 : 8 + this.rnd() * 12,
                 z = -15.5 + this.rnd() * 31;
-            if (this.nearPath(x, z, .8) || Math.hypot(x - PLAZA.x, z - PLAZA.z) < PLAZA.r + .4) continue;
+            if (this.nearPath(x, z, .8) || Math.hypot(x - PLAZA.x, z - PLAZA.z) < PLAZA.r + .4 || inCastle(x, z) || M.tools.some(t => Math.hypot(x - t.x, z - t.z) < 1.2)) continue;
             this.flower(x, z, west ? ['#fff1a8', '#ffe066', '#f8f9e6', '#f7c96b'][i % 4] : ['#b3abe9', '#8dcced', '#f8f9ff', '#d9c2ff'][i % 4]);
         }
         for (const [x, z] of [
-                [-8.8, -8.8],
+                [-16.2, -5.5],
+                [-10.8, -5.5],
                 [-3.5, -2.8],
                 [-9.2, 4.6],
                 [-6.6, 9.6],
@@ -3044,6 +3673,42 @@ window.ISLAND_APP = 'lemon-island';</script>
         g.visible = true;
     };
 
+    /* 축제 때 나무에 켜지는 등불 — 엔진과 같되 색만 섬에 맞춘다 */
+    P.buildFestivalDecor = function() {
+        const positions = Array.from({
+            length: this.regionCount
+        }, () => []);
+        this.scene.updateMatrixWorld(true);
+        for (const tree of this.trees) {
+            const trunk = tree.g.parent,
+                q = this.regionAt(trunk.position.x, trunk.position.z);
+            for (let k = 0; k < 7; k++) {
+                const a = k * Math.PI * 2 / 7,
+                    p = new T.Vector3(Math.cos(a) * 1.04, 2.2 + Math.sin(a * 2) * .13, Math.sin(a) * 1.04);
+                trunk.localToWorld(p);
+                positions[q].push(p.x, p.y, p.z);
+            }
+        }
+        for (let q = 0; q < this.regionCount; q++) {
+            if (!positions[q].length) continue;
+            const geometry = new T.BufferGeometry();
+            geometry.setAttribute('position', new T.Float32BufferAttribute(positions[q], 3));
+            const material = new T.PointsMaterial({
+                color: 0xffdf9b,
+                size: 3.5,
+                sizeAttenuation: false,
+                transparent: true,
+                opacity: 0,
+                depthWrite: false
+            });
+            this.scene.add(new T.Points(geometry, material));
+            this.registerFestivalLight(material, q, {
+                on: q <= 2 ? '#bff4ff' : '#ffe1a1',
+                points: true
+            });
+        }
+    };
+
     /* 움직이는 소품은 한데 묶어(배칭) 굳히지 않는다 */
     const baseBatch = P.batchStatic;
     P.batchStatic = function() {
@@ -3056,6 +3721,23 @@ window.ISLAND_APP = 'lemon-island';</script>
     /* 진행에 따라 섬이 달라진다: 주민의 자리, 새콤과 아이들의 색, 텐트의 선물 */
     P.applyProgress = function() {
         const done = this.state.completed;
+        if (this.player && !this.spawnChecked) {
+            this.spawnChecked = true;
+            const p = this.player.position;
+            if (this.blocked(p.x, p.z)) {
+                let spot = null;
+                for (const r of [.75, 1.5, 2.25, 3])
+                    for (const [dx, dz] of [[0, 1], [1, 0], [-1, 0], [0, -1], [1, 1], [-1, 1], [1, -1], [-1, -1]])
+                        if (!spot && !this.blocked(p.x + dx * r, p.z + dz * r)) spot = [p.x + dx * r, p.z + dz * r];
+                if (!spot) spot = [COURT.outside.x, COURT.outside.z];
+                p.set(spot[0], p.y, spot[1]);
+                this.camTarget.copy(p);
+            }
+            if (Math.hypot(p.x - COURT.outside.x, p.z - COURT.outside.z) > 1 && !this.findPath(COURT.outside.x, COURT.outside.z).length) {
+                p.set(COURT.spawn.x, p.y, COURT.spawn.z);
+                this.camTarget.copy(p);
+            }
+        }
         if (!this.festivalRun) this.restoreFestivalLights();
         const healed = done.includes(5);
         for (const n of this.npcs) {
@@ -3131,6 +3813,24 @@ window.ISLAND_APP = 'lemon-island';</script>
             }
         }
         this.islandLast = now;
+        const tool = this.toolShown;
+        if (tool) {
+            tool.mark.position.y = 1.55 + (this.state.calm ? 0 : Math.sin(t * 2.4) * .1);
+            tool.mark.rotation.y = this.state.calm ? 0 : t * 1.6;
+            tool.ring.scale.setScalar(this.state.calm ? 1 : 1 + Math.sin(t * 3) * .06);
+        }
+        if (this.toolsVisible?.length && !this.paused && !this.festivalRun && this.player && this.state.started)
+            for (const p of this.toolsVisible)
+                if (p.g.visible && Math.hypot(p.t.x - this.player.position.x, p.t.z - this.player.position.z) < 1.3) {
+                    p.g.visible = false;
+                    this.toolsVisible = this.toolsVisible.filter(x => x !== p);
+                    if (this.toolShown === p) {
+                        this.toolShown = null;
+                        if (this.pendingNpc == null) this.path = [];
+                    }
+                    this.cb.pick?.(p.t.id);
+                    break;
+                }
         if (!this.state.calm) {
             if (this.fountainTop) this.fountainTop.scale.setScalar(1 + Math.sin(t * 3) * .06);
             for (const [i, p] of (this.puffs || []).entries()) p.m.position.y = p.y + Math.sin(t * .9 + i) * .12;
@@ -4274,39 +4974,44 @@ window.ISLAND_APP = 'lemon-island';</script>
     }
 
     /* ── 이온화 모형 조립(산·염기 공용) ───────────────── */
-    function modelInit(list) {
+    /* 모형 하나는 연구자의 「예시」로 미리 채워 두고(원본 수업: 염산·수산화 나트륨을 예시로 보여 준 뒤 나머지는 직접), 나머지를 학생이 만든다 */
+    function modelInit(list, example = null) {
         const counts = {};
         for (const k of list)
-            for (const [sp] of M.models[k].parts) counts[k + ':' + sp] = 0;
+            for (const [sp, n] of M.models[k].parts) counts[k + ':' + sp] = k === example ? n : 0;
         return {
             list,
-            pick: list[0],
+            example,
+            pick: example || list[0],
             counts
         };
     }
 
-    function modelScene(sim) {
+    function modelScene(sim, who) {
         const md = sim.model,
-            m = M.models[md.pick];
+            m = M.models[md.pick],
+            isExample = md.pick === md.example;
         const parts = m.parts.map(([sp]) => [sp, md.counts[md.pick + ':' + sp] || 0]);
         const listed = parts.flatMap(([sp, n]) => Array(n).fill(sp));
         const total = listed.length,
             r = total > 14 ? 16 : total > 8 ? 19 : 23;
         const charge = parts.reduce((a, [sp, n]) => a + PT[sp].charge * n, 0);
-        return `${title(m.label + ' 수용액 모형 만들기', m.label + ' ' + m.dissolved + '개 입자를 물에 녹였어요 · 입자 수를 맞춰 보세요')}${beaker(120,150,420,300,'#d9eef6',.86)}${scatter(listed,{x:140,y:205,w:380,h:230},r)}<g transform="translate(600 150)"><rect width="340" height="300" rx="20" fill="#ffffff" stroke="#e2dccb" stroke-width="2"/><text x="24" y="44" class="t-label">녹인 것</text><text x="24" y="78" class="t-big">${esc(m.formula)} × ${m.dissolved}</text><text x="24" y="130" class="t-label">지금 모형</text>${parts.map(([sp,n],i)=>`<text x="24" y="${166+i*34}" class="t-small">${esc(PT[sp].text)} ${n}개 <tspan fill="#8a9a8c">· ${esc(PT[sp].name)}</tspan></text>`).join('')}<text x="24" y="276" class="t-small" fill="${charge===0?'#3f8f5a':'#c0503a'}">전하의 합: ${charge>0?'+':''}${charge} ${charge===0?'✓ 균형':'— 0이 되어야 해요'}</text></g><g transform="translate(120 490)">${['cation','anion','molecule'].map((t,i)=>`<g transform="translate(${i*190} 0)">${particle(16,0,{cation:'Na+',anion:'Cl-',molecule:'HCl'}[t],12).replace(/>[^<]*<\/text>/,'></text>')}<text x="40" y="6" class="t-small">${['양이온','음이온','녹기만 한 분자'][i]}</text></g>`).join('')}</g>`;
+        return `${title(isExample?`${m.label} 수용액 모형 · ${who}의 예시`:`${m.label} 수용액 모형 만들기`, isExample?'입자의 종류·개수·전하를 살펴본 뒤, 다음 물질을 골라 직접 만들어요':`${m.label} ${m.dissolved}개 입자를 물에 녹였어요 · 입자 수를 맞춰 보세요`)}${beaker(120,150,420,300,'#d9eef6',.86)}${scatter(listed,{x:140,y:205,w:380,h:230},r)}<g transform="translate(600 150)"><rect width="340" height="300" rx="20" fill="#ffffff" stroke="${isExample?'#e2bf4a':'#e2dccb'}" stroke-width="${isExample?3:2}"/><text x="24" y="44" class="t-label">녹인 것</text><text x="24" y="78" class="t-big">${esc(m.formula)} × ${m.dissolved}</text><text x="24" y="130" class="t-label">${isExample?'예시 모형':'지금 모형'}</text>${parts.map(([sp,n],i)=>`<text x="24" y="${166+i*34}" class="t-small">${esc(PT[sp].text)} ${n}개 <tspan fill="#8a9a8c">· ${esc(PT[sp].name)}</tspan></text>`).join('')}<text x="24" y="276" class="t-small" fill="${charge===0?'#3f8f5a':'#c0503a'}">전하의 합: ${charge>0?'+':''}${charge} ${charge===0?'✓ 균형':'— 0이 되어야 해요'}</text></g><g transform="translate(120 490)">${['cation','anion','molecule'].map((t,i)=>`<g transform="translate(${i*190} 0)">${particle(16,0,{cation:'Na+',anion:'Cl-',molecule:'HCl'}[t],12).replace(/>[^<]*<\/text>/,'></text>')}<text x="40" y="6" class="t-small">${['양이온','음이온','녹기만 한 분자'][i]}</text></g>`).join('')}</g>`;
     }
 
-    function modelControls(sim) {
+    function modelControls(sim, who) {
         const md = sim.model,
-            m = M.models[md.pick];
+            m = M.models[md.pick],
+            isExample = md.pick === md.example;
         const built = sim.built || {};
-        return `<div class="model-picker" role="group" aria-label="모형을 만들 물질">${md.list.map(k=>`<button type="button" data-lab="pick-model" data-model="${k}" aria-pressed="${md.pick===k}">${esc(M.models[k].label)}${built[k]?' ✓':''}</button>`).join('')}</div><div class="counter-list">${m.parts.map(([sp])=>{const key=md.pick+':'+sp,n=md.counts[key]||0;return `<div class="counter-row"><span class="counter-name">${esc(PT[sp].text)}<small>${esc(PT[sp].name)}</small></span><button type="button" data-lab="count" data-key="${esc(key)}" data-delta="-1" aria-label="${esc(PT[sp].text)} 하나 빼기" ${n?'':'disabled'}>−</button><output>${n}</output><button type="button" data-lab="count" data-key="${esc(key)}" data-delta="1" aria-label="${esc(PT[sp].text)} 하나 더하기" ${n>=8?'disabled':''}>+</button></div>`;}).join('')}</div><p class="compact-rule">${m.strength==='weak'?'힌트: 녹은 입자 중 대부분은 분자 그대로 남아요.':'모형이 맞으면 ‘증거 남기기’로 반응식을 골라 기록해요.'}</p>`;
+        return `<div class="model-picker" role="group" aria-label="모형을 만들 물질">${md.list.map(k=>`<button type="button" data-lab="pick-model" data-model="${k}" aria-pressed="${md.pick===k}">${esc(M.models[k].label)}${k===md.example?' · 예시':built[k]?' ✓':''}</button>`).join('')}</div><div class="counter-list">${m.parts.map(([sp])=>{const key=md.pick+':'+sp,n=md.counts[key]||0;return `<div class="counter-row"><span class="counter-name">${esc(PT[sp].text)}<small>${esc(PT[sp].name)}</small></span><button type="button" data-lab="count" data-key="${esc(key)}" data-delta="-1" aria-label="${esc(PT[sp].text)} 하나 빼기" ${n&&!isExample?'':'disabled'}>−</button><output>${n}</output><button type="button" data-lab="count" data-key="${esc(key)}" data-delta="1" aria-label="${esc(PT[sp].text)} 하나 더하기" ${n>=8||isExample?'disabled':''}>+</button></div>`;}).join('')}</div><p class="compact-rule">${isExample?`${who}가 먼저 보여 준 예시예요. ${esc(m.equation)} — 입자 수를 살펴본 뒤 위에서 다음 물질을 골라 직접 만들어 보세요.`:m.strength==='weak'?'힌트: 녹은 입자 중 대부분은 분자 그대로 남아요.':'모형이 맞으면 ‘증거 남기기’로 반응식을 골라 기록해요.'}</p>`;
     }
 
     function modelAct(sim, a, d) {
         const md = sim.model;
         if (a === 'pick-model' && M.models[d.model]) md.pick = d.model;
         if (a === 'count') {
+            if (md.pick === md.example) return;
             const k = d.key;
             if (k in md.counts) md.counts[k] = Math.max(0, Math.min(8, (md.counts[k] || 0) + Number(d.delta)));
             return {
@@ -4318,6 +5023,7 @@ window.ISLAND_APP = 'lemon-island';</script>
     function modelCheck(sim) {
         const md = sim.model,
             m = M.models[md.pick];
+        if (md.pick === md.example) return '이건 예시예요. 위에서 다음 물질을 골라 직접 모형을 만들어 봐요.';
         const wrong = m.parts.filter(([sp, n]) => (md.counts[md.pick + ':' + sp] || 0) !== n);
         if (!wrong.length) return null;
         const charge = m.parts.reduce((a, [sp]) => a + PT[sp].charge * (md.counts[md.pick + ':' + sp] || 0), 0);
@@ -4360,6 +5066,54 @@ window.ISLAND_APP = 'lemon-island';</script>
         if (!m) return '';
         const listed = m.parts.flatMap(([sp, n]) => Array(n).fill(sp));
         return `<svg class="lab-svg" viewBox="0 0 420 240" role="img" aria-label="${esc(m.label)} 모형"><rect width="420" height="240" rx="18" fill="#fbf7ea"/><rect x="20" y="30" width="380" height="180" rx="18" fill="#d9eef6" stroke="#7d93a0" stroke-width="3"/>${scatter(listed,{x:30,y:40,w:360,h:160},listed.length>6?20:24)}<text x="210" y="232" class="t-small" text-anchor="middle">${esc(m.equation)}</text></svg>`;
+    }
+
+    /* ── 간이 전기 전도 장치(산·염기 공용) ─────────────── */
+    const LED_WORD = {
+        bright: '밝게 켜짐',
+        dim: '희미하게 켜짐',
+        off: '켜지지 않음'
+    };
+
+    function conductScene(sim, list, heading) {
+        const s = sim.cell,
+            led = s ? S[s].conduct : null;
+        const glow = led === 'bright' ? '<circle cx="300" cy="150" r="70" fill="url(#glowG)"/>' : led === 'dim' ? '<circle cx="300" cy="150" r="34" fill="url(#glowG)" opacity=".7"/>' : '';
+        const short = k => S[k].short || S[k].name.replace(' 수용액', '');
+        const table = list.map((k, i) => `<text x="640" y="${214+i*40}" class="t-small">${esc(short(k))}</text><text x="930" y="${214+i*40}" class="t-small" text-anchor="end" fill="${sim.tested[k]?'#3d5d4a':'#a3ab9f'}">${sim.tested[k]?LED_WORD[S[k].conduct]:'—'}</text>`).join('');
+        return svg(`${title(heading,'아래 병을 누르면 그 용액을 전도 장치에 담아요 (농도 1 M)')}${glow}<rect x="248" y="170" width="104" height="54" rx="12" fill="#3b4b5a"/><circle cx="300" cy="150" r="22" fill="${led==='bright'?'#ffe066':led==='dim'?'#f3e3a0':'#d9dde0'}" stroke="#8a949c" stroke-width="3"/><line x1="280" y1="224" x2="280" y2="380" stroke="#8a949c" stroke-width="8"/><line x1="320" y1="224" x2="320" y2="380" stroke="#8a949c" stroke-width="8"/>${beaker(200,286,200,140,s?'#dcecf2':'#f3f6f7',s?.6:0,{label:s?S[s].name:'비어 있음'})}<rect x="610" y="150" width="340" height="250" rx="18" fill="#ffffff" stroke="#e2dccb" stroke-width="2"/><text x="640" y="182" class="t-label">내가 본 전구</text>${table}${list.map((k,i)=>hit(`<rect x="${40+i*186}" y="490" width="172" height="48" rx="12" fill="${sim.cell===k?'#fff0b8':'#ffffff'}" stroke="#d8c9a4" stroke-width="2"/><text x="${126+i*186}" y="520" class="t-small" text-anchor="middle">${esc(short(k))}</text>`,'pour',{sol:k},S[k].name+' 담기')).join('')}`, '간이 전기 전도 장치');
+    }
+
+    function conductReadings(sim) {
+        if (!sim.cell) return '';
+        return `<div class="reading-row"><div class="reading current"><small>담은 용액</small><b style="font-size:1.1rem">${esc(S[sim.cell].name)}</b></div><div class="reading voltage"><small>전구</small><b style="font-size:1.1rem">${esc(LED_WORD[S[sim.cell].conduct])}</b></div></div>`;
+    }
+
+    function conductAct(sim, a, d, list) {
+        if (a === 'pour' && list.includes(d.sol)) {
+            sim.cell = d.sol;
+            sim.tested[d.sol] = true;
+            return {
+                sound: S[d.sol].conduct === 'off' ? 'click' : 'switch-close'
+            };
+        }
+        if (a === 'empty') sim.cell = null;
+    }
+
+    function conductCapture(sim, list, need, tag, label) {
+        const miss = need.filter(k => !sim.tested[k]);
+        if (miss.length) return {
+            error: `${miss.map(k=>S[k].name).join(', ')}도 담아 본 뒤 기록해요.`
+        };
+        const tested = list.filter(k => sim.tested[k]);
+        return {
+            tag,
+            label,
+            fields: tested.map(k => choiceField(k, S[k].name + ' (1 M)', ['밝게 켜짐', '희미하게 켜짐', '켜지지 않음'], LED_WORD[S[k].conduct], '오른쪽 표에 적힌 내 관찰을 옮겨 적어요.')),
+            snap: {
+                list: tested
+            }
+        };
     }
 
     /* ── 지시약 검사대(조수 시험·염기·표 공용) ─────────── */
@@ -4441,6 +5195,11 @@ window.ISLAND_APP = 'lemon-island';</script>
                 }
             };
         },
+        say(tag) {
+            if (tag === 'start') return [0, '건강한 레몬 즙은 푸른 리트머스를 붉게 바꾸지. 샘물은 비교할 기준이야. 새콤이의 즙은 어떨지 확인해 주게.'];
+            if (tag === 'juice') return [0, '새콤이의 즙은 샘물과 똑같이 푸른색 그대로군… 산성을 잃어 가고 있어! 산성을 회복할 궁극의 약이 필요하네.'];
+            return null;
+        },
         after() {},
         figure(e) {
             const xs = [60, 190, 320];
@@ -4459,11 +5218,12 @@ window.ISLAND_APP = 'lemon-island';</script>
     Labs[1] = {
         title: '에시드 연구실 · 조수 시험대',
         steps: ['푸른 리트머스 종이로 용액 A~D를 검사하고 색을 기록해요.', 'BTB 용액으로 다시 확인하고 색을 기록해요.', '용액에 마그네슘 조각을 넣고, 나오는 기체에 성냥불을 대어 확인해요.'],
-        prediction: ['네 용액 중 산을 가려내는 가장 믿을 만한 방법은?', ['지시약의 색 변화로 알 수 있을 것 같아', '용액의 겉모습만 봐도 알 수 있을 것 같아', '실험으로 확인해 볼래']],
+        prediction: ['산 수용액에 초록색 BTB 용액을 떨어뜨리면 공통적으로 어떤 색이 될까?', ['노란색', '초록색', '파란색']],
         principle: '산 수용액은 푸른 리트머스를 붉게, 초록색 BTB 용액을 노랗게 바꿔요. 마그네슘 같은 금속과 반응해 수소 기체(H₂)를 내놓는데, 성냥불을 대면 ‘펑’ 소리를 내며 타요. 모든 금속이 산과 반응하는 것은 아니에요.',
         safety: '성냥불은 시험관 입구에 잠깐만 대요. 산 수용액이 손에 묻으면 흐르는 물에 씻어요.',
         init(tags) {
-            const phase = has(tags, 'btb') ? 2 : has(tags, 'litmus') ? 1 : 0;
+            const first = this.checks(tags).findIndex(ok => !ok),
+                phase = first < 0 ? 2 : first;
             return {
                 phase,
                 tool: ['blueLitmus', 'btb', 'mg'][phase],
@@ -4490,7 +5250,7 @@ window.ISLAND_APP = 'lemon-island';</script>
             const noMg = L1.find(k => !sim.mg[k]);
             if (noMg) return {
                 selector: sim.tool === 'mg' ? `[data-lab="apply"][data-cup="${noMg}"]` : '[data-lab="tool"][data-tool="mg"]',
-                copy: sim.tool === 'mg' ? `시험관 ${noMg}을 눌러 마그네슘 조각을 넣어요.` : '먼저 ‘마그네슘 조각’을 골라요.'
+                copy: sim.tool === 'mg' ? `시험관 ${noMg}를 눌러 마그네슘 조각을 넣어요.` : '먼저 ‘마그네슘 조각’을 골라요.'
             };
             if (!L1.some(k => sim.match[k] && S[L1SOL[k]].mg !== 'none')) return {
                 selector: sim.tool === 'match' ? '[data-lab="apply"][data-cup="A"]' : '[data-lab="tool"][data-tool="match"]',
@@ -4504,6 +5264,13 @@ window.ISLAND_APP = 'lemon-island';</script>
                 selector: '[data-action="complete"]',
                 copy: '세 가지 시험을 모두 통과했어요! ‘부탁 해결하기’를 눌러요.'
             };
+        },
+        say(tag) {
+            if (tag === 'start') return [1, '이 리트머스 종이로 앞에 있는 용액들 중 산성을 띠는 용액을 찾아보게나.'];
+            if (tag === 'litmus') return [1, '산성을 띠는 용액에 넣은 리트머스 종이는 공통적으로 붉게 변했군. 기본기는 있는 친구였구먼! 그러면 한 번 더 시험해 보도록 하지.'];
+            if (tag === 'btb') return [1, '좋아! 사실 A·B·C는 묽은 염산, 묽은 황산, 아세트산 수용액이었네. 세 산 모두 수소(H)를 가지고 있지. 산에 금속을 넣어 보면 정말 수소가 나오는지 확인할 수 있을 게야. 염산에 마그네슘을 넣었더니 꽤나 재미있는 반응을 보이더군.'];
+            if (tag === 'mg') return [1, '부글부글… 기체가 계속 나오고, 불을 대니 ‘펑’! 그래, 바로 이거야. 우린 수소를 찾은 거야!'];
+            return null;
         },
         name(k, sim) {
             return sim.reveal || sim.phase === 2 ? `${S[L1SOL[k]].name}` : '';
@@ -4602,23 +5369,19 @@ window.ISLAND_APP = 'lemon-island';</script>
     };
 
     /* ═══ 2. 산의 정체 — 전도성 · 이온 이동 · 이온화 모형 ═══ */
-    const CONDUCT = ['HCl', 'H2SO4', 'CH3COOH', 'sugar', 'water'],
-        CONDUCT_NEED = ['HCl', 'H2SO4', 'CH3COOH', 'sugar'];
-    const LED_WORD = {
-        bright: '밝게 켜짐',
-        dim: '희미하게 켜짐',
-        off: '켜지지 않음'
-    };
+    const ACID_CONDUCT = ['HCl', 'H2SO4', 'CH3COOH', 'sugar', 'water'],
+        ACID_NEED = ['HCl', 'H2SO4', 'CH3COOH', 'sugar'],
+        ACID_MODELS = ['HNO3', 'H2SO4', 'CH3COOH'];
     Labs[2] = {
         title: '에시드의 전기 실험대',
-        steps: ['간이 전기 전도 장치로 산 수용액과 설탕물의 전구 밝기를 비교해 기록해요.', '리트머스 종이 위에서 전류를 흘려, 붉은색을 만든 이온을 찾아 기록해요.', '염산·황산·아세트산의 이온화 모형을 만들어 기록해요.'],
+        steps: ['간이 전기 전도 장치로 산 수용액과 설탕물의 전구 밝기를 비교해 기록해요.', '리트머스 종이 위에서 전류를 흘려, 붉은색을 만든 이온을 찾아 기록해요.', '에시드 박사의 염산 예시를 보고, 질산·황산·아세트산의 이온화 모형을 직접 만들어 기록해요.'],
         prediction: ['산 수용액에 전류를 흘리면 전구는?', ['켜질 것 같아', '켜지지 않을 것 같아', '산마다 다를 것 같아']],
-        principle: '물에 녹아 이온으로 나뉘는 물질(전해질)의 수용액에는 전류가 흘러요. 전류를 흘리면 양이온은 (−)극으로, 음이온은 (+)극으로 움직여요. 산은 물에 녹아 수소 이온(H⁺)을 내놓아요. 대부분 이온화하면 강산, 일부만 이온화하면 약산이에요.',
+        principle: '물에 녹아 이온으로 나뉘는 물질(전해질)의 수용액에는 전류가 흘러요. 전류를 흘리면 양이온은 (−)극으로, 음이온은 (+)극으로 움직여요. 산이 물에 녹아 수소 이온(H⁺)과 음이온으로 나뉘는 것을 ‘산의 이온화’라고 해요. 대부분 이온화하면 강산, 일부만 이온화하면 약산이에요.',
         safety: '전원은 낮은 전압을 써요. 전극을 바꿀 때는 전류를 끈 상태에서 바꿔요.',
         init(tags) {
-            const phase = has(tags, 'migrate-acid') ? 2 : has(tags, 'conduct') ? 1 : 0;
+            const phase = this.phaseOf(tags);
             const built = {};
-            for (const k of ['HCl', 'H2SO4', 'CH3COOH', 'HNO3']) built[k] = has(tags, 'model-' + k);
+            for (const k of ['HCl', ...ACID_MODELS]) built[k] = has(tags, 'model-' + k);
             return {
                 phase,
                 tested: {},
@@ -4628,14 +5391,15 @@ window.ISLAND_APP = 'lemon-island';</script>
                     ran: false,
                     ranAt: 0
                 },
-                model: modelInit(['HCl', 'H2SO4', 'CH3COOH', 'HNO3']),
+                model: modelInit(['HCl', 'HNO3', 'H2SO4', 'CH3COOH'], 'HCl'),
                 built
             };
         },
-        checks: tags => [has(tags, 'conduct'), has(tags, 'migrate-acid'), ['HCl', 'H2SO4', 'CH3COOH'].every(k => has(tags, 'model-' + k))],
+        phaseOf: tags => !has(tags, 'conduct') ? 0 : !has(tags, 'migrate-acid') ? 1 : 2,
+        checks: tags => [has(tags, 'conduct'), has(tags, 'migrate-acid'), ACID_MODELS.every(k => has(tags, 'model-' + k))],
         hint(sim, tags) {
             if (sim.phase === 0) {
-                const next = CONDUCT_NEED.find(k => !sim.tested[k]);
+                const next = ACID_NEED.find(k => !sim.tested[k]);
                 if (next) return {
                     selector: `[data-lab="pour"][data-sol="${next}"]`,
                     copy: `‘${S[next].name}’ 병을 눌러 전도 장치에 담아 봐요.`
@@ -4645,20 +5409,17 @@ window.ISLAND_APP = 'lemon-island';</script>
                     copy: '네 용액의 전구 밝기를 봤어요. ‘증거 남기기’로 기록해요.'
                 };
             }
-            if (sim.phase === 1) {
-                if (!sim.migration.ran) return {
-                    selector: '[data-lab="run"]',
-                    copy: '‘전류 흘리기’를 눌러 붉은색이 어느 쪽으로 넓어지는지 봐요.'
-                };
-                return {
-                    selector: '[data-action="capture"]',
-                    copy: '붉은 띠가 넓어진 쪽을 확인했어요. ‘증거 남기기’로 기록해요.'
-                };
-            }
-            const next = ['HCl', 'H2SO4', 'CH3COOH'].find(k => !has(tags, 'model-' + k));
+            if (sim.phase === 1) return !sim.migration.ran ? {
+                selector: '[data-lab="run"]',
+                copy: '‘전류 흘리기’를 눌러 붉은색이 어느 쪽으로 넓어지는지 봐요.'
+            } : {
+                selector: '[data-action="capture"]',
+                copy: '붉은 띠가 넓어진 쪽을 확인했어요. ‘증거 남기기’로 기록해요.'
+            };
+            const next = ACID_MODELS.find(k => !has(tags, 'model-' + k));
             if (next && sim.model.pick !== next) return {
                 selector: `[data-lab="pick-model"][data-model="${next}"]`,
-                copy: `${M.models[next].label} 모형을 골라 입자 수를 맞춰 봐요.`
+                copy: sim.model.pick === 'HCl' ? `염산 예시를 봤다면 이제 ${M.models[next].label}을(를) 골라 직접 만들어 봐요.` : `${M.models[next].label} 모형을 골라 입자 수를 맞춰 봐요.`
             };
             if (next) {
                 const err = modelCheck(sim);
@@ -4675,61 +5436,40 @@ window.ISLAND_APP = 'lemon-island';</script>
                 copy: '산의 정체를 밝힐 증거가 모였어요. ‘부탁 해결하기’를 눌러요.'
             };
         },
-        scene(sim) {
-            if (sim.phase === 0) {
-                const s = sim.cell,
-                    led = s ? S[s].conduct : null;
-                const glow = led === 'bright' ? '<circle cx="300" cy="150" r="70" fill="url(#glowG)"/>' : led === 'dim' ? '<circle cx="300" cy="150" r="34" fill="url(#glowG)" opacity=".7"/>' : '';
-                const table = CONDUCT.map((k, i) => `<text x="640" y="${196+i*44}" class="t-small">${esc(S[k].name)}</text><text x="930" y="${196+i*44}" class="t-small" text-anchor="end" fill="${sim.tested[k]?'#3d5d4a':'#a3ab9f'}">${sim.tested[k]?LED_WORD[S[k].conduct]:'—'}</text>`).join('');
-                return svg(`${title('Step 1 · 간이 전기 전도 장치','아래 병을 누르면 그 용액을 전도 장치에 담아요 (농도 1 M)')}${glow}<rect x="248" y="170" width="104" height="54" rx="12" fill="#3b4b5a"/><circle cx="300" cy="150" r="22" fill="${led==='bright'?'#ffe066':led==='dim'?'#f3e3a0':'#d9dde0'}" stroke="#8a949c" stroke-width="3"/><line x1="280" y1="224" x2="280" y2="380" stroke="#8a949c" stroke-width="8"/><line x1="320" y1="224" x2="320" y2="380" stroke="#8a949c" stroke-width="8"/>${beaker(200,300,200,150,s?'#dcecf2':'#f3f6f7',s?.6:0,{label:s?S[s].name:'비어 있음'})}<rect x="610" y="150" width="340" height="250" rx="18" fill="#ffffff" stroke="#e2dccb" stroke-width="2"/><text x="640" y="176" class="t-label">내가 본 전구</text>${table}${CONDUCT.map((k,i)=>hit(`<rect x="${60+i*112}" y="486" width="100" height="44" rx="12" fill="${sim.cell===k?'#fff0b8':'#ffffff'}" stroke="#d8c9a4" stroke-width="2"/><text x="${110+i*112}" y="514" class="t-small" text-anchor="middle">${esc(S[k].short||S[k].name.replace(' 수용액',''))}</text>`,'pour',{sol:k},S[k].name+' 담기')).join('')}`, '간이 전기 전도 장치');
+        say(tag, tags) {
+            if (tag === 'start') return [1, '조수! 일단 산 수용액에 전기가 흐르는지 체크해 보자고! 간이 전기 전도 장치로 간단하게 테스트해 보도록 하지.'];
+            if (tag === 'conduct') return [1, '전기가 흐르는 걸 보니 전해질이군! 그럼 수소 이온을 찾을 수 있겠지. 이제 전류를 흘려서 어느 이온이 산을 이루는지 찾아볼 차례야.'];
+            if (tag === 'migrate-acid') return [1, '(−)극 쪽으로 붉은색이 넓어졌지? 양이온 때문에 산의 공통적인 성질이 나타난 것이었어! 오호, 이제 퍼즐 조각이 맞춰지고 있군! 다음은 산이 물에 녹은 모습을 모형으로 나타내 볼 차례야.'];
+            if (/^model-/.test(tag)) {
+                const all = ACID_MODELS.every(k => has(tags, 'model-' + k));
+                if (tag === 'model-CH3COOH') return [1, '앞의 산들과 다른 점을 발견했는가? 아세트산은 일부만 이온화하는구먼. 염산·황산·질산처럼 대부분 이온화하는 산은 강산, 아세트산처럼 일부만 이온화하는 산은 약산이라고 하자!' + (all ? ' 그래도 물에 녹아 수소 이온(H⁺)을 내놓는 건 모두 같지. 이걸 ‘산의 이온화’라고 부르는 건 어떻나?!' : '')];
+                return [1, all ? '훌륭해! 산은 모두 물에 녹아 수소 이온(H⁺)을 내놓는군. 이걸 ‘산의 이온화’라고 부르는 건 어떻나?! 대부분 이온화하는 산은 강산, 아세트산처럼 일부만 이온화하는 산은 약산이라고 하자!' : '염산을 참고해서 잘 만들었군! 생각보다 쉽지는 않지? 곧 쉬워질 거야. 막히면 언제든 힌트를 부르게!'];
             }
+            return null;
+        },
+        scene(sim) {
+            if (sim.phase === 0) return conductScene(sim, ACID_CONDUCT, 'Step 1 · 간이 전기 전도 장치');
             if (sim.phase === 1) return svg(`${title('Step 2 · 전류를 흘려 움직이는 이온 찾기','전류를 흘리면 이온이 반대 전하의 전극 쪽으로 끌려가요')}${migrationScene(sim,'acid')}`, '리트머스 종이 위 이온의 이동');
-            return svg(modelScene(sim), '이온화 모형');
+            return svg(modelScene(sim, 'Dr.에시드'), '이온화 모형');
         },
         readings(sim) {
-            if (sim.phase !== 0 || !sim.cell) return '';
-            const w = LED_WORD[S[sim.cell].conduct];
-            return `<div class="reading-row"><div class="reading current"><small>담은 용액</small><b style="font-size:1.1rem">${esc(S[sim.cell].name)}</b></div><div class="reading voltage"><small>전구</small><b style="font-size:1.1rem">${esc(w)}</b></div></div>`;
+            return sim.phase === 0 ? conductReadings(sim) : '';
         },
         note(sim) {
             return ['전구가 켜지면 수용액 속에 움직일 수 있는 이온이 있다는 뜻이에요. 설탕처럼 이온으로 나뉘지 않는 물질의 수용액은 전류가 흐르지 않아요.', '종이 전체에는 질산 칼륨의 K⁺와 NO₃⁻가 있지만 색을 바꾸지 않아요. 색이 바뀐 곳은 실에서 나온 이온이 움직인 자리예요.', '입자 모형: 초록 = 양이온, 주황 = 음이온, 노랑 = 녹기만 하고 이온화하지 않은 분자.'][sim.phase];
         },
         controls(sim) {
-            if (sim.phase === 0) return `<p class="compact-rule">그림 아래의 병을 눌러 한 가지씩 담아 봐요. 네 가지(염산·황산·아세트산·설탕물)는 꼭 확인해요.</p><button type="button" data-lab="empty">↺ 장치 비우기</button>`;
+            if (sim.phase === 0) return `<p class="compact-rule">그림 아래의 병을 눌러 한 가지씩 담아 봐요. 네 가지(염산·황산·아세트산·설탕물)는 꼭 확인해요.</p><div class="tool-tray"><button type="button" data-lab="empty">↺ 장치 비우기</button></div>`;
             if (sim.phase === 1) return migrationControls(sim);
-            return modelControls(sim);
+            return modelControls(sim, 'Dr.에시드');
         },
         act(sim, a, d) {
-            if (sim.phase === 0) {
-                if (a === 'pour' && S[d.sol]) {
-                    sim.cell = d.sol;
-                    sim.tested[d.sol] = true;
-                    return {
-                        sound: S[d.sol].conduct === 'off' ? 'click' : 'switch-close'
-                    };
-                }
-                if (a === 'empty') sim.cell = null;
-                return;
-            }
+            if (sim.phase === 0) return conductAct(sim, a, d, ACID_CONDUCT);
             if (sim.phase === 1) return migrationAct(sim, a);
             return modelAct(sim, a, d);
         },
         capture(sim) {
-            if (sim.phase === 0) {
-                const miss = CONDUCT_NEED.filter(k => !sim.tested[k]);
-                if (miss.length) return {
-                    error: `${miss.map(k=>S[k].name).join(', ')}도 담아 본 뒤 기록해요.`
-                };
-                const list = CONDUCT.filter(k => sim.tested[k]);
-                return {
-                    tag: 'conduct',
-                    label: '간이 전기 전도 장치로 전구 밝기 비교',
-                    fields: list.map(k => choiceField(k, S[k].name + ' (1 M)', ['밝게 켜짐', '희미하게 켜짐', '켜지지 않음'], LED_WORD[S[k].conduct], '오른쪽 표에 적힌 내 관찰을 옮겨 적어요.')),
-                    snap: {
-                        list
-                    }
-                };
-            }
+            if (sim.phase === 0) return conductCapture(sim, ACID_CONDUCT, ACID_NEED, 'conduct', '간이 전기 전도 장치로 전구 밝기 비교');
             if (sim.phase === 1) {
                 if (!sim.migration.ran) return {
                     error: '먼저 ‘전류 흘리기’를 눌러 붉은색의 움직임을 관찰해요.'
@@ -4746,11 +5486,10 @@ window.ISLAND_APP = 'lemon-island';</script>
             return modelCapture(sim);
         },
         after(sim, tags) {
-            if (sim.phase === 0 && has(tags, 'conduct')) sim.phase = 1;
-            else if (sim.phase === 1 && has(tags, 'migrate-acid')) sim.phase = 2;
+            sim.phase = this.phaseOf(tags);
             for (const k of Object.keys(sim.built)) sim.built[k] = has(tags, 'model-' + k);
-            if (sim.phase === 2) {
-                const next = ['HCl', 'H2SO4', 'CH3COOH'].find(k => !has(tags, 'model-' + k));
+            if (sim.phase === 2 && sim.model.pick !== 'HCl') {
+                const next = ACID_MODELS.find(k => !has(tags, 'model-' + k));
                 if (next) sim.model.pick = next;
             }
         },
@@ -4768,17 +5507,24 @@ window.ISLAND_APP = 'lemon-island';</script>
             C: 'CaOH2',
             D: 'sugar'
         };
-    const BASE_TOOLS = ['blueLitmus', 'redLitmus', 'btb', 'pp'];
+    const BASE_TOOLS = ['blueLitmus', 'redLitmus', 'btb', 'pp'],
+        BASE_CONDUCT = ['NaOH', 'KOH', 'NH3', 'sugar', 'water'],
+        BASE_NEED = ['NaOH', 'KOH', 'NH3', 'sugar'],
+        BASE_MODELS = ['KOH', 'CaOH2', 'NH3'];
     Labs[3] = {
         title: '베이스 연구실 · 염기 실험대',
-        steps: ['염기를 알려 주는 지시약 두 가지를 골라 용액 A~D를 검사하고 기록해요.', '리트머스 종이 위에서 전류를 흘려, 푸른색을 만든 이온을 찾아 기록해요.', '수산화 나트륨·수산화 칼슘·암모니아의 이온화 모형을 만들어 기록해요.'],
+        steps: ['염기를 알려 주는 지시약 두 가지를 골라 용액 A~D를 검사하고 기록해요.', '간이 전기 전도 장치로 염기 수용액과 설탕물의 전구 밝기를 비교해 기록해요.', '리트머스 종이 위에서 전류를 흘려, 푸른색을 만든 이온을 찾아 기록해요.', '베이스 박사의 수산화 나트륨 예시를 보고, 수산화 칼륨·수산화 칼슘·암모니아의 이온화 모형을 만들어 기록해요.'],
         prediction: ['비눗방울 물질 같은 염기에 BTB를 떨어뜨리면?', ['노란색', '초록색', '파란색']],
-        principle: '염기 수용액은 붉은 리트머스를 푸르게, BTB를 파랗게, 페놀프탈레인을 붉게 바꿔요. 염기는 물에 녹아 수산화 이온(OH⁻)을 내놓아요. 푸른 리트머스는 염기에서 변하지 않아서 염기를 찾는 데는 쓸모가 적어요.',
+        principle: '염기 수용액은 붉은 리트머스를 푸르게, BTB를 파랗게, 페놀프탈레인을 붉게 바꿔요. 염기는 물에 녹아 수산화 이온(OH⁻)을 내놓고, 그 수용액에는 전류가 흘러요. 대부분 이온화하면 강염기, 일부만 이온화하면 약염기예요. 푸른 리트머스는 염기에서 변하지 않아서 염기를 찾는 데는 쓸모가 적어요.',
         safety: '염기 수용액은 단백질을 녹여 미끌거려요. 그래서 맨손으로 만지지 않고 장갑과 보안경을 써요.',
+        indicatorDone: tags => ['ind-redLitmus', 'ind-btb', 'ind-pp'].filter(t => tags.includes(t)).length >= 2,
+        phaseOf(tags) {
+            return !this.indicatorDone(tags) ? 0 : !has(tags, 'conduct-base') ? 1 : !has(tags, 'migrate-base') ? 2 : 3;
+        },
         init(tags) {
-            const phase = has(tags, 'migrate-base') ? 2 : this.indicatorDone(tags) ? 1 : 0;
+            const phase = this.phaseOf(tags);
             const built = {};
-            for (const k of ['NaOH', 'CaOH2', 'NH3', 'KOH']) built[k] = has(tags, 'model-' + k);
+            for (const k of ['NaOH', ...BASE_MODELS]) built[k] = has(tags, 'model-' + k);
             return {
                 phase,
                 tool: 'redLitmus',
@@ -4788,18 +5534,19 @@ window.ISLAND_APP = 'lemon-island';</script>
                     btb: {},
                     pp: {}
                 },
+                tested: {},
+                cell: null,
                 migration: {
                     polarity: 'left-neg',
                     ran: false,
                     ranAt: 0
                 },
-                model: modelInit(['NaOH', 'CaOH2', 'NH3', 'KOH']),
+                model: modelInit(['NaOH', 'KOH', 'CaOH2', 'NH3'], 'NaOH'),
                 built
             };
         },
-        indicatorDone: tags => ['ind-redLitmus', 'ind-btb', 'ind-pp'].filter(t => tags.includes(t)).length >= 2,
         checks(tags) {
-            return [this.indicatorDone(tags), has(tags, 'migrate-base'), ['NaOH', 'CaOH2', 'NH3'].every(k => has(tags, 'model-' + k))];
+            return [this.indicatorDone(tags), has(tags, 'conduct-base'), has(tags, 'migrate-base'), BASE_MODELS.every(k => has(tags, 'model-' + k))];
         },
         hint(sim, tags) {
             if (sim.phase === 0) {
@@ -4818,17 +5565,28 @@ window.ISLAND_APP = 'lemon-island';</script>
                     copy: `${I[sim.tool].short} 결과를 ‘증거 남기기’로 기록해요. 염기를 알려 주는 지시약 두 가지가 필요해요.`
                 };
             }
-            if (sim.phase === 1) return !sim.migration.ran ? {
+            if (sim.phase === 1) {
+                const next = BASE_NEED.find(k => !sim.tested[k]);
+                if (next) return {
+                    selector: `[data-lab="pour"][data-sol="${next}"]`,
+                    copy: `‘${S[next].name}’ 병을 눌러 전도 장치에 담아 봐요.`
+                };
+                return {
+                    selector: '[data-action="capture"]',
+                    copy: '네 용액의 전구 밝기를 봤어요. ‘증거 남기기’로 기록해요.'
+                };
+            }
+            if (sim.phase === 2) return !sim.migration.ran ? {
                 selector: '[data-lab="run"]',
                 copy: '‘전류 흘리기’를 눌러 푸른색이 어느 쪽으로 넓어지는지 봐요.'
             } : {
                 selector: '[data-action="capture"]',
                 copy: '푸른 띠가 넓어진 쪽을 확인했어요. ‘증거 남기기’로 기록해요.'
             };
-            const next = ['NaOH', 'CaOH2', 'NH3'].find(k => !has(tags, 'model-' + k));
+            const next = BASE_MODELS.find(k => !has(tags, 'model-' + k));
             if (next && sim.model.pick !== next) return {
                 selector: `[data-lab="pick-model"][data-model="${next}"]`,
-                copy: `${M.models[next].label} 모형을 골라 입자 수를 맞춰 봐요.`
+                copy: sim.model.pick === 'NaOH' ? `수산화 나트륨 예시를 봤다면 이제 ${M.models[next].label}을(를) 골라 직접 만들어 봐요.` : `${M.models[next].label} 모형을 골라 입자 수를 맞춰 봐요.`
             };
             if (next) {
                 const err = modelCheck(sim);
@@ -4845,6 +5603,19 @@ window.ISLAND_APP = 'lemon-island';</script>
                 copy: '염기의 정체를 밝혔어요! ‘부탁 해결하기’를 눌러요.'
             };
         },
+        say(tag, tags) {
+            if (tag === 'start') return [2, '앞에 있는 용액들 중 염기성을 띠는 용액을 찾아볼래? 이번엔 어떤 지시약을 쓸지 네가 골라 봐!'];
+            if (tag === 'ind-blueLitmus') return [2, '음… 푸른 리트머스는 하나도 변하지 않았네. 염기를 찾으려면 다른 지시약이 필요해 보여.'];
+            if (/^ind-/.test(tag)) return this.indicatorDone(tags) ? [2, '좋아! 앞에 있던 용액들은 사실 수산화 나트륨, 수산화 칼륨, 석회수(수산화 칼슘), 설탕물이야. NaOH, KOH, Ca(OH)₂ — 공통으로 OH를 갖고 있지. 이제 함께 전기가 흐르는지 체크해 보자!'] : [2, '테스트가 너무 쉬웠구나. 바로 다음! 다른 지시약으로도 한 번 더 확인해 볼래?'];
+            if (tag === 'conduct-base') return [2, '염기 수용액도 전기가 흐르는 걸 보니 전해질이야! 수산화 이온을 찾을 수 있겠어. 그런데 암모니아수는 희미했지? 그 까닭은 모형에서 알아보자.'];
+            if (tag === 'migrate-base') return [2, '(+)극 쪽이 푸른색으로 변했지? 음이온 때문이야. 수산화 나트륨 수용액의 음이온은 수산화 이온이니까, OH⁻가 붉은 리트머스를 파랗게 바꾼 거구나! 수산화 나트륨 모형은 내가 예시로 보여 줄게.'];
+            if (/^model-/.test(tag)) {
+                const all = BASE_MODELS.every(k => has(tags, 'model-' + k));
+                if (tag === 'model-NH3') return [2, '앞의 염기들과 다른 점 찾았어? 암모니아는 물과 반응해 OH⁻를 조금만 내놓아. 수산화 나트륨·수산화 칼륨·수산화 칼슘처럼 대부분 이온화하면 강염기, 암모니아처럼 일부만 이온화하면 약염기라고 하자!' + (all ? ' 그래도 물에 녹아 수산화 이온(OH⁻)을 내놓는 건 모두 같아.' : '')];
+                return [2, all ? '이제 좀 알 것 같아! 염기는 모두 물에 녹아 수산화 이온(OH⁻)을 내놓는구나. 대부분 이온화하면 강염기, 암모니아처럼 일부만 이온화하면 약염기야.' : '수산화 나트륨을 참고해서 잘 만들었어! 스스로 해 보다가 질문 있으면 언제든 불러.'];
+            }
+            return null;
+        },
         scene(sim) {
             if (sim.phase === 0) {
                 const xs = [70, 300, 530, 760],
@@ -4854,19 +5625,23 @@ window.ISLAND_APP = 'lemon-island';</script>
                     const r = indicatorResult(t, L3SOL[k]);
                     return `<g transform="translate(${i*36} 0)"><circle r="14" fill="${r.color}" stroke="#ffffff" stroke-width="3"/><text y="34" class="t-mini" text-anchor="middle">${{blueLitmus:'푸리',redLitmus:'붉리',btb:'BTB',pp:'페놀'}[t]}</text></g>`;
                 }).join('');
-                return svg(`${title('Step 1 · 염기를 알려 주는 지시약 고르기','오른쪽에서 지시약을 고르고 용액 자리를 눌러요')}${L3.map((k,i)=>{const x=xs[i],t=!!map[k],r=indicatorResult(tool,L3SOL[k]);return hit(`${beaker(x,300,150,150,k==='C'?'#e6f0f0':'#dcecf2',.6,{label:'용액 '+k,sub:S[L3SOL[k]].short||S[L3SOL[k]].name})}${t?stripOrDrop(x+60,150,tool,L3SOL[k],true):slot(x+14,150,122,100,I[tool].short)}${t?tag(x+75,140,r.word,'#4c5a52'):''}<g transform="translate(${x+22} 270)">${badges(k)}</g>`,'apply',{cup:k},`용액 ${k}를 ${I[tool].short}(으)로 검사`,t?'is-done':'');}).join('')}`, '네 용액과 여러 지시약');
+                return svg(`${title('Step 1 · 염기를 알려 주는 지시약 고르기','오른쪽에서 지시약을 고르고 용액 자리를 눌러요')}${L3.map((k,i)=>{const x=xs[i],t=!!map[k],r=indicatorResult(tool,L3SOL[k]);return hit(`${beaker(x,300,150,150,k==='C'?'#e6f0f0':'#dcecf2',.6,{label:'용액 '+k})}${t?stripOrDrop(x+60,150,tool,L3SOL[k],true):slot(x+14,150,122,100,I[tool].short)}${t?tag(x+75,140,r.word,'#4c5a52'):''}<g transform="translate(${x+22} 270)">${badges(k)}</g>`,'apply',{cup:k},`용액 ${k}를 ${I[tool].short}(으)로 검사`,t?'is-done':'');}).join('')}`, '네 용액과 여러 지시약');
             }
-            if (sim.phase === 1) return svg(`${title('Step 2 · 전류를 흘려 움직이는 이온 찾기','이번엔 붉은 리트머스 종이 위에 수산화 나트륨 수용액을 적신 실을 올렸어요')}${migrationScene(sim,'base')}`, '리트머스 종이 위 이온의 이동');
-            return svg(modelScene(sim), '이온화 모형');
+            if (sim.phase === 1) return conductScene(sim, BASE_CONDUCT, 'Step 2 · 염기 수용액에도 전류가 흐를까?');
+            if (sim.phase === 2) return svg(`${title('Step 3 · 전류를 흘려 움직이는 이온 찾기','이번엔 붉은 리트머스 종이 위에 수산화 나트륨 수용액을 적신 실을 올렸어요')}${migrationScene(sim,'base')}`, '리트머스 종이 위 이온의 이동');
+            return svg(modelScene(sim, 'Dr.베이스'), '이온화 모형');
         },
-        readings: () => '',
+        readings(sim) {
+            return sim.phase === 1 ? conductReadings(sim) : '';
+        },
         note(sim) {
-            return ['지시약마다 알려 주는 것이 달라요. 염기에서 색이 변하는 지시약을 찾아 보세요.', '종이 전체의 K⁺와 NO₃⁻는 색을 바꾸지 않아요. 색이 바뀐 곳은 실에서 나온 이온이 움직인 자리예요.', '암모니아는 물과 반응해 OH⁻를 조금만 내놓아요(약염기). 입자 모형에서는 대부분 NH₃ 분자로 남겨요.'][sim.phase];
+            return ['지시약마다 알려 주는 것이 달라요. 염기에서 색이 변하는 지시약을 찾아 보세요.', '전구가 켜지면 움직이는 이온이 있다는 뜻이에요. 밝기를 비교하면 이온이 얼마나 많은지 짐작할 수 있어요.', '종이 전체의 K⁺와 NO₃⁻는 색을 바꾸지 않아요. 색이 바뀐 곳은 실에서 나온 이온이 움직인 자리예요.', '암모니아는 물과 반응해 OH⁻를 조금만 내놓아요(약염기). 입자 모형에서는 대부분 NH₃ 분자로 남겨요.'][sim.phase];
         },
         controls(sim) {
             if (sim.phase === 0) return `<div class="tool-tray">${toolButton(sim,'blueLitmus','푸른 리트머스','📘')}${toolButton(sim,'redLitmus','붉은 리트머스','📕')}${toolButton(sim,'btb','BTB 용액','💧')}${toolButton(sim,'pp','페놀프탈레인','🧴')}</div><p class="compact-rule">지금 고른 지시약: <b>${esc(I[sim.tool].name)}</b> · 한 지시약으로 네 용액을 다 검사하면 기록할 수 있어요.</p>`;
-            if (sim.phase === 1) return migrationControls(sim);
-            return modelControls(sim);
+            if (sim.phase === 1) return `<p class="compact-rule">그림 아래의 병을 눌러 한 가지씩 담아 봐요. 수산화 나트륨·수산화 칼륨·암모니아수·설탕물은 꼭 확인해요.</p><div class="tool-tray"><button type="button" data-lab="empty">↺ 장치 비우기</button></div>`;
+            if (sim.phase === 2) return migrationControls(sim);
+            return modelControls(sim, 'Dr.베이스');
         },
         act(sim, a, d) {
             if (sim.phase === 0) {
@@ -4879,10 +5654,11 @@ window.ISLAND_APP = 'lemon-island';</script>
                 }
                 return;
             }
-            if (sim.phase === 1) return migrationAct(sim, a);
+            if (sim.phase === 1) return conductAct(sim, a, d, BASE_CONDUCT);
+            if (sim.phase === 2) return migrationAct(sim, a);
             return modelAct(sim, a, d);
         },
-        capture(sim, tags) {
+        capture(sim) {
             if (sim.phase === 0) {
                 const tool = sim.tool,
                     map = sim.tests[tool];
@@ -4891,14 +5667,15 @@ window.ISLAND_APP = 'lemon-island';</script>
                 };
                 return {
                     tag: 'ind-' + tool,
-                    label: `${I[tool].name}로 네 용액 검사`,
-                    fields: L3.map(k => choiceField(k, `용액 ${k} (${S[L3SOL[k]].short||S[L3SOL[k]].name})`, I[tool].options, I[tool].word(S[L3SOL[k]].pH), '그림에 보이는 색을 골라요.')),
+                    label: `${I[tool].name}${/[가-힣]$/.test(I[tool].name) && (I[tool].name.charCodeAt(I[tool].name.length - 1) - 0xac00) % 28 && (I[tool].name.charCodeAt(I[tool].name.length - 1) - 0xac00) % 28 !== 8 ? '으로' : '로'} 네 용액 검사`,
+                    fields: L3.map(k => choiceField(k, `용액 ${k}`, I[tool].options, I[tool].word(S[L3SOL[k]].pH), '그림에 보이는 색을 골라요.')),
                     snap: {
                         tool
                     }
                 };
             }
-            if (sim.phase === 1) {
+            if (sim.phase === 1) return conductCapture(sim, BASE_CONDUCT, BASE_NEED, 'conduct-base', '간이 전기 전도 장치로 염기 수용액 전구 밝기 비교');
+            if (sim.phase === 2) {
                 if (!sim.migration.ran) return {
                     error: '먼저 ‘전류 흘리기’를 눌러 푸른색의 움직임을 관찰해요.'
                 };
@@ -4914,11 +5691,10 @@ window.ISLAND_APP = 'lemon-island';</script>
             return modelCapture(sim);
         },
         after(sim, tags) {
-            if (sim.phase === 0 && this.indicatorDone(tags)) sim.phase = 1;
-            else if (sim.phase === 1 && has(tags, 'migrate-base')) sim.phase = 2;
+            sim.phase = this.phaseOf(tags);
             for (const k of Object.keys(sim.built)) sim.built[k] = has(tags, 'model-' + k);
-            if (sim.phase === 2) {
-                const next = ['NaOH', 'CaOH2', 'NH3'].find(k => !has(tags, 'model-' + k));
+            if (sim.phase === 3 && sim.model.pick !== 'NaOH') {
+                const next = BASE_MODELS.find(k => !has(tags, 'model-' + k));
                 if (next) sim.model.pick = next;
             }
         },
@@ -4931,6 +5707,14 @@ window.ISLAND_APP = 'lemon-island';</script>
             }
             return '';
         }
+    };
+
+    /* 수산화 나트륨 20 mL 와 넣은 염산의 부피비 — 원본 실험 결과표 그대로 */
+    const ratio = hcl => {
+        if (!hcl) return '20 : 0';
+        const g = (a, b) => b ? g(b, a % b) : a,
+            d = g(20, hcl);
+        return `${20/d} : ${hcl/d}`;
     };
 
     /* ═══ 4. 중화병의 원인 — 혼합 실험 ★ ═══ */
@@ -4965,13 +5749,22 @@ window.ISLAND_APP = 'lemon-island';</script>
                 copy: `지금 ${want} mL예요. 색·온도·입자 수를 보고 ‘증거 남기기’로 기록해요.`
             };
         },
+        say(tag) {
+            if (tag === 'start') return [2, '산과 염기의 반응을 눈으로 확인할 수 있게 BTB 용액을 쓸 거야! 수산화 나트륨 수용액 20 mL에 BTB를 떨어뜨렸어. 이제 염산을 10 mL씩 넣으면서 색과 온도를 잘 봐.'];
+            if (tag === 'mix-0') return [2, '염산을 넣기 전이라 H⁺는 하나도 없고 OH⁻가 있어서 파란색이야. 이제 염산을 10 mL 넣어 봐!'];
+            if (tag === 'mix-10') return [2, '아직 파란색이지? 그런데 입자를 봐. H⁺와 OH⁻가 만나서 물이 생겼어! 온도도 조금 올랐고.'];
+            if (tag === 'mix-20') return [2, '1:1로 섞였더니 수소 이온과 수산화 이온이 모두 물이 되어 사라졌어! 산도 염기도 아닌 중성이 되어서 초록색이 된 거야. 사라진 이온들이 힌트야!'];
+            if (tag === 'mix-30') return [2, '초록색을 지나 노란색이 됐어! 입자를 세어 봐. 이번엔 무엇이 남았지?'];
+            if (tag === 'mix-40') return [2, '왜 노란색이 되었을까? 그렇지! 산을 결정하는 수소 이온이 남아 있기 때문이야. 드디어 중화병의 단서를 다 모았어!'];
+            return null;
+        },
         scene(sim) {
             const m = M.mix(sim.hcl);
             const listed = [...Array(m.Na).fill('Na+'), ...Array(m.Cl).fill('Cl-'), ...Array(m.H).fill('H+'), ...Array(m.OH).fill('OH-'), ...Array(m.water).fill('H2O')];
             const level = .3 + (20 + sim.hcl) / 60 * .55;
             const temp = m.temp,
                 tH = Math.max(0, Math.min(1, (temp - 15) / 15));
-            return svg(`${title('수산화 나트륨 수용액 20 mL + BTB','묽은 염산을 10 mL씩 넣어요 · 두 용액의 농도는 같아요')}<g transform="translate(0 0)"><rect x="186" y="96" width="30" height="120" rx="8" fill="#eef6f8" stroke="#7d93a0" stroke-width="3"/><rect x="190" y="${100+ (1-(40-sim.hcl)/40)*112}" width="22" height="${(40-sim.hcl)/40*112}" rx="5" fill="#dcecf2"/><path d="M193 216 L209 216 L203 238 L199 238 Z" fill="#7d93a0"/><text x="232" y="140" class="t-small">묽은 염산</text><text x="232" y="164" class="t-small">남은 양 ${40-sim.hcl} mL</text></g>${beaker(90,250,280,200,C[m.color],level)}<text x="230" y="498" class="t-label" text-anchor="middle">넣은 염산 ${sim.hcl} mL · ${m.colorWord}</text><g transform="translate(410 250)"><rect x="-10" y="0" width="20" height="170" rx="10" fill="#ffffff" stroke="#7d93a0" stroke-width="3"/><rect x="-5" y="${160-tH*150}" width="10" height="${tH*150+4}" rx="5" fill="#e0555a"/><circle cy="182" r="18" fill="#e0555a" stroke="#7d93a0" stroke-width="3"/><text x="0" y="-12" class="t-small" text-anchor="middle">${temp.toFixed(1)} °C</text></g><g transform="translate(470 110)"><rect width="500" height="340" rx="22" fill="#ffffff" stroke="#e2dccb" stroke-width="2"/><text x="24" y="40" class="t-label">비커 속 입자 (10 mL에 이온 한 쌍)</text>${scatter(listed,{x:20,y:60,w:460,h:260},listed.length>8?26:30)}</g>`, '중화 반응 실험');
+            return svg(`${title('수산화 나트륨 수용액 20 mL + BTB','묽은 염산을 10 mL씩 넣어요 · 두 용액의 농도는 같아요')}<g transform="translate(0 0)"><rect x="186" y="96" width="30" height="120" rx="8" fill="#eef6f8" stroke="#7d93a0" stroke-width="3"/><rect x="190" y="${100+ (1-(40-sim.hcl)/40)*112}" width="22" height="${(40-sim.hcl)/40*112}" rx="5" fill="#dcecf2"/><path d="M193 216 L209 216 L203 238 L199 238 Z" fill="#7d93a0"/><text x="232" y="140" class="t-small">묽은 염산</text><text x="232" y="164" class="t-small">남은 양 ${40-sim.hcl} mL</text></g>${beaker(90,250,280,200,C[m.color],level)}<text x="230" y="498" class="t-label" text-anchor="middle">넣은 염산 ${sim.hcl} mL · ${m.colorWord}</text><text x="230" y="526" class="t-small" text-anchor="middle">부피비 NaOH : HCl = ${ratio(sim.hcl)}</text><g transform="translate(410 250)"><rect x="-10" y="0" width="20" height="170" rx="10" fill="#ffffff" stroke="#7d93a0" stroke-width="3"/><rect x="-5" y="${160-tH*150}" width="10" height="${tH*150+4}" rx="5" fill="#e0555a"/><circle cy="182" r="18" fill="#e0555a" stroke="#7d93a0" stroke-width="3"/><text x="0" y="-12" class="t-small" text-anchor="middle">${temp.toFixed(1)} °C</text></g><g transform="translate(470 110)"><rect width="500" height="340" rx="22" fill="#ffffff" stroke="#e2dccb" stroke-width="2"/><text x="24" y="40" class="t-label">비커 속 입자 (10 mL에 이온 한 쌍)</text>${scatter(listed,{x:20,y:60,w:460,h:260},listed.length>8?26:30)}</g>`, '중화 반응 실험');
         },
         readings(sim) {
             const m = M.mix(sim.hcl);
@@ -5216,6 +6009,13 @@ window.ISLAND_APP = 'lemon-island';</script>
                 snap: {}
             };
         },
+        say(tag, tags) {
+            if (tag === 'start') return [3, '새콤이의 체액 모형이에요. 베이스 박사님이 치료제는 한 방울씩 넣고 pH를 꼭 확인하래요. 너무 적어도, 너무 많아도 안 된대요!'];
+            if (tag === 'cure') return [2, '(쪽지) 레몬 종족에게 알맞은 산성으로 돌아왔구나! 이번엔 마을 사람들이 쓸 지시약이야. BTB 말고도 페놀프탈레인 용액, 메틸 오렌지 용액을 쓸 수 있어. 산성·중성·염기성 용액에 하나씩 떨어뜨려 표를 채워 줘.'];
+            if (/^table-/.test(tag)) return TABLE_TOOLS.every(t => has(tags, 'table-' + t)) ? [2, '(쪽지) 여러 가지 지시약의 사용법이 완성됐어! 지시약을 알맞게 쓰면 염기성 물질이 든 것을 찾을 수 있을 거야. 창고 시료로 시험해 봐.'] : [3, '표가 채워지고 있어요! 다른 지시약도 떨어뜨려 봐 주세요.'];
+            if (tag === 'unknown') return [3, '시료 ③이 비눗방울처럼 염기성이었군요! 이제 마을 사람들도 지시약으로 가려낼 수 있겠어요.'];
+            return null;
+        },
         after(sim, tags) {
             if (sim.phase === 0 && has(tags, 'cure')) sim.phase = 1;
             else if (sim.phase === 1 && TABLE_TOOLS.every(t => has(tags, 'table-' + t))) {
@@ -5243,7 +6043,33 @@ window.ISLAND_APP = 'lemon-island';</script>
     const val = (rec, key) => rec?.entered?.[key];
     const hasTag = (all, qid, pred) => (all[qid] || []).some(e => e.manual && pred(e.tag));
 
+    /* 보기 순서를 문항마다 고정된 방식으로 섞는다 — 정답이 늘 첫째 자리에 오지 않게(다시 그려도 순서는 그대로) */
+    function mix(q) {
+        const list = q.type === 'pick' ? q.options : q.choices;
+        let h = 0;
+        for (const ch of q.prompt) h = (h * 31 + ch.codePointAt(0)) >>> 0;
+        const order = list.map((_, i) => i);
+        for (let i = order.length - 1; i > 0; i--) {
+            h = (Math.imul(h, 1103515245) + 12345) >>> 0;
+            const j = h % (i + 1);
+            [order[i], order[j]] = [order[j], order[i]];
+        }
+        if (order.every((v, i) => v === i)) order.push(order.shift());
+        return q.type === 'pick' ? Object.assign({}, q, {
+            options: order.map(i => list[i])
+        }) : Object.assign({}, q, {
+            choices: order.map(i => list[i]),
+            correct: order.indexOf(q.correct)
+        });
+    }
+
     function build(id, all) {
+        const d = raw(id, all);
+        d.questions = d.questions.map(mix);
+        return d;
+    }
+
+    function raw(id, all) {
         const mine = all[id] || [];
         if (id === 1) {
             const lit = find(mine, 'litmus'),
@@ -5284,7 +6110,7 @@ window.ISLAND_APP = 'lemon-island';</script>
                         ok: true,
                         mine: hasTag(all, 2, t => t === 'migrate-acid')
                     }, {
-                        text: '염산·황산·아세트산의 이온화 모형에 공통으로 H⁺가 있었다.',
+                        text: '염산(예시)·질산·황산·아세트산의 이온화 모형에 공통으로 H⁺가 있었다.',
                         ok: true,
                         mine: hasTag(all, 2, t => t.startsWith('model-'))
                     }, {
@@ -5309,13 +6135,20 @@ window.ISLAND_APP = 'lemon-island';</script>
             };
         }
         if (id === 3) {
-            const mig = find(mine, 'migrate-base');
+            const mig = find(mine, 'migrate-base'),
+                con = find(mine, 'conduct-base');
             const ind = mine.filter(e => e.manual && /^ind-(redLitmus|btb|pp)$/.test(e.tag));
             if (!mig || !ind.length) throw Error('지시약과 이온 이동의 직접 기록이 필요해요.');
             return {
                 title: '베이스 박사의 확인 · 염기의 정체',
-                observation: `내 기록: ${ind.map(e=>e.label.replace(/로 네 용액 검사$/,'')+' → 용액 A '+val(e,'A')).join(' / ')} · 푸른색이 ${val(mig,'side')}으로 넓어짐`,
+                observation: `내 기록: ${ind.map(e=>e.label.replace(/(으로|로) 네 용액 검사$/,'')+' → 용액 A '+val(e,'A')).join(' / ')}${con?` · 암모니아수 전구 ${val(con,'NH3')}`:''} · 푸른색이 ${val(mig,'side')}으로 넓어짐`,
                 questions: [{
+                    type: 'choice',
+                    prompt: '수산화 나트륨 NaOH, 수산화 칼륨 KOH, 수산화 칼슘 Ca(OH)₂의 화학식에 공통으로 들어 있는 부분은?',
+                    choices: ['OH', 'Na', 'O₂'],
+                    correct: 0,
+                    explanation: '세 염기 모두 OH를 가지고 있어요. 물에 녹으면 이 부분이 수산화 이온(OH⁻)으로 나뉘어요. 암모니아(NH₃)는 OH가 없지만 물과 반응해 OH⁻를 만들어요.'
+                }, {
                     type: 'choice',
                     prompt: '염기의 공통적인 성질을 만드는 입자는?',
                     choices: ['OH⁻ (수산화 이온)', 'Na⁺ (나트륨 이온)', 'H⁺ (수소 이온)'],
@@ -5358,6 +6191,18 @@ window.ISLAND_APP = 'lemon-island';</script>
                     correct: 0,
                     explanation: 'Na⁺와 Cl⁻는 반응에 참여하지 않는 구경꾼 이온이에요. 물을 증발시켜야 비로소 염화 나트륨 고체로 남아요.'
                 }, {
+                    type: 'choice',
+                    prompt: '연습 ① 질산 HNO₃과 수산화 칼륨 KOH 수용액을 섞었어요. 물이 되는 이온과 물속에 남는 이온을 바르게 짝 지은 것은?',
+                    choices: ['물이 되는 이온 H⁺·OH⁻ / 남는 이온 K⁺·NO₃⁻', '물이 되는 이온 K⁺·NO₃⁻ / 남는 이온 H⁺·OH⁻', '물이 되는 이온 H⁺·NO₃⁻ / 남는 이온 K⁺·OH⁻'],
+                    correct: 0,
+                    explanation: 'HNO₃ + KOH → H₂O + KNO₃. H⁺와 OH⁻가 만나 물이 되고, K⁺와 NO₃⁻는 구경꾼 이온으로 물속에 남아요. 물을 증발시키면 질산 칼륨(KNO₃)이 남아요.'
+                }, {
+                    type: 'choice',
+                    prompt: '연습 ② 묽은 황산 H₂SO₄에 수산화 바륨 Ba(OH)₂ 수용액을 넣었더니 흰 앙금이 생겼어요. 이 반응을 바르게 나타낸 것은?',
+                    choices: ['H₂SO₄ + Ba(OH)₂ → 2H₂O + BaSO₄', 'H₂SO₄ + Ba(OH)₂ → H₂O + BaSO₄', 'H₂SO₄ + Ba(OH)₂ → 2H₂ + BaSO₆'],
+                    correct: 0,
+                    explanation: 'H⁺ 2개와 OH⁻ 2개가 만나 물 2개가 돼요. 남은 Ba²⁺와 SO₄²⁻는 물에 녹지 않는 황산 바륨(BaSO₄) 앙금이 되어 가라앉아요. 물속에 그대로 남는 Na⁺·Cl⁻와 다른 점이에요.'
+                }, {
                     type: 'pick',
                     prompt: '레몬 아이들에게 중화병이 생긴 과정을 설명하는 조각을 모두 고르세요.',
                     options: [{
@@ -5383,7 +6228,7 @@ window.ISLAND_APP = 'lemon-island';</script>
                     }],
                     explanation: '비눗방울의 OH⁻가 아이들 몸속의 H⁺와 만나 물이 되면서 산성이 약해졌어요(새콤의 즙 결과). 마그네슘·전구 결과는 참이지만 이 사건의 원인과는 관계가 없어요.'
                 }],
-                summary: '중화 반응: H⁺ + OH⁻ → H₂O. 같은 수만큼 만나면 중성, 남는 쪽이 액성을 정해요. 구경꾼 이온(Na⁺·Cl⁻)은 물속에 그대로 있어요. 반응하면 열이 나와 온도가 올라가요.'
+                summary: '중화 반응: H⁺ + OH⁻ → H₂O. 같은 수만큼 만나면 중성, 남는 쪽이 액성을 정해요. 반응하면 열이 나와 온도가 올라가요. 남은 이온은 물속에 그대로 있거나(Na⁺·Cl⁻, K⁺·NO₃⁻), 물에 녹지 않는 앙금이 되기도 해요(BaSO₄).'
             };
         }
         if (id === 5) {
@@ -5725,6 +6570,7 @@ window.ISLAND_APP = 'lemon-island';</script>
     dlgIds.forEach(id => $(id).addEventListener('close', () => {
         if (id === 'lab') demo = false;
         pause();
+        if (state.started && (id === 'lab' || id === 'dialogue' || id === 'concept' || id === 'journal')) updateHud();
     }));
     $('journal').addEventListener('cancel', e => {
         if (!comfort.confirmJournal()) e.preventDefault();
@@ -5741,6 +6587,98 @@ window.ISLAND_APP = 'lemon-island';</script>
         return id === 0 || state.completed.includes(id - 1) || state.completed.includes(id);
     }
 
+    /* ── Dr.에시드의 흩어진 도구 ─────────────────────── */
+    const josa = (w, a, b) => {
+        const c = String(w).charCodeAt(String(w).length - 1);
+        return w + (c >= 0xac00 && c <= 0xd7a3 && (c - 0xac00) % 28 ? a : b);
+    };
+    const tagsOf = qid => state.evidence[qid].filter(e => e.manual).map(e => e.tag);
+    const toolById = id => M.tools.find(t => t.id === id) || null;
+    const hasTools = qid => M.tools.some(t => t.quest === qid);
+    /* 부탁 qid 의 지금 단계에 필요한데 아직 건네지 않은 도구(없으면 null). 첫 도구는 부탁을 들은 뒤부터 */
+    function toolFor(qid) {
+        if (!hasTools(qid) || state.completed.includes(qid)) return null;
+        const step = L[qid].checks(tagsOf(qid)).findIndex(ok => !ok),
+            t = M.tools.find(x => x.quest === qid && x.step === step);
+        if (!t || state.fetch.given.includes(t.id)) return null;
+        if (t.step === 0 && !state.fetch.heard.includes(qid)) return null;
+        return t;
+    }
+    const holding = t => !!t && state.fetch.got.includes(t.id) && !state.fetch.given.includes(t.id);
+    /* 지금 찾아야 할 도구: 다음 부탁이 열려 있고, 그 부탁을 들었고, 아직 줍지 않은 것 하나(고리·표시·이름표·지도 별) */
+    function worldTool() {
+        const q = next();
+        if (!q || !state.started || !accessible(q.id) || pendingEntry() >= 0 || !state.fetch.heard.includes(q.id)) return null;
+        const t = toolFor(q.id);
+        return t && !holding(t) ? t : null;
+    }
+    /* 섬에 흩어져 보이는 도구: 에시드의 이야기를 들은 뒤, 아직 줍지도 건네지도 않은 것 모두 */
+    const scatteredTools = () => state.started && state.fetch.heard.length ? M.tools.filter(t => !state.fetch.got.includes(t.id) && !state.fetch.given.includes(t.id) && !state.completed.includes(t.quest)).map(t => t.id) : [];
+    function syncTools() {
+        world?.setTools?.(scatteredTools(), worldTool()?.id || null);
+    }
+    let fetchAuto = null;
+
+    function pickTool(id) {
+        const t = toolById(id);
+        if (!t || state.fetch.got.includes(id)) return;
+        state.fetch.got.push(id);
+        save();
+        sound('success');
+        const npc = M.cast[M.quests[t.quest].npc].name,
+            q = next(),
+            needed = q && toolFor(q.id)?.id === id;
+        toast(needed ? `${t.icon} ${josa(t.name, '을', '를')} 주웠어요! ${npc}에게 건네요.` : `${t.icon} ${josa(t.name, '을', '를')} 주웠어요! 나중에 ${npc}가 찾을 때 건네요.`);
+        updateHud();
+        if (needed && fetchAuto === id) {
+            fetchAuto = null;
+            setTimeout(() => {
+                if (!dlgIds.some(d => $(d).open)) navigate(t.quest);
+            }, 500);
+        }
+    }
+
+    function giveTool(id) {
+        const t = toolById(id);
+        if (!t || !holding(t)) return;
+        state.fetch.given.push(id);
+        save();
+        beep();
+        updateHud();
+        const npc = M.quests[t.quest].npc;
+        if (sim && !demo && sim.id === t.quest && $('lab').open) {
+            sim.quip = [npc, t.thanks, 'give'];
+            renderLab();
+            return;
+        }
+        beginLab(t.quest);
+        if (sim && sim.id === t.quest && $('lab').open) {
+            sim.quip = [npc, t.thanks, 'give'];
+            renderLab();
+        }
+    }
+
+    function fetchGo(id) {
+        const t = toolById(id);
+        if (!t) return;
+        comfort.stopTalk(true);
+        dlgIds.forEach(d => $(d).open && $(d).close());
+        pause();
+        updateHud();
+        if (holding(t)) {
+            navigate(t.quest);
+            return;
+        }
+        if (!state.fetch.heard.includes(t.quest)) {
+            state.fetch.heard.push(t.quest);
+            save();
+            updateHud();
+        }
+        fetchAuto = t.id;
+        if (world?.goTool(t.id)) toast(`${t.icon} ${josa(t.name, '을', '를')} 찾으러 가요. 하늘빛으로 빛나는 상자 위로 걸어가면 저절로 주워요.`);
+        else toast(`${t.where}에서 하늘빛으로 빛나는 ${josa(t.name, '을', '를')} 찾아보세요.`);
+    }
+
     function castQuest(cid) {
         const mine = M.quests.filter(q => q.npc === cid);
         return mine.find(q => !state.completed.includes(q.id)) || mine[mine.length - 1] || null;
@@ -5753,6 +6691,17 @@ window.ISLAND_APP = 'lemon-island';</script>
             hud = $('questHud');
         hud.hidden = !state.started;
         hud.innerHTML = `<div class="eyebrow">${state.festival?'두 왕국의 비눗방울 축제':state.mode==='beginner'?'함께 알아가는 첫 탐험':'레몬 백작의 부탁'}</div><h2>${q?esc(q.name):state.festival?'축제가 열렸어요!':'마지막 안내문을 남겨요'}</h2><p>${q?esc(M.cast[q.npc].name+'에게 가서 이야기를 들어요.'):state.festival?'주민을 만나고 비눗방울 축제를 둘러보세요.':'기록을 완성하고 축제를 열어요.'}</p><button data-action="${q?'navigate':'journal'}" ${q?'data-id="'+q.id+'"':''}>${q?'⌖ '+esc(q.place)+' 길 안내':'▤ 탐험일지 펼치기'}</button><div class="progress"><span style="width:${done/QN*100}%"></span></div><div class="small-row"><span>${done} / ${QN} 부탁 해결</span><span>${state.nickname?disp(state.nickname)+'의 여정':''}</span></div>`;
+        const need = q && pending < 0 && accessible(q.id) && state.fetch.heard.includes(q.id) ? toolFor(q.id) : null;
+        if (need) {
+            const npc = M.cast[q.npc].name;
+            hud.querySelector('p').textContent = holding(need) ? `${need.icon} ${josa(need.name, '을', '를')} 찾았어요! ${npc}에게 건네요.` : `조수의 일 · ${need.icon} ${josa(need.name, '을', '를')} 찾아 ${npc}에게 건네요. (${need.where})`;
+            const button = hud.querySelector('button');
+            button.dataset.action = holding(need) ? 'navigate' : 'fetch-go';
+            button.dataset.tool = need.id;
+            button.dataset.id = q.id;
+            button.textContent = holding(need) ? `⌖ ${npc}에게 건네러 가기` : `⌖ ${need.icon} ${need.name} 찾기`;
+        }
+        syncTools();
         if (pending >= 0) hud.innerHTML = `<div class="eyebrow">다음 여정 전에 · 필수 기록</div><h2>${esc(M.entries[pending].title)}</h2><p>알아낸 것·증거와 이유·새로운 적용을 적고 서명해요.</p><button data-action="journal" data-tab="${pending}">✎ 기록 완성하기</button><div class="small-row">부탁 ${done}/${QN} · 필수 기록 ${sealedCount()}/${EN}</div>`;
         if (!q && !state.festival && M.ready(state)) {
             hud.querySelector('h2').textContent = '비눗방울 축제를 열 준비 완료!';
@@ -5777,7 +6726,8 @@ window.ISLAND_APP = 'lemon-island';</script>
                 open = mine.find(x => !state.completed.includes(x.id));
             l.classList.toggle('done', !open);
             l.classList.toggle('locked', !!open && !accessible(open.id));
-            l.innerHTML = `${esc(c.short)} <span>${!open?'✓':accessible(open.id)?'!':'·'}</span>`;
+            const tw = open && accessible(open.id) && pending < 0 && state.fetch.heard.includes(open.id) ? toolFor(open.id) : null;
+            l.innerHTML = `${esc(c.short)} <span>${!open?'✓':tw?(holding(tw)?'🧪':'🔎'):accessible(open.id)?'!':'·'}</span>`;
         }
         document.body.classList.toggle('calm', state.calm);
     }
@@ -5819,7 +6769,7 @@ window.ISLAND_APP = 'lemon-island';</script>
         if (cid === 4) {
             const healed = state.completed.includes(5);
             talk([
-                [4, healed ? '이제 뛰어놀 수 있어요! 비눗방울은 장갑 끼고 구경할 거예요. 과학자님, 고마워요!' : state.completed.includes(0) ? '백작님이 과학자님이 꼭 방법을 찾아 주실 거래요… 전 괜찮아요. 조금 졸릴 뿐이에요.' : '안녕하세요… 저는 새콤이에요. 요즘 자꾸 힘이 없어요.']
+                [4, healed ? '이제 뛰어놀 수 있어요! 비눗방울은 장갑 끼고 구경할 거예요. 과학자님, 고마워요!' : state.completed.includes(0) ? '백작님이 그러셨어요. 손님이 연구자님들을 도와 꼭 방법을 찾아 주실 거라고요… 전 괜찮아요. 조금 졸릴 뿐이에요.' : '안녕하세요… 저는 새콤이에요. 요즘 자꾸 힘이 없어요.']
             ]);
             return;
         }
@@ -5845,6 +6795,36 @@ window.ISLAND_APP = 'lemon-island';</script>
             ], mine.map(x => `<button class="${x===q?'primary':''}" data-action="lab" data-id="${x.id}">다시 살펴보기 · ${esc(x.name)}</button>`).join(''));
             return;
         }
+        if (hasTools(q.id)) {
+            const first = !state.fetch.heard.includes(q.id);
+            if (first) {
+                state.fetch.heard.push(q.id);
+                save();
+            }
+            const t = toolFor(q.id),
+                labButton = `<button data-action="lab" data-id="${q.id}">실험대 보기</button>`;
+            updateHud();
+            if (t && holding(t) && !first) {
+                giveTool(t.id);
+                return;
+            }
+            if (t && holding(t)) {
+                talk([...q.lines.slice(0, -1), [q.npc, `어라, ${josa(t.name, '을', '를')} 벌써 챙겨 왔군? 역시 준비성 좋은 조수야! ${t.thanks}`]], `<button class="primary" data-action="tool-give" data-tool="${t.id}">${t.icon} ${josa(t.name, '을', '를')} 건네고 실험하기</button>`);
+                return;
+            }
+            if (t) {
+                talk(first && t.step === 0 ? q.lines : first ? [q.lines[1], [q.npc, t.ask]] : [
+                    [q.npc, t.ask]
+                ], `<button class="primary" data-action="fetch-go" data-tool="${t.id}">🔎 ${t.name} 찾으러 가기</button>${first?'':labButton}`);
+                return;
+            }
+            if (!first) {
+                talk([
+                    [q.npc, '좋아, 필요한 도구는 챙겼군! 실험대에서 이어서 해 보세.']
+                ], `<button class="primary" data-action="lab" data-id="${q.id}">실험대로 가기</button>`);
+                return;
+            }
+        }
         talk(q.lines, `<button class="primary" data-action="lab" data-id="${q.id}">같이 살펴볼게!</button>`);
     }
 
@@ -5865,6 +6845,8 @@ window.ISLAND_APP = 'lemon-island';</script>
             record: null,
             localEvidence: []
         }, L[id].init(known));
+        const first = L[id].say?.('start', known);
+        sim.quip = !known.length && first ? [...first, 'start'] : null;
         renderLab();
         show('lab');
         demo = teacher;
@@ -5885,19 +6867,36 @@ window.ISLAND_APP = 'lemon-island';</script>
             npc = M.cast[q.npc],
             cs = checks(),
             can = demo || state.predictions[q.id] != null,
-            current = cs.findIndex(c => !c[0]);
-        $('labContent').innerHTML = `<header class="modal-head"><div class="eyebrow">${demo?'교사 시연 · 학생 기록에 저장되지 않아요':esc(q.place)+' · 부탁 '+(q.id+1)+' / '+QN}</div><h2 id="labTitle">${esc(q.name)}</h2><button class="close" data-close aria-label="실험 닫기">×</button><p>${esc(q.goal)}</p></header><div class="lab-layout"><aside class="lab-side"><div class="lab-task-head"><h3 class="task-heading">${esc(npc.name)}의 부탁을 들어주기 위해 할 일</h3><details class="lab-guide"><summary>부탁·원리 다시 보기</summary><div class="lab-guide-content"><b>${npc.icon} ${esc(npc.name)}의 부탁</b><p>${esc(q.lines.filter(l=>l[0]===q.npc).map(l=>l[1]).join(' '))}</p><h4>원리 다시 살펴보기</h4><p>${esc(lab.principle)}</p><p class="science-note">${esc(lab.safety)}</p></div></details><button class="hint-button" data-action="next-hint">💡 다음에 무엇을 하지?</button></div><ol class="mission-steps">${cs.map((c,i)=>`<li class="${c[0]?'done':i===current?'current':''}"><span class="step-number">Step ${i+1}${c[0]?' ✓':''}</span><div><b>${c[0]?'해냈어요':i===current?'지금 할 일':'다음 할 일'}</b><p>${esc(c[1])}</p></div></li>`).join('')}</ol><p id="nextHint" class="hint-message" role="status"></p></aside><section class="lab-main">${!can?`<div class="prediction"><div class="prediction-scene"><div class="circuit-wrap lab-scene" inert>${lab.scene(sim)}</div></div><div class="prediction-choices"><p><b>먼저 나의 예상</b><br>${esc(lab.prediction[0])}</p><div class="choices">${lab.prediction[1].map((t,i)=>`<button data-action="predict" data-value="${i}">${esc(t)}</button>`).join('')}</div><p class="muted">예상은 틀려도 괜찮아요. 실험 뒤 생각을 바꿀 수 있어요.</p></div></div>`:renderExperiment()}</section></div>`;
+            current = cs.findIndex(c => !c[0]),
+            gateTool = !demo && toolFor(sim.id);
+        $('labContent').innerHTML = `<header class="modal-head"><div class="eyebrow">${demo?'교사 시연 · 학생 기록에 저장되지 않아요':esc(q.place)+' · 부탁 '+(q.id+1)+' / '+QN}</div><h2 id="labTitle">${esc(q.name)}</h2><button class="close" data-close aria-label="실험 닫기">×</button><p>${esc(q.goal)}</p></header><div class="lab-layout"><aside class="lab-side"><div class="lab-task-head"><h3 class="task-heading">${esc(npc.name)}의 부탁을 들어주기 위해 할 일</h3><details class="lab-guide"><summary>부탁·원리 다시 보기</summary><div class="lab-guide-content"><b>${npc.icon} ${esc(npc.name)}의 부탁</b><p>${esc(q.lines.filter(l=>l[0]===q.npc).map(l=>l[1]).join(' '))}</p><h4>원리 다시 살펴보기</h4><p>${esc(lab.principle)}</p><p class="science-note">${esc(lab.safety)}</p></div></details><button class="hint-button" data-action="next-hint">💡 다음에 무엇을 하지?</button></div><ol class="mission-steps">${cs.map((c,i)=>`<li class="${c[0]?'done':i===current?'current':''}"><span class="step-number">Step ${i+1}${c[0]?' ✓':''}</span><div><b>${c[0]?'해냈어요':i===current?'지금 할 일':'다음 할 일'}</b><p>${i===current&&gateTool?`🔎 먼저 ${esc(josa(gateTool.name,'을','를'))} ${holding(gateTool)?'건네요':'찾아와 건네요'}. `:''}${esc(c[1])}</p></div></li>`).join('')}</ol><p id="nextHint" class="hint-message" role="status"></p></aside><section class="lab-main">${!can?`<div class="prediction"><div class="prediction-scene"><div class="circuit-wrap lab-scene" inert>${lab.scene(sim)}</div></div><div class="prediction-choices"><p><b>먼저 나의 예상</b><br>${esc(lab.prediction[0])}</p><div class="choices">${lab.prediction[1].map((t,i)=>`<button data-action="predict" data-value="${i}">${esc(t)}</button>`).join('')}</div><p class="muted">예상은 틀려도 괜찮아요. 실험 뒤 생각을 바꿀 수 있어요.</p></div></div>`:renderExperiment()}</section></div>`;
+    }
+
+    /* 실험대 곁 과학자의 한마디(원본 수업 대사) — 기록을 붙일 때마다 바뀐다 */
+    function quipHTML() {
+        const q = sim.quip,
+            c = q && M.cast[q[0]];
+        if (!c) return '';
+        return `<div class="npc-quip" role="status"><span class="npc-quip-face" aria-hidden="true">${c.icon}</span><p><b>${esc(c.name)}</b>${esc(q[1])}</p></div>`;
+    }
+
+    function gateHTML(t) {
+        const has = holding(t),
+            npc = M.cast[M.quests[t.quest].npc].name;
+        return `<div class="tool-gate" role="status"><div class="tool-gate-icon" aria-hidden="true">${t.icon}</div><div><div class="eyebrow">조수의 일 · 필요한 도구</div><h3>${esc(t.name)}</h3><p>${esc(has?`찾아온 ${josa(t.name,'을','를')} ${npc}에게 건네면 이 단계 실험을 시작해요.`:t.ask)}</p>${has?'':`<p class="muted">하늘빛으로 빛나는 상자 위로 걸어가면 저절로 주워요.</p>`}<button class="primary" data-action="${has?'tool-give':'fetch-go'}" data-tool="${t.id}">${has?`${t.icon} ${esc(josa(t.name,'을','를'))} 건네기`:`🔎 ${esc(t.name)} 찾으러 가기`}</button></div></div>`;
     }
 
     function renderExperiment() {
         const lab = L[sim.id],
-            list = evid();
-        return `<div class="experiment-workbench ${sim.record?'is-recording':''}"><section class="circuit-pane" aria-label="실험 장면"><div class="sim-badges"><span class="pill amber">${esc(lab.title)}</span></div><div id="labScene" class="circuit-wrap lab-scene">${lab.scene(sim)}</div><div id="labReadings">${lab.readings(sim)}</div><p id="labNote" class="circuit-note">${esc(lab.note(sim))}</p></section><section class="lab-tools" aria-label="실험 조작과 직접 기록"><fieldset class="experiment-controls" ${sim.record?'disabled':''}><legend>실험 조작</legend><p id="labFeedback" class="lab-feedback" role="alert" hidden></p><div id="labControls">${lab.controls(sim)}</div><div class="action-row"><button class="secondary" data-action="capture">▣ 증거 남기기</button><button class="primary" data-action="complete" ${doneChecks()?'':'disabled'}>${state.completed.includes(sim.id)&&!demo?'조사 마치기':'부탁 해결하기 ✓'}</button></div><p class="record-invite">관찰한 뒤 ‘증거 남기기’를 누르면 이 자리에서 결과를 직접 기록해요.</p></fieldset>${recorderHTML()}${list.length?`<details class="evidence-list"><summary>내가 남긴 증거 ${list.length}개 보기</summary><div class="evidence-history">${list.slice(-5).map(e=>`<div class="evidence-item">✎ ${esc(e.label)}</div>`).join('')}</div></details>`:''}</section></div>`;
+            list = evid(),
+            gate = !demo && toolFor(sim.id);
+        if (gate) return `<div class="experiment-workbench is-gated"><section class="circuit-pane" aria-label="실험 장면"><div class="sim-badges"><span class="pill amber">${esc(lab.title)}</span></div><div id="labScene" class="circuit-wrap lab-scene" inert>${lab.scene(sim)}</div><p id="labNote" class="circuit-note">${esc(lab.note(sim))}</p></section><section class="lab-tools" aria-label="필요한 도구">${sim.quip&&sim.quip[2]!=='start'?quipHTML():''}${gateHTML(gate)}${list.length?`<details class="evidence-list"><summary>내가 남긴 증거 ${list.length}개 보기</summary><div class="evidence-history">${list.slice(-5).map(e=>`<div class="evidence-item">✎ ${esc(e.label)}</div>`).join('')}</div></details>`:''}</section></div>`;
+        return `<div class="experiment-workbench ${sim.record?'is-recording':''}"><section class="circuit-pane" aria-label="실험 장면"><div class="sim-badges"><span class="pill amber">${esc(lab.title)}</span></div><div id="labScene" class="circuit-wrap lab-scene">${lab.scene(sim)}</div><div id="labReadings">${lab.readings(sim)}</div><p id="labNote" class="circuit-note">${esc(lab.note(sim))}</p></section><section class="lab-tools" aria-label="실험 조작과 직접 기록">${quipHTML()}<fieldset class="experiment-controls" ${sim.record?'disabled':''}><legend>실험 조작</legend><p id="labFeedback" class="lab-feedback" role="alert" hidden></p><div id="labControls">${lab.controls(sim)}</div><div class="action-row"><button class="secondary" data-action="capture">▣ 증거 남기기</button><button class="primary" data-action="complete" ${doneChecks()?'':'disabled'}>${state.completed.includes(sim.id)&&!demo?'조사 마치기':'부탁 해결하기 ✓'}</button></div><p class="record-invite">관찰한 뒤 ‘증거 남기기’를 누르면 이 자리에서 결과를 직접 기록해요.</p></fieldset>${recorderHTML()}${list.length?`<details class="evidence-list"><summary>내가 남긴 증거 ${list.length}개 보기</summary><div class="evidence-history">${list.slice(-5).map(e=>`<div class="evidence-item">✎ ${esc(e.label)}</div>`).join('')}</div></details>`:''}</section></div>`;
     }
 
     /* 실험 조작 뒤에는 그림·계기·조작 칸만 다시 그리고, 누르던 단추로 초점을 돌려 둔다 */
     function refreshLab() {
-        if (!$('labScene')) return renderLab();
+        if (!$('labScene') || !$('labControls')) return renderLab();
         const lab = L[sim.id],
             active = document.activeElement,
             key = active?.dataset?.lab ? '[data-lab="' + active.dataset.lab + '"]' + ['tool', 'model', 'key', 'delta', 'sample', 'cup', 'sol', 'row', 'u'].filter(k => active.dataset[k] != null).map(k => `[data-${k}="${CSS.escape(active.dataset[k])}"]`).join('') : null;
@@ -5911,7 +6910,7 @@ window.ISLAND_APP = 'lemon-island';</script>
     }
 
     function labAct(action, data) {
-        if (!sim || sim.record) return;
+        if (!sim || sim.record || (!demo && toolFor(sim.id))) return;
         const res = L[sim.id].act(sim, action, data) || {};
         if (res.sound) sound(res.sound);
         refreshLab();
@@ -5927,6 +6926,9 @@ window.ISLAND_APP = 'lemon-island';</script>
         } : !(demo || state.predictions[sim.id] != null) ? {
             selector: '[data-action="predict"]',
             copy: '먼저 내 예상을 하나 골라요. 틀려도 괜찮아요.'
+        } : !demo && toolFor(sim.id) ? {
+            selector: '[data-action="fetch-go"],[data-action="tool-give"]',
+            copy: holding(toolFor(sim.id)) ? '찾아온 도구를 건네면 실험을 시작해요.' : '먼저 필요한 도구를 찾아와요. ‘찾으러 가기’를 누르면 길을 안내해요.'
         } : L[sim.id].hint(sim, tags());
         const target = $('lab').querySelector(hint.selector) || $('recordForm')?.querySelector('button[type=submit]');
         $('nextHint').textContent = hint.copy;
@@ -6018,9 +7020,12 @@ window.ISLAND_APP = 'lemon-island';</script>
         else list.push(record);
         sim.record = null;
         L[sim.id].after(sim, tags());
+        const said = L[sim.id].say?.(r.tag, tags());
+        if (said) sim.quip = [...said, r.tag];
         if (!demo) save();
         beep();
         renderLab();
+        if (!demo) updateHud();
         toast('직접 적은 관찰을 탐험일지에 붙였어요.');
     }
 
@@ -6201,28 +7206,43 @@ window.ISLAND_APP = 'lemon-island';</script>
         g.fillStyle = '#6ea4c4';
         g.fillRect(0, 0, w, h);
         LAYOUT.lands.forEach(([x0, x1, z0, z1], i) => {
-            g.fillStyle = i ? '#a6d4b2' : '#bcd780';
+            g.fillStyle = i ? '#c6b4e8' : '#e2d77c';
             g.beginPath();
             g.roundRect(xx(x0), zz(z0), (x1 - x0) * sx, (z1 - z0) * sy, 8);
             g.fill();
         });
         g.fillStyle = '#d9b98a';
         for (const z of LAYOUT.bridges) g.fillRect(xx(2.5), zz(z - 1.3), 5 * sx, 2.6 * sy);
-        g.strokeStyle = '#ecdcaf';
         g.lineCap = 'round';
         g.lineJoin = 'round';
         for (const r of LAYOUT.roads) {
             g.lineWidth = (large ? 4 : 2) * r.w;
-            g.beginPath();
-            r.pts.forEach((p, i) => i ? g.lineTo(xx(p[0]), zz(p[1])) : g.moveTo(xx(p[0]), zz(p[1])));
-            g.stroke();
+            for (let i = 1; i < r.pts.length; i++) {
+                const a = r.pts[i - 1],
+                    b = r.pts[i];
+                g.strokeStyle = (a[0] + b[0]) / 2 > 5 ? '#f1e9fb' : '#b98a55';
+                g.beginPath();
+                g.moveTo(xx(a[0]), zz(a[1]));
+                g.lineTo(xx(b[0]), zz(b[1]));
+                g.stroke();
+            }
         }
         g.fillStyle = '#e7cfa6';
         g.beginPath();
         g.arc(xx(LAYOUT.plaza.x), zz(LAYOUT.plaza.z), LAYOUT.plaza.r * sx, 0, Math.PI * 2);
         g.fill();
-        g.fillStyle = '#f5cf3a';
-        g.fillRect(xx(-16.5), zz(-15.5), 6 * sx, 4 * sy);
+        const court = LAYOUT.court;
+        g.fillStyle = '#f7e9b0';
+        g.fillRect(xx(court.x0), zz(court.z0), (court.x1 - court.x0) * sx, (court.z1 - court.z0) * sy);
+        g.strokeStyle = '#d8b24a';
+        g.lineWidth = large ? 2.5 : 1.2;
+        g.strokeRect(xx(court.x0), zz(court.z0), (court.x1 - court.x0) * sx, (court.z1 - court.z0) * sy);
+        g.fillStyle = '#e8d6a8';
+        g.fillRect(xx(court.gate[0]), zz(court.z1) - 2, (court.gate[1] - court.gate[0]) * sx, 4);
+        g.fillStyle = '#f6e3a0';
+        g.fillRect(xx(-16.9), zz(-15.8), 6.8 * sx, 4.2 * sy);
+        g.strokeStyle = '#a8753a';
+        g.strokeRect(xx(-16.9), zz(-15.8), 6.8 * sx, 4.2 * sy);
         if (large) {
             g.font = 'bold 12px "Malgun Gothic"';
             g.textAlign = 'center';
@@ -6233,15 +7253,34 @@ window.ISLAND_APP = 'lemon-island';</script>
         }
         for (const q of M.quests) {
             g.fillStyle = state.completed.includes(q.id) ? '#6d9c6b' : accessible(q.id) ? '#e1a93a' : '#9ab393';
+            g.strokeStyle = '#4a3a1a';
+            g.lineWidth = large ? 2 : 1;
             g.beginPath();
             g.arc(xx(q.x), zz(q.z), large ? 8 : 4, 0, Math.PI * 2);
             g.fill();
+            g.stroke();
             if (large) {
                 g.font = 'bold 12px "Malgun Gothic"';
                 g.textAlign = 'center';
                 g.fillStyle = '#3f5847';
                 g.fillText((q.id + 1) + '. ' + M.cast[q.npc].short, xx(q.x), zz(q.z) - 12);
             }
+        }
+        const wt = worldTool();
+        if (wt) {
+            const r = large ? 9 : 5;
+            g.fillStyle = '#d9462f';
+            g.strokeStyle = '#ffffff';
+            g.lineWidth = large ? 2.5 : 1.5;
+            g.beginPath();
+            for (let k = 0; k < 10; k++) {
+                const a = -Math.PI / 2 + k * Math.PI / 5,
+                    rr = k % 2 ? r * .45 : r;
+                g.lineTo(xx(wt.x) + Math.cos(a) * rr, zz(wt.z) + Math.sin(a) * rr);
+            }
+            g.closePath();
+            g.fill();
+            g.stroke();
         }
         const pos = world ? world.player.position : state.pos;
         g.fillStyle = '#fffaf0';
@@ -6272,7 +7311,7 @@ window.ISLAND_APP = 'lemon-island';</script>
     const storyPages = [{
         tag: '레몬 왕국에서 온 편지',
         title: '산성이 곧 기운인 나라',
-        text: '레몬 왕국 사람들은 몸속이 새콤한 산성일 때 가장 힘이 나요. 지구의 과학자인 당신에게 레몬 백작의 편지가 도착했어요.'
+        text: '레몬 왕국 사람들은 몸속이 새콤한 산성일 때 가장 힘이 나요. 지구에서 온 당신에게 레몬 성으로 와 달라는 레몬 백작의 초대장이 도착했어요.'
     }, {
         tag: '그런데… 아이들이 시들어요',
         title: '경계 마을에 번진 중화병',
@@ -6280,7 +7319,7 @@ window.ISLAND_APP = 'lemon-island';</script>
     }, {
         tag: '과학자가 사건을 푸는 방법',
         title: '예상하고, 실험하고, 직접 기록해요',
-        text: '두 연구자의 조수가 되어 실험해요. 관찰한 색과 값을 ‘증거 남기기’로 직접 적고, 막히면 힌트를 눌러요. 다음에 누를 곳이 빛나요.'
+        text: '두 연구자의 조수가 되어 실험해요. 흩어진 실험 도구를 찾아 건네고, 관찰한 색과 값을 ‘증거 남기기’로 직접 적어요. 막히면 힌트를 눌러요. 다음에 누를 곳이 빛나요.'
     }, {
         tag: '세 편의 필수 기록',
         title: '증거로 말하는 과학자',
@@ -6294,7 +7333,7 @@ window.ISLAND_APP = 'lemon-island';</script>
         }, (_, k) => `<circle cx="${560+((k*97)%260)}" cy="${60+((k*53)%150)}" r="${10+(k%3)*7}" fill="#dff5ff" fill-opacity=".25" stroke="#bfe9ff" stroke-width="2"/>`).join('');
         const lemon = (x, y, s, c) => `<g transform="translate(${x} ${y}) scale(${s})"><ellipse cx="0" cy="0" rx="34" ry="42" fill="${c}"/><path d="M0 -42 L-7 -56 L7 -56 Z" fill="${c}"/><ellipse cx="14" cy="-50" rx="12" ry="5" fill="#5fa54a" transform="rotate(-20 14 -50)"/><circle cx="-11" cy="-4" r="4" fill="#2f332c"/><circle cx="11" cy="-4" r="4" fill="#2f332c"/><path d="M-8 12 Q0 ${c==='#d8d3a6'?8:18} 8 12" fill="none" stroke="#6d3b2f" stroke-width="3" stroke-linecap="round"/></g>`;
         if (i >= 2) return `<svg viewBox="0 0 800 320" role="img" aria-label="${i===2?'실험대와 기록 공책':'세 편의 기록 공책'}"><rect width="800" height="320" fill="${sky[0]}"/><rect y="220" width="800" height="100" fill="#e6d2a8"/>${i===2?`<g transform="translate(150 110)"><path d="M0 0 L0 110 Q0 126 16 126 L94 126 Q110 126 110 110 L110 0" fill="#f2d24a" fill-opacity=".85" stroke="#7d93a0" stroke-width="4"/><path d="M180 0 L180 110 Q180 126 196 126 L274 126 Q290 126 290 110 L290 0" fill="#5db36d" fill-opacity=".85" stroke="#7d93a0" stroke-width="4"/><path d="M360 0 L360 110 Q360 126 376 126 L454 126 Q470 126 470 110 L470 0" fill="#3f79d4" fill-opacity=".85" stroke="#7d93a0" stroke-width="4"/><text x="55" y="-16" text-anchor="middle" font-size="22" fill="#6a5520">산성</text><text x="235" y="-16" text-anchor="middle" font-size="22" fill="#3f6f4a">중성</text><text x="415" y="-16" text-anchor="middle" font-size="22" fill="#2f5a9a">염기성</text></g>`:`${[0,1,2].map(k=>`<g transform="translate(${150+k*190} ${80+k*8}) rotate(${-6+k*6})"><rect width="150" height="180" rx="12" fill="#fffaf0" stroke="#d8c9a4" stroke-width="4"/><rect width="26" height="180" rx="8" fill="${['#f5cf3a','#8fcff0','#b7a2e0'][k]}"/>${[0,1,2,3].map(j=>`<line x1="46" x2="128" y1="${50+j*28}" y2="${50+j*28}" stroke="#d8cdb3" stroke-width="4"/>`).join('')}<text x="86" y="30" text-anchor="middle" font-size="26">${['🧪','🫧','🏡'][k]}</text></g>`).join('')}`}</svg>`;
-        return `<svg viewBox="0 0 800 320" role="img" aria-label="${i===0?'노을 진 레몬 왕국과 레몬 성':'기운을 잃은 레몬 아이와 날아드는 비눗방울'}"><defs><linearGradient id="sky${i}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${sky[0]}"/><stop offset="1" stop-color="${sky[1]}"/></linearGradient></defs><rect width="800" height="320" fill="url(#sky${i})"/><circle cx="140" cy="90" r="46" fill="#ffe9a0" opacity=".9"/><path d="M0 250 Q200 200 400 240 T800 230 V320 H0 Z" fill="${i===1?'#6f8f6a':'#8fbf5a'}"/><path d="M0 285 Q220 250 460 280 T800 270 V320 H0 Z" fill="${i===1?'#5d7a58':'#7aad4c'}"/>${i===0?`<g transform="translate(470 110)"><rect x="-70" y="40" width="140" height="100" fill="#f6e7bd"/><rect x="-100" y="20" width="36" height="120" fill="#f3dea6"/><rect x="64" y="20" width="36" height="120" fill="#f3dea6"/><ellipse cx="-82" cy="8" rx="26" ry="34" fill="#f5cf3a"/><ellipse cx="82" cy="8" rx="26" ry="34" fill="#f5cf3a"/><ellipse cx="0" cy="20" rx="44" ry="50" fill="#f7d543"/><rect x="-16" y="100" width="32" height="40" rx="14" fill="#7a5a3a"/></g>${lemon(250,240,1.1,'#f4cf2f')}`:`${lemon(300,240,1,'#d8d3a6')}${lemon(390,256,.8,'#d8d3a6')}${bubbles}`}</svg>`;
+        return `<svg viewBox="0 0 800 320" role="img" aria-label="${i===0?'노을 진 레몬 왕국과 레몬 성':'기운을 잃은 레몬 아이와 날아드는 비눗방울'}"><defs><linearGradient id="sky${i}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${sky[0]}"/><stop offset="1" stop-color="${sky[1]}"/></linearGradient></defs><rect width="800" height="320" fill="url(#sky${i})"/><circle cx="140" cy="90" r="46" fill="#ffe9a0" opacity=".9"/><path d="M0 250 Q200 200 400 240 T800 230 V320 H0 Z" fill="${i===1?'#8a78ad':'#d8c25a'}"/><path d="M0 285 Q220 250 460 280 T800 270 V320 H0 Z" fill="${i===1?'#76659a':'#c7ab46'}"/>${i===0?`<g transform="translate(470 110)"><rect x="-70" y="40" width="140" height="100" fill="#f6e7bd"/><rect x="-100" y="20" width="36" height="120" fill="#f3dea6"/><rect x="64" y="20" width="36" height="120" fill="#f3dea6"/><ellipse cx="-82" cy="8" rx="26" ry="34" fill="#f5cf3a"/><ellipse cx="82" cy="8" rx="26" ry="34" fill="#f5cf3a"/><ellipse cx="0" cy="20" rx="44" ry="50" fill="#f7d543"/><rect x="-16" y="100" width="32" height="40" rx="14" fill="#7a5a3a"/></g>${lemon(250,240,1.1,'#f4cf2f')}`:`${lemon(300,240,1,'#d8d3a6')}${lemon(390,256,.8,'#d8d3a6')}${bubbles}`}</svg>`;
     }
 
     function startStory(replay = false) {
@@ -6529,7 +7568,7 @@ window.ISLAND_APP = 'lemon-island';</script>
                 completeQuest(true);
                 break;
             case 'inventory':
-                $('inventoryContent').innerHTML = `<header class="modal-head"><h2 id="inventoryTitle">나의 선물 보관함</h2><button class="close" data-close aria-label="보관함 닫기">×</button></header><p>주민의 부탁을 해결할 때마다 선물을 받아요. 받은 선물은 연구 텐트 옆에도 놓여요.</p><div class="gift-grid">${M.quests.map(q=>{const got=state.completed.includes(q.id);return `<article class="gift-card ${got?'earned':'locked'}"><div class="gift-emoji" aria-hidden="true">${got?q.gift:'🎁'}</div><h3>${got?esc(q.reward):'아직 열지 않은 선물'}</h3><p>${esc(M.cast[q.npc].name)} · ${got?'부탁 해결 선물':'「'+esc(q.name)+'」을 해결해요'}</p></article>`;}).join('')}</div><button data-action="camp">내 연구 텐트 보러 가기 →</button>`;
+                $('inventoryContent').innerHTML = `<header class="modal-head"><h2 id="inventoryTitle">나의 선물 보관함</h2><button class="close" data-close aria-label="보관함 닫기">×</button></header><p>주민의 부탁을 해결할 때마다 선물을 받아요. 받은 선물은 연구 텐트 옆에도 놓여요.</p><div class="gift-grid">${M.quests.map(q=>{const got=state.completed.includes(q.id);return `<article class="gift-card ${got?'earned':'locked'}"><div class="gift-emoji" aria-hidden="true">${got?q.gift:'🎁'}</div><h3>${got?esc(q.reward):'아직 열지 않은 선물'}</h3><p>${esc(M.cast[q.npc].name)} · ${got?'부탁 해결 선물':'「'+esc(q.name)+'」을 해결해요'}</p></article>`;}).join('')}</div><h3 class="tool-bag-title">🧰 조수의 도구 가방</h3><p>Dr.에시드의 흩어진 실험 도구를 찾아 건넨 기록이에요.</p><div class="tool-bag">${M.tools.map(t=>{const given=state.fetch.given.includes(t.id),got=state.fetch.got.includes(t.id);return `<div class="tool-bag-item ${given?'given':got?'got':'missing'}"><span aria-hidden="true">${given||got?t.icon:'❔'}</span><b>${given||got?esc(t.name):'아직 찾지 못한 도구'}</b><small>${given?'에시드에게 건넴':got?'가방에 있음 · 건네러 가요':'부탁 '+(t.quest+1)+'에서 찾아요'}</small></div>`;}).join('')}</div><button data-action="camp">내 연구 텐트 보러 가기 →</button>`;
                 show('inventory');
                 break;
             case 'next-hint':
@@ -6597,6 +7636,12 @@ window.ISLAND_APP = 'lemon-island';</script>
                 break;
             case 'navigate':
                 navigate(id);
+                break;
+            case 'fetch-go':
+                fetchGo(b.dataset.tool);
+                break;
+            case 'tool-give':
+                giveTool(b.dataset.tool);
                 break;
             case 'lab':
                 beginLab(id);
@@ -6752,7 +7797,22 @@ window.ISLAND_APP = 'lemon-island';</script>
         save();
         close('welcome');
         updateHud();
-        toast('반가워요! 레몬 성 앞의 레몬 백작에게 가 보세요.');
+        if (!state.visited.includes(0) && !state.completed.length) {
+            const sp = LAYOUT.court.spawn;
+            state.pos = {
+                x: sp.x,
+                z: sp.z
+            };
+            if (world) {
+                world.player.position.set(sp.x, world.player.position.y, sp.z);
+                world.camTarget.copy(world.player.position);
+                world.path = [];
+                world.player.rotation.y = Math.PI;
+            }
+            setTimeout(() => {
+                if (!dlgIds.some(d => $(d).open)) interact(0);
+            }, state.calm ? 60 : 600);
+        } else toast('반가워요! 레몬 성 안뜰이에요. 왕좌 앞의 레몬 백작에게 다가가 말을 걸어 보세요.');
     });
     document.addEventListener('focusout', e => {
         if (e.target.id === 'musicSeek') comfort.cancelMusicPosition();
@@ -6831,10 +7891,11 @@ window.ISLAND_APP = 'lemon-island';</script>
         save,
         toast
     });
-    $('npcLabels').innerHTML = M.cast.map(c => `<button id="npc-${c.id}" class="npc-label" ${c.id===4?'':`data-action="navigate" data-id="${M.quests.find(q=>q.npc===c.id).id}"`} title="${esc(c.name)}">${esc(c.short)}</button>`).join('');
+    $('npcLabels').innerHTML = M.cast.map(c => `<button id="npc-${c.id}" class="npc-label" ${c.id===4?'':`data-action="navigate" data-id="${M.quests.find(q=>q.npc===c.id).id}"`} title="${esc(c.name)}">${esc(c.short)}</button>`).join('') + '<button id="toolLabel" class="npc-label tool-label" data-action="fetch-go" hidden></button>';
     try {
         world = new IslandWorld($('world'), {
             interact,
+            pick: id => pickTool(id),
             journal: () => openJournal(),
             toast,
             near: id => {
@@ -6849,6 +7910,18 @@ window.ISLAND_APP = 'lemon-island';</script>
                     el.style.top = p.y + 'px';
                     el.hidden = !state.started || p.x < 15 || p.x > innerWidth - 15 || p.y < 90 || p.y > innerHeight - 40 || !p.visible;
                 });
+                const ts = world?.toolScreen?.(),
+                    tl = $('toolLabel');
+                if (tl) {
+                    const t = ts && toolById(ts.id);
+                    tl.hidden = !t || !state.started || !ts.visible || ts.x < 15 || ts.x > innerWidth - 15 || ts.y < 90 || ts.y > innerHeight - 40;
+                    if (t) {
+                        if (tl.dataset.tool !== t.id) tl.innerHTML = `${t.icon} ${esc(t.name)} <span>줍기</span>`;
+                        tl.dataset.tool = t.id;
+                        tl.style.left = ts.x + 'px';
+                        tl.style.top = ts.y + 'px';
+                    }
+                }
                 drawMap($('miniMap'));
             }
         }, state);
