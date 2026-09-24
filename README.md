@@ -12,6 +12,8 @@
 | 놀러오세요 전기의 숲 · 빛 축제를 부탁해 | 전기와 자기(전류·전압·저항·회로) | 중2 | 배포됨(원조, 이 레포 밖) | https://scienceisjo.github.io/electricity/sparkle-island/ |
 | 레몬 백작의 부탁 (lemon-island) | 산과 염기·중화 반응 | 고1 통합과학 | 배포됨 (v1, 2026-09-24) | https://scienceisjo.github.io/science-islands/lemon-island/ |
 
+> 레몬 백작의 부탁은 [겨울쌤의 「레몬 백작의 부탁」 수업](https://m.blog.naver.com/tady52/222403408526)을 바탕으로 구현되었습니다.
+
 ## 폴더 규칙
 
 ```

@@ -25,7 +25,11 @@
         journalTab = -1,
         toastTimer, saveTimer, demo = false,
         talkState = null;
-    const dlgIds = ['welcome', 'dialogue', 'lab', 'journal', 'map', 'settings', 'ending', 'story', 'inventory', 'concept'];
+    const dlgIds = ['welcome', 'dialogue', 'lab', 'journal', 'map', 'settings', 'ending', 'story', 'inventory', 'concept', 'credit'];
+    /* 원안 안내 — 겨울쌤의 「레몬 백작의 부탁」 수업. 기기마다 처음 들어올 때 한 번 뜨고, 표지·아래 글·설정에서 늘 볼 수 있다. */
+    const CREDIT_URL = 'https://m.blog.naver.com/tady52/222403408526',
+        CREDIT_KEY = 'lemon-island-credit-seen-v1';
+    let creditThen = null;
     const labels = ['내가 알아낸 것', '증거와 과학적 이유', '새로운 상황에 적용하기'];
 
     /* ── 기본 도구 ─────────────────────────────────── */
@@ -636,7 +640,7 @@
     }
 
     function openSettings() {
-        $('settingsContent').innerHTML = `<header class="modal-head"><h2 id="settingsTitle">탐험 설정</h2><button class="close" data-close aria-label="설정 닫기">×</button></header><div class="settings-body">${comfort.settingsHTML()}<label class="setting-row"><span>조작·성공 효과음<small>도구, 버튼, 증거 기록과 부탁 해결 소리예요.</small></span><input type="checkbox" data-setting="effects" ${state.effects?'checked':''}></label><label class="setting-row"><span>움직임 줄이기<small>반복 움직임을 줄이고 대사는 한 번에 보여요.</small></span><input type="checkbox" data-setting="calm" ${state.calm?'checked':''}></label><label class="setting-row"><span>탐험 안내</span><select data-setting="mode"><option value="review" ${state.mode==='review'?'selected':''}>복습 탐험</option><option value="beginner" ${state.mode==='beginner'?'selected':''}>첫 탐험 · 문장 도움</option></select></label><label class="setting-row"><span>텐트 등불 색<small>첫 부탁을 해결하면 텐트 옆에 켜져요.</small></span><select data-setting="camp"><option value="lemon" ${state.camp==='lemon'?'selected':''}>레몬빛</option><option value="mint" ${state.camp==='mint'?'selected':''}>민트빛</option><option value="bubble" ${state.camp==='bubble'?'selected':''}>비눗방울빛</option></select></label><div class="notice">방향키·WASD로 걷기 / E로 대화 / J로 일지<br>길을 누르면 걸어가요. 화면 왼쪽 아래 조이스틱도 쓸 수 있어요.</div><details class="teacher-tools"><summary>🧑‍🏫 교사 도구</summary><div class="note class">시연은 학생 진행도와 증거에 저장되지 않아요. 서술형은 자동 채점하지 않아요. 고른 증거가 주장과 맞는지, 입자로 설명한 이유, 새 상황에 대한 판단을 함께 살펴봐 주세요.</div>${M.quests.map(q=>`<button data-action="demo" data-id="${q.id}">${q.id+1}. ${esc(q.name)}</button>`).join('')}<p class="muted">부탁 6개와 필수 기록 3편으로 이루어져요. 한 차시에 부탁 두세 개씩 나누어 진행할 수 있어요.</p></details><div class="action-row"><button data-action="story-replay">이야기 다시 읽기</button><button data-action="export-json">진행 기록 보관</button><button class="danger" data-action="reset">새 탐험 시작</button></div></div>`;
+        $('settingsContent').innerHTML = `<header class="modal-head"><h2 id="settingsTitle">탐험 설정</h2><button class="close" data-close aria-label="설정 닫기">×</button></header><div class="settings-body">${comfort.settingsHTML()}<label class="setting-row"><span>조작·성공 효과음<small>도구, 버튼, 증거 기록과 부탁 해결 소리예요.</small></span><input type="checkbox" data-setting="effects" ${state.effects?'checked':''}></label><label class="setting-row"><span>움직임 줄이기<small>반복 움직임을 줄이고 대사는 한 번에 보여요.</small></span><input type="checkbox" data-setting="calm" ${state.calm?'checked':''}></label><label class="setting-row"><span>탐험 안내</span><select data-setting="mode"><option value="review" ${state.mode==='review'?'selected':''}>복습 탐험</option><option value="beginner" ${state.mode==='beginner'?'selected':''}>첫 탐험 · 문장 도움</option></select></label><label class="setting-row"><span>텐트 등불 색<small>첫 부탁을 해결하면 텐트 옆에 켜져요.</small></span><select data-setting="camp"><option value="lemon" ${state.camp==='lemon'?'selected':''}>레몬빛</option><option value="mint" ${state.camp==='mint'?'selected':''}>민트빛</option><option value="bubble" ${state.camp==='bubble'?'selected':''}>비눗방울빛</option></select></label><div class="notice">방향키·WASD로 걷기 / E로 대화 / J로 일지<br>길을 누르면 걸어가요. 화면 왼쪽 아래 조이스틱도 쓸 수 있어요.</div><details class="teacher-tools"><summary>🧑‍🏫 교사 도구</summary><div class="note class">시연은 학생 진행도와 증거에 저장되지 않아요. 서술형은 자동 채점하지 않아요. 고른 증거가 주장과 맞는지, 입자로 설명한 이유, 새 상황에 대한 판단을 함께 살펴봐 주세요.</div>${M.quests.map(q=>`<button data-action="demo" data-id="${q.id}">${q.id+1}. ${esc(q.name)}</button>`).join('')}<p class="muted">부탁 6개와 필수 기록 3편으로 이루어져요. 한 차시에 부탁 두세 개씩 나누어 진행할 수 있어요.</p></details><div class="notice credit-row">이 페이지는 겨울쌤의 「레몬 백작의 부탁」 수업을 바탕으로 구현되었습니다. <a href="${CREDIT_URL}" target="_blank" rel="noopener">수업 원본 보기 ↗</a></div><div class="action-row"><button data-action="story-replay">이야기 다시 읽기</button><button data-action="credit-open">원안 안내 다시 보기</button><button data-action="export-json">진행 기록 보관</button><button class="danger" data-action="reset">새 탐험 시작</button></div></div>`;
         show('settings');
         comfort.updateAudioUI();
     }
@@ -776,7 +780,7 @@
 
     /* ── 파일 ──────────────────────────────────────── */
     function reportBody() {
-        return `<section class="print-cover"><p>레몬 백작의 부탁 · 산과 염기 탐험일지</p><h1>${disp(state.nickname)}의<br>산과 염기 탐험일지</h1><p>학급 ${esc(state.classCode)||'—'} · 번호 ${esc(state.number)||'—'}<br>${state.mode==='beginner'?'첫 탐험':'복습 탐험'} · 부탁 ${state.completed.length}/${QN} 해결</p><p>관찰 → 증거 → 입자로 설명한 이유 → 새로운 적용</p><p class="print-footer">${M.ready(state)?'완성한 탐험일지':'작성 중인 탐험일지'} · ${new Date().toLocaleDateString('ko-KR',{timeZone:'Asia/Seoul'})}<br>© 2026 조승재(과학이조선생) · 해누리중학교</p></section>${M.entries.map((e,i)=>{const recs=e.quests.flatMap(q=>state.evidence[q].map(r=>[r,q]));const figs=recs.map(([r,q])=>figureOf(r,q)).filter(Boolean).slice(-2);return `<section class="print-page"><h2>${i+1}. ${esc(e.title)}</h2><p>${esc(e.story)}</p><div class="evidence"><b>내가 남긴 실험 증거</b>${recs.length?recs.map(([r])=>`<div>${esc(evidenceText(r))}</div>`).join(''):'<p>아직 기록하지 않았어요.</p>'}${figs.join('')}</div>${e.quests.filter(q=>state.predictions[q]).map(q=>`<p class="print-footer">처음 예상 · ${esc(state.predictions[q])}</p>`).join('')}${labels.map((l,j)=>`<article><h3>${esc(e.labels?.[j]||l)}</h3><p class="print-footer">${esc(e.questions[j])}</p><p>${disp(state.notes[i][j])||'아직 작성하지 않았어요.'}</p></article>`).join('')}</section>`;}).join('')}<section class="print-page"><h2>산과 염기, 무엇이 달랐을까</h2>${summaryTable()}${state.evidence[0].length?`<h3>처음 관찰 · 새콤의 즙</h3><div class="evidence">${state.evidence[0].map(e=>`<div>${esc(evidenceText(e))}</div>`).join('')}</div>`:''}<p class="print-footer">작성한 설명은 학생의 기록입니다. 자동 채점하거나 대신 작성하지 않았습니다.</p></section>`;
+        return `<section class="print-cover"><p>레몬 백작의 부탁 · 산과 염기 탐험일지</p><h1>${disp(state.nickname)}의<br>산과 염기 탐험일지</h1><p>학급 ${esc(state.classCode)||'—'} · 번호 ${esc(state.number)||'—'}<br>${state.mode==='beginner'?'첫 탐험':'복습 탐험'} · 부탁 ${state.completed.length}/${QN} 해결</p><p>관찰 → 증거 → 입자로 설명한 이유 → 새로운 적용</p><p class="print-footer">이 탐험은 겨울쌤의 「레몬 백작의 부탁」 수업을 바탕으로 구현되었습니다 · ${CREDIT_URL}</p><p class="print-footer">${M.ready(state)?'완성한 탐험일지':'작성 중인 탐험일지'} · ${new Date().toLocaleDateString('ko-KR',{timeZone:'Asia/Seoul'})}<br>© 2026 조승재(과학이조선생) · 해누리중학교</p></section>${M.entries.map((e,i)=>{const recs=e.quests.flatMap(q=>state.evidence[q].map(r=>[r,q]));const figs=recs.map(([r,q])=>figureOf(r,q)).filter(Boolean).slice(-2);return `<section class="print-page"><h2>${i+1}. ${esc(e.title)}</h2><p>${esc(e.story)}</p><div class="evidence"><b>내가 남긴 실험 증거</b>${recs.length?recs.map(([r])=>`<div>${esc(evidenceText(r))}</div>`).join(''):'<p>아직 기록하지 않았어요.</p>'}${figs.join('')}</div>${e.quests.filter(q=>state.predictions[q]).map(q=>`<p class="print-footer">처음 예상 · ${esc(state.predictions[q])}</p>`).join('')}${labels.map((l,j)=>`<article><h3>${esc(e.labels?.[j]||l)}</h3><p class="print-footer">${esc(e.questions[j])}</p><p>${disp(state.notes[i][j])||'아직 작성하지 않았어요.'}</p></article>`).join('')}</section>`;}).join('')}<section class="print-page"><h2>산과 염기, 무엇이 달랐을까</h2>${summaryTable()}${state.evidence[0].length?`<h3>처음 관찰 · 새콤의 즙</h3><div class="evidence">${state.evidence[0].map(e=>`<div>${esc(evidenceText(e))}</div>`).join('')}</div>`:''}<p class="print-footer">작성한 설명은 학생의 기록입니다. 자동 채점하거나 대신 작성하지 않았습니다.</p></section>`;
     }
 
     function download(name, data, mime) {
@@ -853,6 +857,13 @@
                     talkState.index++;
                     renderTalk();
                 }
+                break;
+            case 'credit-close':
+                close('credit');
+                break;
+            case 'credit-open':
+                creditThen = null;
+                show('credit');
                 break;
             case 'talk-close':
                 close('dialogue');
@@ -1235,6 +1246,25 @@
         }
     updateHud();
     drawMap($('miniMap'));
-    if (!state.started) show('welcome');
-    else pause();
+    const startFlow = () => {
+        if (!state.started) show('welcome');
+        else pause();
+    };
+    $('credit').addEventListener('close', () => {
+        try {
+            localStorage.setItem(CREDIT_KEY, '1');
+        } catch {}
+        const then = creditThen;
+        creditThen = null;
+        if (then) then();
+    });
+    let creditSeen = false;
+    try {
+        creditSeen = localStorage.getItem(CREDIT_KEY) === '1';
+    } catch {}
+    if (creditSeen) startFlow();
+    else {
+        creditThen = startFlow;
+        show('credit');
+    }
 })();
