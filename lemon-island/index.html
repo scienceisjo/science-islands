@@ -231,6 +231,49 @@ span.tool-btn{cursor:default}
 #lab .npc-quip b{font-size:clamp(12px,.85vw,15px)}
 #lab .npc-quip-face{width:clamp(44px,3.4vw,56px);height:clamp(44px,3.4vw,56px);font-size:clamp(24px,1.8vw,30px)}
 }
+
+/* 2026-09-25 · 이야기와 인물 삽화 (이 섬에만 적용) */
+.story-illustration{position:relative;height:auto;aspect-ratio:2/1;background:#f2e4c5}
+.story-illustration>img,.story-art-fallback{position:absolute;inset:0;display:block;width:100%;height:100%}
+.story-illustration>img{object-fit:cover;object-position:center 45%}
+.story-art-fallback>svg{width:100%;height:100%}
+.character-portrait{position:relative;display:block;flex:none;overflow:hidden;background:#f7edce;border:1px solid #e5d6aa;border-radius:18px;isolation:isolate}
+.character-portrait .portrait-fallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:60px}
+.character-portrait>img{position:relative;display:block;width:100%;height:100%;object-fit:cover;object-position:center 30%}
+#dialogue{max-width:900px;padding:24px;margin-bottom:clamp(18px,5vh,60px);overflow:auto}
+.illustrated-dialogue{display:grid;grid-template-columns:190px minmax(0,1fr);gap:24px;align-items:start}
+.dialogue-portrait{width:100%;aspect-ratio:3/4}
+.dialogue-copy{min-width:0;padding-top:7px}
+#dialogue .dialogue-name{margin:0 32px 13px 0;padding:8px 14px;gap:8px;transform:none;flex-wrap:wrap}
+#dialogue .dialogue-name>span{font-size:20px}
+#dialogue .dialogue-role{margin-left:0}
+#dialogue .dialogue-text{margin:0 0 20px;font-size:18px;line-height:1.85;overflow-wrap:anywhere}
+#dialogue .dialogue-footer{flex-wrap:wrap;gap:10px}
+#dialogue .dialogue-footer small{color:#74765e}
+#dialogue .dialogue-footer button{min-height:44px}
+#dialogue .close{z-index:2}
+#lab .character-portrait.npc-quip-face{width:64px;height:76px;border-radius:14px}
+#lab .npc-quip-face .portrait-fallback{font-size:30px}
+#lab .npc-quip-face>img{object-position:center 24%}
+@media(max-width:600px){
+ .story-illustration{height:auto;aspect-ratio:3/2}
+ .story-illustration>img{object-position:center}
+ #dialogue{width:calc(100% - 24px);padding:18px;margin-bottom:18px;max-height:calc(100dvh - 36px)}
+ .illustrated-dialogue{grid-template-columns:84px minmax(0,1fr);gap:14px}
+ .dialogue-portrait{grid-column:1;grid-row:1;border-radius:13px}
+ .dialogue-copy{display:contents}
+ #dialogue .dialogue-name{grid-column:2;grid-row:1;align-self:center;justify-self:start;display:flex;gap:5px 7px;padding:8px 10px;margin:0 22px 0 0;font-size:15px}
+ #dialogue .dialogue-role{flex-basis:100%;font-size:11px}
+ #dialogue .dialogue-text{grid-column:1/-1;margin:0;font-size:16px;line-height:1.8}
+ .dialogue-copy>.notice,.dialogue-copy>.dialogue-tools,#dialogue .dialogue-footer{grid-column:1/-1;margin:0}
+ #dialogue .dialogue-footer button{padding:11px 15px}
+ #lab .character-portrait.npc-quip-face{width:52px;height:64px}
+}
+@media(max-height:560px) and (min-width:601px){
+ #dialogue{margin-bottom:12px;max-height:calc(100dvh - 24px);padding:18px}
+ .illustrated-dialogue{grid-template-columns:125px minmax(0,1fr);gap:18px}
+ .story-illustration{height:190px;aspect-ratio:auto}
+}
 </style>
 </head>
 <body>
@@ -250,7 +293,7 @@ span.tool-btn{cursor:default}
  <div id="joystick" aria-label="터치 이동 조이스틱"><div></div></div>
  <div id="toast" class="toast" role="status" aria-live="polite"></div>
  <div id="saveStatus" class="save-status">기기에 저장됨</div>
- <footer id="app-credit">© 2026 조승재(과학이조선생) · 해누리중학교 · 원안: <a href="https://m.blog.naver.com/tady52/222403408526" target="_blank" rel="noopener">겨울쌤 「레몬 백작의 부탁」 수업</a> · 2026.09.24</footer>
+ <footer id="app-credit">© 2026 조승재(과학이조선생) · 해누리중학교 · 원안: <a href="https://m.blog.naver.com/tady52/222403408526" target="_blank" rel="noopener">겨울쌤 「레몬 백작의 부탁」 수업</a> · 2026.09.25</footer>
 </main>
 <dialog id="welcome" class="welcome-dialog" aria-labelledby="welcomeTitle"><section id="coverPanel"><div class="cover-art" aria-hidden="true"><svg viewBox="0 0 1080 600" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="coverSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#241e44"/><stop offset=".52" stop-color="#7a4f86"/><stop offset="1" stop-color="#f1a45e"/></linearGradient><radialGradient id="coverMoon"><stop offset="0" stop-color="#fff6c8"/><stop offset=".6" stop-color="#ffe38a"/><stop offset="1" stop-color="#ffe38a" stop-opacity="0"/></radialGradient><radialGradient id="coverBubble" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#ffffff" stop-opacity=".55"/><stop offset=".5" stop-color="#cfefff" stop-opacity=".12"/><stop offset="1" stop-color="#b9a6ff" stop-opacity=".3"/></radialGradient></defs><rect width="1080" height="600" fill="url(#coverSky)"/><g fill="#fff8d8" opacity=".75"><circle cx="560" cy="60" r="2"/><circle cx="640" cy="120" r="1.6"/><circle cx="720" cy="44" r="2.2"/><circle cx="820" cy="90" r="1.4"/><circle cx="1010" cy="60" r="2"/><circle cx="600" cy="190" r="1.3"/><circle cx="960" cy="200" r="1.6"/></g><circle cx="905" cy="125" r="120" fill="url(#coverMoon)" opacity=".55"/><circle cx="905" cy="125" r="52" fill="#ffe9a0"/><path d="M0 420 Q220 360 470 400 T1080 380 V600 H0 Z" fill="#4f6d57" opacity=".7"/><g transform="translate(790 250)"><rect x="-95" y="80" width="190" height="150" fill="#f6e7bd"/><rect x="-108" y="228" width="216" height="14" fill="#d9c28a"/><rect x="-135" y="40" width="46" height="190" fill="#f3dea6"/><rect x="89" y="40" width="46" height="190" fill="#f3dea6"/><ellipse cx="-112" cy="26" rx="34" ry="44" fill="#f5cf3a"/><path d="M-112 -18 l-7 -16 h14 z" fill="#e0b52a"/><ellipse cx="112" cy="26" rx="34" ry="44" fill="#f5cf3a"/><path d="M112 -18 l-7 -16 h14 z" fill="#e0b52a"/><ellipse cx="0" cy="44" rx="62" ry="72" fill="#f7d543"/><path d="M0 -28 l-9 -20 h18 z" fill="#e0b52a"/><ellipse cx="20" cy="-40" rx="16" ry="6" fill="#5fa54a" transform="rotate(-24 20 -40)"/><g fill="#ffe3a4"><rect x="-60" y="120" width="22" height="34" rx="4"/><rect x="-12" y="120" width="22" height="34" rx="4"/><rect x="38" y="120" width="22" height="34" rx="4"/><rect x="-122" y="100" width="18" height="28" rx="4"/><rect x="104" y="100" width="18" height="28" rx="4"/></g><rect x="-20" y="170" width="40" height="60" rx="18" fill="#7a5a3a"/><path d="M-112 -34 v-26" stroke="#8a6a4a" stroke-width="3"/><path d="M-112 -60 h26 v16 h-26" fill="#e8643c"/><path d="M112 -34 v-26" stroke="#8a6a4a" stroke-width="3"/><path d="M112 -60 h26 v16 h-26" fill="#3f9fb2"/></g><path d="M0 470 Q260 430 540 468 T1080 452 V600 H0 Z" fill="#d8c25a"/><path d="M0 520 Q300 490 600 520 T1080 505 V600 H0 Z" fill="#c7ab46"/><g><g transform="translate(610 440)"><rect x="-6" y="0" width="12" height="46" fill="#9a6c43"/><circle cx="0" cy="-12" r="34" fill="#f9e48f"/><circle cx="-22" cy="4" r="22" fill="#fff0b8"/><circle cx="22" cy="2" r="24" fill="#fff0b8"/><ellipse cx="-14" cy="-6" rx="7" ry="9" fill="#f2b400"/><ellipse cx="16" cy="-18" rx="7" ry="9" fill="#f2b400"/><ellipse cx="4" cy="10" rx="7" ry="9" fill="#f2b400"/></g><g transform="translate(1000 452) scale(.85)"><rect x="-6" y="0" width="12" height="46" fill="#9a6c43"/><circle cx="0" cy="-12" r="34" fill="#f9e48f"/><circle cx="-22" cy="4" r="22" fill="#fff0b8"/><circle cx="22" cy="2" r="24" fill="#fff0b8"/><ellipse cx="-14" cy="-6" rx="7" ry="9" fill="#f2b400"/><ellipse cx="16" cy="-18" rx="7" ry="9" fill="#f2b400"/></g></g><g transform="translate(700 500)"><rect x="-16" y="10" width="32" height="46" rx="12" fill="#46365a"/><ellipse cx="0" cy="-12" rx="24" ry="30" fill="#f4cf2f"/><path d="M0 -42 l-5 -12 h10 z" fill="#f4cf2f"/><rect x="-12" y="-54" width="24" height="8" rx="3" fill="#e3b53f"/><circle cx="-8" cy="-14" r="3" fill="#2f332c"/><circle cx="8" cy="-14" r="3" fill="#2f332c"/></g><g transform="translate(748 520) scale(.7)"><rect x="-16" y="10" width="32" height="40" rx="12" fill="#f2a54a"/><ellipse cx="0" cy="-10" rx="24" ry="28" fill="#d8d3a6"/><ellipse cx="12" cy="-40" rx="10" ry="4" fill="#5fa54a" transform="rotate(-20 12 -40)"/><circle cx="-8" cy="-12" r="3" fill="#2f332c"/><circle cx="8" cy="-12" r="3" fill="#2f332c"/></g><g stroke="#e4f6ff" stroke-width="2.5" fill="url(#coverBubble)"><circle cx="1030" cy="330" r="28"/><circle cx="975" cy="275" r="17"/><circle cx="1050" cy="230" r="13"/><circle cx="930" cy="360" r="12"/><circle cx="1000" cy="410" r="20"/><circle cx="880" cy="300" r="9"/></g></svg></div><div class="cover-copy"><div class="eyebrow">놀러오세요 과학의 섬 · 산과 염기</div><h1>레몬 백작의<br>부탁</h1><p>경계 마을 아이들이 시들어 가요.<br>두 연구자의 조수가 되어 산과 염기의 정체를 밝히고,<br>한 권의 탐험일지를 완성해요.</p><button class="primary" data-action="story-begin">편지 이야기 시작 →</button><button class="text-button" data-action="import">저장한 일지 가져오기</button><p class="visit-line" id="visitLine" hidden aria-live="polite"></p><p class="cover-credit">원안 · <a href="https://m.blog.naver.com/tady52/222403408526" target="_blank" rel="noopener">겨울쌤의 「레몬 백작의 부탁」 수업 ↗</a></p></div></section><form id="startForm" hidden><div class="eyebrow">레몬 왕국에서 온 편지</div><h1 id="welcomeTitle">아이들을<br>구해 주게!</h1><p>실험으로 원인을 찾고, 증거로 설명해요.<br>나의 발견은 한 권의 탐험일지가 돼요.</p><label class="input-label" for="nickname">탐험가 이름 <small>별명을 사용해요</small></label><input id="nickname" name="nickname" maxlength="20" value="새싹" autocomplete="off"><fieldset class="mode-options"><legend>어떤 탐험을 시작할까요?</legend><label><input type="radio" name="mode" value="review" checked><span><b>복습 탐험</b><small>배운 내용을 써 봐요</small></span></label><label><input type="radio" name="mode" value="beginner"><span><b>첫 탐험</b><small>문장 도움을 받아요</small></span></label></fieldset><p class="required-note">✎ 필수 기록 3편을 쓰고 서명하면 비눗방울 축제가 열려요.</p><label class="music-start"><input type="checkbox" id="startMusic" checked> 배경음악과 함께 시작</label><button class="primary full" type="submit">레몬 성에 들어가기 <span>→</span></button><button type="button" class="text-button full" data-action="import">저장한 탐험일지 가져오기</button></form></dialog>
 <dialog id="dialogue" class="dialogue-dialog" aria-labelledby="npcName"><button class="close" data-close aria-label="대화 닫기">×</button><div id="dialogueContent"></div></dialog>
@@ -6732,6 +6775,20 @@ window.ISLAND_APP = 'lemon-island';</script>
         document.body.classList.toggle('calm', state.calm);
     }
 
+    /* 이야기 삽화와 대화 초상화. 이미지가 없어도 기존 그림·대사로 진행한다. */
+    const storyPictures = ['story-invitation', 'story-village', 'story-research', 'story-records'];
+    const storyPictureAlts = [
+        '노을 진 레몬 성 앞에서 초대장을 건네는 레몬 백작',
+        '보라색 경계 마을에서 기운 없는 레몬 아이들을 돌보는 보라 이장',
+        '연구실에서 도구와 공책을 살피는 에시드 박사와 베이스 박사',
+        '세 권의 연구 기록 너머로 비눗방울 축제를 준비하는 마을 주민들'
+    ];
+    const portraitPictures = ['portrait-count', 'portrait-acid', 'portrait-base', 'portrait-mayor', 'portrait-saekom'];
+    function portraitHTML(c, extraClass = '') {
+        const picture = c.id === 4 && state.completed.includes(5) ? 'portrait-saekom-well' : portraitPictures[c.id];
+        return `<span class="character-portrait ${extraClass}" aria-hidden="true"><span class="portrait-fallback">${c.icon}</span><img src="art/${picture}.webp" width="768" height="1024" alt="" decoding="async" onerror="this.remove()"></span>`;
+    }
+
     /* ── 대화: 여러 줄을 한 줄씩, 마지막 줄에 할 일 단추 ── */
     function talk(lines, buttons = '', notice = '') {
         talkState = {
@@ -6751,7 +6808,7 @@ window.ISLAND_APP = 'lemon-island';</script>
         const [who, text] = t.lines[t.index],
             c = M.cast[who],
             last = t.index === t.lines.length - 1;
-        $('dialogueContent').innerHTML = `<div class="dialogue-name" id="npcName"><span>${c.icon}</span>${esc(c.name)}<small class="dialogue-role">${esc(c.role)}</small></div><p class="dialogue-text">${esc(text)}</p>${last&&t.notice?`<div class="notice">${t.notice}</div>`:''}<div class="dialogue-footer"><small>${t.lines.length>1?(t.index+1)+' / '+t.lines.length:esc(c.role)}</small>${last?(t.buttons||'<button class="primary" data-action="talk-close">알겠어요</button>'):'<button class="primary" data-action="talk-next">다음 ▸</button>'}</div>`;
+        $('dialogueContent').innerHTML = `<div class="illustrated-dialogue">${portraitHTML(c, 'dialogue-portrait')}<div class="dialogue-copy"><div class="dialogue-name" id="npcName"><span>${c.icon}</span>${esc(c.name)}<small class="dialogue-role">${esc(c.role)}</small></div><p class="dialogue-text">${esc(text)}</p>${last&&t.notice?`<div class="notice">${t.notice}</div>`:''}<div class="dialogue-footer"><small>${t.lines.length>1?(t.index+1)+' / '+t.lines.length:esc(c.role)}</small>${last?(t.buttons||'<button class="primary" data-action="talk-close">알겠어요</button>'):'<button class="primary" data-action="talk-next">다음 ▸</button>'}</div></div></div>`;
         if (start || $('dialogue').open) {
             comfort.startTalk(c.voice);
             $('dialogueContent').querySelector('.dialogue-footer .primary')?.focus({
@@ -6877,7 +6934,7 @@ window.ISLAND_APP = 'lemon-island';</script>
         const q = sim.quip,
             c = q && M.cast[q[0]];
         if (!c) return '';
-        return `<div class="npc-quip" role="status"><span class="npc-quip-face" aria-hidden="true">${c.icon}</span><p><b>${esc(c.name)}</b>${esc(q[1])}</p></div>`;
+        return `<div class="npc-quip" role="status">${portraitHTML(c, 'npc-quip-face')}<p><b>${esc(c.name)}</b>${esc(q[1])}</p></div>`;
     }
 
     function gateHTML(t) {
@@ -7345,7 +7402,7 @@ window.ISLAND_APP = 'lemon-island';</script>
 
     function renderStory() {
         const p = storyPages[storyPage];
-        $('storyContent').innerHTML = `<div class="story-art story-svg">${storyArt(storyPage)}</div><section class="story-caption"><div class="eyebrow">${esc(p.tag)} · ${storyPage+1}/4</div><h2 id="storyTitle">${esc(p.title)}</h2><p>${esc(p.text)}</p><div class="story-dots" aria-label="이야기 ${storyPage+1}장">${storyPages.map((_,i)=>`<i class="${i===storyPage?'active':''}"></i>`).join('')}</div><div class="action-row"><button data-action="story-back" ${storyPage===0?'disabled':''}>← 이전</button><button class="primary" data-action="story-next">${storyPage===3?(storyReplay?'이야기 닫기':'나의 탐험 준비하기 →'):'다음 이야기 →'}</button></div></section>`;
+        $('storyContent').innerHTML = `<div class="story-art story-svg story-illustration"><div class="story-art-fallback" aria-hidden="true">${storyArt(storyPage)}</div><img src="art/${storyPictures[storyPage]}.webp" alt="${esc(storyPictureAlts[storyPage])}" width="1536" height="1024" decoding="async" onerror="this.previousElementSibling.removeAttribute('aria-hidden');this.remove()"></div><section class="story-caption"><div class="eyebrow">${esc(p.tag)} · ${storyPage+1}/4</div><h2 id="storyTitle">${esc(p.title)}</h2><p>${esc(p.text)}</p><div class="story-dots" aria-label="이야기 ${storyPage+1}장">${storyPages.map((_,i)=>`<i class="${i===storyPage?'active':''}"></i>`).join('')}</div><div class="action-row"><button data-action="story-back" ${storyPage===0?'disabled':''}>← 이전</button><button class="primary" data-action="story-next">${storyPage===3?(storyReplay?'이야기 닫기':'나의 탐험 준비하기 →'):'다음 이야기 →'}</button></div></section>`;
     }
 
     function nextStory() {

@@ -266,6 +266,20 @@
         document.body.classList.toggle('calm', state.calm);
     }
 
+    /* 이야기 삽화와 대화 초상화. 이미지가 없어도 기존 그림·대사로 진행한다. */
+    const storyPictures = ['story-invitation', 'story-village', 'story-research', 'story-records'];
+    const storyPictureAlts = [
+        '노을 진 레몬 성 앞에서 초대장을 건네는 레몬 백작',
+        '보라색 경계 마을에서 기운 없는 레몬 아이들을 돌보는 보라 이장',
+        '연구실에서 도구와 공책을 살피는 에시드 박사와 베이스 박사',
+        '세 권의 연구 기록 너머로 비눗방울 축제를 준비하는 마을 주민들'
+    ];
+    const portraitPictures = ['portrait-count', 'portrait-acid', 'portrait-base', 'portrait-mayor', 'portrait-saekom'];
+    function portraitHTML(c, extraClass = '') {
+        const picture = c.id === 4 && state.completed.includes(5) ? 'portrait-saekom-well' : portraitPictures[c.id];
+        return `<span class="character-portrait ${extraClass}" aria-hidden="true"><span class="portrait-fallback">${c.icon}</span><img src="art/${picture}.webp" width="768" height="1024" alt="" decoding="async" onerror="this.remove()"></span>`;
+    }
+
     /* ── 대화: 여러 줄을 한 줄씩, 마지막 줄에 할 일 단추 ── */
     function talk(lines, buttons = '', notice = '') {
         talkState = {
@@ -285,7 +299,7 @@
         const [who, text] = t.lines[t.index],
             c = M.cast[who],
             last = t.index === t.lines.length - 1;
-        $('dialogueContent').innerHTML = `<div class="dialogue-name" id="npcName"><span>${c.icon}</span>${esc(c.name)}<small class="dialogue-role">${esc(c.role)}</small></div><p class="dialogue-text">${esc(text)}</p>${last&&t.notice?`<div class="notice">${t.notice}</div>`:''}<div class="dialogue-footer"><small>${t.lines.length>1?(t.index+1)+' / '+t.lines.length:esc(c.role)}</small>${last?(t.buttons||'<button class="primary" data-action="talk-close">알겠어요</button>'):'<button class="primary" data-action="talk-next">다음 ▸</button>'}</div>`;
+        $('dialogueContent').innerHTML = `<div class="illustrated-dialogue">${portraitHTML(c, 'dialogue-portrait')}<div class="dialogue-copy"><div class="dialogue-name" id="npcName"><span>${c.icon}</span>${esc(c.name)}<small class="dialogue-role">${esc(c.role)}</small></div><p class="dialogue-text">${esc(text)}</p>${last&&t.notice?`<div class="notice">${t.notice}</div>`:''}<div class="dialogue-footer"><small>${t.lines.length>1?(t.index+1)+' / '+t.lines.length:esc(c.role)}</small>${last?(t.buttons||'<button class="primary" data-action="talk-close">알겠어요</button>'):'<button class="primary" data-action="talk-next">다음 ▸</button>'}</div></div></div>`;
         if (start || $('dialogue').open) {
             comfort.startTalk(c.voice);
             $('dialogueContent').querySelector('.dialogue-footer .primary')?.focus({
@@ -411,7 +425,7 @@
         const q = sim.quip,
             c = q && M.cast[q[0]];
         if (!c) return '';
-        return `<div class="npc-quip" role="status"><span class="npc-quip-face" aria-hidden="true">${c.icon}</span><p><b>${esc(c.name)}</b>${esc(q[1])}</p></div>`;
+        return `<div class="npc-quip" role="status">${portraitHTML(c, 'npc-quip-face')}<p><b>${esc(c.name)}</b>${esc(q[1])}</p></div>`;
     }
 
     function gateHTML(t) {
@@ -879,7 +893,7 @@
 
     function renderStory() {
         const p = storyPages[storyPage];
-        $('storyContent').innerHTML = `<div class="story-art story-svg">${storyArt(storyPage)}</div><section class="story-caption"><div class="eyebrow">${esc(p.tag)} · ${storyPage+1}/4</div><h2 id="storyTitle">${esc(p.title)}</h2><p>${esc(p.text)}</p><div class="story-dots" aria-label="이야기 ${storyPage+1}장">${storyPages.map((_,i)=>`<i class="${i===storyPage?'active':''}"></i>`).join('')}</div><div class="action-row"><button data-action="story-back" ${storyPage===0?'disabled':''}>← 이전</button><button class="primary" data-action="story-next">${storyPage===3?(storyReplay?'이야기 닫기':'나의 탐험 준비하기 →'):'다음 이야기 →'}</button></div></section>`;
+        $('storyContent').innerHTML = `<div class="story-art story-svg story-illustration"><div class="story-art-fallback" aria-hidden="true">${storyArt(storyPage)}</div><img src="art/${storyPictures[storyPage]}.webp" alt="${esc(storyPictureAlts[storyPage])}" width="1536" height="1024" decoding="async" onerror="this.previousElementSibling.removeAttribute('aria-hidden');this.remove()"></div><section class="story-caption"><div class="eyebrow">${esc(p.tag)} · ${storyPage+1}/4</div><h2 id="storyTitle">${esc(p.title)}</h2><p>${esc(p.text)}</p><div class="story-dots" aria-label="이야기 ${storyPage+1}장">${storyPages.map((_,i)=>`<i class="${i===storyPage?'active':''}"></i>`).join('')}</div><div class="action-row"><button data-action="story-back" ${storyPage===0?'disabled':''}>← 이전</button><button class="primary" data-action="story-next">${storyPage===3?(storyReplay?'이야기 닫기':'나의 탐험 준비하기 →'):'다음 이야기 →'}</button></div></section>`;
     }
 
     function nextStory() {
